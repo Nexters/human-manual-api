@@ -4,25 +4,9 @@ from pakit.domain.assessment import (
     Classification,
     MbtiType,
 )
+from pakit.domain.characters import NOUNS as CHARACTER_NOUNS
 
-NOUNS: dict[MbtiType, str] = {
-    MbtiType.INTJ: "큐브",
-    MbtiType.ISTJ: "로봇",
-    MbtiType.ENTJ: "불도저",
-    MbtiType.ESTJ: "헬리콥터",
-    MbtiType.INFJ: "비밀상자",
-    MbtiType.ISFJ: "테디베어",
-    MbtiType.ENFJ: "기차",
-    MbtiType.ESFJ: "티포트",
-    MbtiType.INFP: "쿠크다스",
-    MbtiType.ISFP: "침대",
-    MbtiType.ENFP: "연",
-    MbtiType.ESFP: "실로폰",
-    MbtiType.INTP: "망원경",
-    MbtiType.ISTP: "공구함",
-    MbtiType.ENTP: "팽이",
-    MbtiType.ESTP: "RC카",
-}
+NOUNS = CHARACTER_NOUNS
 
 # PRD 07의 문구 후보이며, 형용사 확정 시 콘텐츠 저장소로 이동할 대상이다.
 DESCRIPTORS: dict[tuple[str, str], str] = {

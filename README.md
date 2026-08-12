@@ -42,7 +42,14 @@ src/pakit/
 조합하는 최소 수직 슬라이스입니다. MBTI별 캐릭터 명사는 최종 디자인 에셋과 동일하게
 확정되었으며, 아직 미확정인 형용사 문구는 응답의 `provisional`로 명시합니다.
 
+프론트엔드는 완료된 22개 답변과 MBTI 퍼센트를
+`POST /api/v1/assessments/submissions`로 제출할 수 있습니다. 현재 응답은 MBTI별 최종
+캐릭터를 사용하되, 채점 규칙과 결과 카피가 확정되기 전까지 `mode: "mock"`으로 반환합니다.
+
 상세 결정 사항과 다음 구현 순서는 [`docs/architecture.md`](./docs/architecture.md)를 참고하세요.
+22개 문항의 기계 판독 가능한 ID 목록은
+[`docs/assessment-identifiers.v1.json`](./docs/assessment-identifiers.v1.json)에 있습니다.
+실행 가능한 요청·응답 명세와 예시는 서버 실행 후 `/docs`의 Swagger에서 확인할 수 있습니다.
 
 ## Codex로 작업하기
 

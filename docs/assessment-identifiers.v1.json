@@ -1,0 +1,158 @@
+{
+  "assessment_version": "2026-08-12.1",
+  "identifier_status": "published",
+  "id_policy": {
+    "question_id": "step{number}.q{two_digit_order}",
+    "option_id": "lower_snake_case",
+    "immutable_after_publish": true,
+    "display_copy_is_not_an_identifier": true
+  },
+  "mbti_input": {
+    "type": "axis_scores",
+    "allowed_values": [0, 20, 40, 60, 80, 100],
+    "axes": [
+      {"score_key": "introversion", "left_pole": "E", "right_pole": "I"},
+      {"score_key": "intuition", "left_pole": "S", "right_pole": "N"},
+      {"score_key": "feeling", "left_pole": "T", "right_pole": "F"},
+      {"score_key": "perceiving", "left_pole": "J", "right_pole": "P"}
+    ]
+  },
+  "questions": [
+    {
+      "question_id": "step1.q01",
+      "answer_kind": "choice",
+      "option_ids": ["restaurant", "worries", "hangout", "information"]
+    },
+    {
+      "question_id": "step1.q02",
+      "answer_kind": "choice",
+      "option_ids": [
+        "navigation",
+        "lift_mood",
+        "planning",
+        "reacting",
+        "mediate_conflict",
+        "choose_gift"
+      ]
+    },
+    {
+      "question_id": "step1.q03",
+      "answer_kind": "choice",
+      "option_ids": [
+        "save_favorites",
+        "multiple_alarms",
+        "duplicate_clothes",
+        "check_spoilers"
+      ]
+    },
+    {
+      "question_id": "step1.q04",
+      "answer_kind": "choice",
+      "option_ids": [
+        "phone_overuse",
+        "sleep_late",
+        "overspending",
+        "slow_reply",
+        "messy_room",
+        "low_battery"
+      ]
+    },
+    {
+      "question_id": "step1.q05",
+      "answer_kind": "choice",
+      "option_ids": ["after_waking", "during_meal", "after_work", "late_night"]
+    },
+    {
+      "question_id": "step1.q06",
+      "answer_kind": "choice",
+      "option_ids": ["rush", "interrupt", "take_food", "arrive_late", "nag", "change_plan"]
+    },
+    {
+      "question_id": "step1.q07",
+      "answer_kind": "choice",
+      "option_ids": [
+        "sleep_until_noon",
+        "morning_run",
+        "brunch_cafe",
+        "stay_in_bed",
+        "watch_streaming",
+        "self_development"
+      ]
+    },
+    {
+      "question_id": "step1.q08",
+      "answer_kind": "choice",
+      "option_ids": ["go_to_bed", "contact_others", "eat_alone", "go_for_drive"]
+    },
+    {
+      "question_id": "step1.q09",
+      "answer_kind": "choice",
+      "option_ids": ["tsundere", "planner", "meme_addict", "foodie"]
+    },
+    {
+      "question_id": "step1.q10",
+      "answer_kind": "choice",
+      "option_ids": ["morning_person", "no_plan", "photo_obsessed", "hates_walking"]
+    },
+    {
+      "question_id": "step2.q01",
+      "answer_kind": "choice",
+      "option_ids": ["inspect_profile", "approach_directly"]
+    },
+    {
+      "question_id": "step2.q02",
+      "answer_kind": "choice",
+      "option_ids": ["hint_and_wait", "resolve_immediately"]
+    },
+    {
+      "question_id": "step2.q03",
+      "answer_kind": "choice",
+      "option_ids": ["rehearse_with_ai", "send_immediately"]
+    },
+    {
+      "question_id": "step2.q04",
+      "answer_kind": "scale",
+      "constraints": {"status": "pending"}
+    },
+    {
+      "question_id": "step2.q05",
+      "answer_kind": "choice",
+      "option_ids": ["share_everything", "share_selectively"]
+    },
+    {
+      "question_id": "step2.q06",
+      "answer_kind": "integer",
+      "constraints": {"status": "pending"}
+    },
+    {
+      "question_id": "step2.q07",
+      "answer_kind": "choice",
+      "option_ids": ["decorate_for_mood", "essentials_only"]
+    },
+    {
+      "question_id": "step2.q08",
+      "answer_kind": "choice",
+      "option_ids": ["express_with_words", "express_with_actions"]
+    },
+    {
+      "question_id": "step2.q09",
+      "answer_kind": "choice",
+      "option_ids": ["ruminate", "forget_quickly"]
+    },
+    {
+      "question_id": "step2.q10",
+      "answer_kind": "choice",
+      "option_ids": ["order_familiar_menu", "try_new_menu"]
+    },
+    {
+      "question_id": "step2.q11",
+      "answer_kind": "choice",
+      "option_ids": ["order_familiar_stores", "try_new_store"]
+    },
+    {
+      "question_id": "step2.q12",
+      "answer_kind": "action",
+      "action_ids": ["press", "skip"]
+    }
+  ]
+}

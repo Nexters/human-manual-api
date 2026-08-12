@@ -13,6 +13,17 @@ def create_app() -> FastAPI:
         title=settings.app_name,
         version=__version__,
         debug=settings.debug,
+        openapi_tags=[
+            {
+                "name": "테스트",
+                "description": (
+                    "'나 사용 설명서' 테스트의 답변 제출, 검증, 결과 분류 API입니다. "
+                    "문항과 선택지의 고정 ID는 "
+                    "`docs/assessment-identifiers.v1.json`을 기준으로 사용합니다."
+                ),
+            },
+            {"name": "system", "description": "서버 상태 확인 API입니다."},
+        ],
     )
     application.add_middleware(
         CORSMiddleware,
