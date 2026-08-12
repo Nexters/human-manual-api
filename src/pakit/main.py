@@ -23,6 +23,10 @@ def create_app() -> FastAPI:
                     "`docs/assessment-identifiers.v1.json`을 기준으로 사용합니다."
                 ),
             },
+            {
+                "name": "Compatibility",
+                "description": "두 테스트 결과를 비교하는 친구 궁합 API입니다.",
+            },
             {"name": "system", "description": "서버 상태 확인 API입니다."},
         ],
     )

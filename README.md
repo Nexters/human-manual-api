@@ -1,6 +1,6 @@
 # Pakit Backend
 
-AI가 아닌 룰 기반으로 만드는 **나 사용 설명서** 서비스의 FastAPI 백엔드입니다.
+**나 사용 설명서** 서비스의 FastAPI 백엔드입니다.
 현재 제품 기준은 [`PRD_나사용설명서.html`](./PRD_%E1%84%82%E1%85%A1%E1%84%89%E1%85%A1%E1%84%8B%E1%85%AD%E1%86%BC%E1%84%89%E1%85%A5%E1%86%AF%E1%84%86%E1%85%A7%E1%86%BC%E1%84%89%E1%85%A5.html)입니다.
 
 ## 시작하기
@@ -43,6 +43,10 @@ src/pakit/
 구성되며, 응답의 `result_code`를 사용해 `GET /api/results/{result_code}`로 다시 조회할 수
 있습니다. MBTI별 캐릭터 명사를 제외한 성향 점수·충전 점수·결과 문구는 현재 목업값입니다.
 현재 GET API는 `demo-result-code`만 지원하며 고정 데모 결과를 반환합니다.
+
+친구 궁합은
+`GET /api/compatibility?mine=demo-result-code&friend=demo-friend-code`로 확인할 수 있습니다.
+현재 궁합 점수와 문구는 프론트엔드 연동용 고정 목업값입니다.
 
 상세 결정 사항과 다음 구현 순서는 [`docs/architecture.md`](./docs/architecture.md)를 참고하세요.
 22개 문항의 기계 판독 가능한 ID 목록은

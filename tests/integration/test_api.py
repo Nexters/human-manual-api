@@ -4,6 +4,7 @@ from pakit.api.schemas.assessment_submissions import (
     ASSESSMENT_SUBMISSION_EXAMPLE,
     ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE,
 )
+from pakit.api.schemas.compatibility import COMPATIBILITY_RESPONSE_EXAMPLE
 from pakit.domain.assessment_contract import ASSESSMENT_VERSION, QUESTION_CONTRACTS, AnswerKind
 from pakit.main import app
 
@@ -59,6 +60,13 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
     get_operation = document["paths"]["/api/results/{result_code}"]["get"]
     assert get_operation["summary"] == "테스트 결과 조회"
     assert "demo-result-code" in get_operation["description"]
+    compatibility_operation = document["paths"]["/api/compatibility"]["get"]
+    assert compatibility_operation["tags"] == ["Compatibility"]
+    assert compatibility_operation["summary"] == "친구 궁합 조회"
+    compatibility_example = compatibility_operation["responses"]["200"]["content"][
+        "application/json"
+    ]["example"]
+    assert compatibility_example == COMPATIBILITY_RESPONSE_EXAMPLE
 
     test_tag = next(tag for tag in document["tags"] if tag["name"] == "Test")
     assert "답변 제출" in test_tag["description"]
@@ -83,6 +91,16 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
         "can_do",
         "warnings",
         "charging",
+    }
+    compatibility_schema = document["components"]["schemas"]["CompatibilityOutput"]
+    assert set(compatibility_schema["properties"]) == {
+        "mine",
+        "friend",
+        "headline",
+        "description",
+        "synergy",
+        "tips",
+        "relationship_tip",
     }
 
 
@@ -120,6 +138,31 @@ def test_returns_404_for_unknown_result_code() -> None:
         "error": {
             "code": "TEST_RESULT_NOT_FOUND",
             "message": "테스트 결과를 찾을 수 없습니다.",
+        }
+    }
+
+
+def test_gets_mock_friend_compatibility() -> None:
+    response = client.get(
+        "/api/compatibility",
+        params={"mine": "demo-result-code", "friend": "demo-friend-code"},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == COMPATIBILITY_RESPONSE_EXAMPLE
+
+
+def test_returns_404_for_unknown_compatibility_codes() -> None:
+    response = client.get(
+        "/api/compatibility",
+        params={"mine": "unknown", "friend": "demo-friend-code"},
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {
+        "error": {
+            "code": "COMPATIBILITY_NOT_FOUND",
+            "message": "친구 궁합 결과를 찾을 수 없습니다.",
         }
     }
 
