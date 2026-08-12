@@ -15,7 +15,7 @@ def create_app() -> FastAPI:
         debug=settings.debug,
         openapi_tags=[
             {
-                "name": "테스트",
+                "name": "Test",
                 "description": (
                     "'나 사용 설명서' 테스트의 답변 제출, 검증, 결과 분류 API입니다. "
                     "문항과 선택지의 고정 ID는 "

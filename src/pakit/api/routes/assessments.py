@@ -17,7 +17,7 @@ from pakit.services.submission_service import (
     submit_assessment,
 )
 
-router = APIRouter(prefix="/tests", tags=["테스트"])
+router = APIRouter(prefix="/tests", tags=["Test"])
 
 
 @router.post(

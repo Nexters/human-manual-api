@@ -57,7 +57,7 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
     assert response.status_code == 200
     document = response.json()
     operation = document["paths"]["/api/tests/submissions"]["post"]
-    assert operation["tags"] == ["테스트"]
+    assert operation["tags"] == ["Test"]
     assert operation["summary"] == "테스트 결과 제출"
     assert "요청 데이터" in operation["description"]
     assert "22개 문항" in operation["description"]
@@ -69,7 +69,7 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
     assert swagger_example["value"] == ASSESSMENT_SUBMISSION_EXAMPLE
     assert "실제 문항·선택지 ID" in swagger_example["description"]
 
-    test_tag = next(tag for tag in document["tags"] if tag["name"] == "테스트")
+    test_tag = next(tag for tag in document["tags"] if tag["name"] == "Test")
     assert "답변 제출" in test_tag["description"]
     assert "/api/v1/tests/submissions" not in document["paths"]
     assert "/api/v1/tests/evaluate" not in document["paths"]
