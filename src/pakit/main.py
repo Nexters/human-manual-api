@@ -18,7 +18,7 @@ def create_app() -> FastAPI:
             {
                 "name": "Test",
                 "description": (
-                    "'나 사용 설명서' 테스트의 답변 제출, 검증, 결과 분류 API입니다. "
+                    "'나 사용 설명서' 테스트의 답변 제출, 검증, 결과 조회 API입니다. "
                     "문항과 선택지의 고정 ID는 "
                     "`docs/assessment-identifiers.v1.json`을 기준으로 사용합니다."
                 ),

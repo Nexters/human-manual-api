@@ -66,6 +66,7 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
     assert "/api/v1/tests/evaluate" not in document["paths"]
     assert "/api/assessments/submissions" not in document["paths"]
     assert "/api/assessments/evaluate" not in document["paths"]
+    assert "/api/tests/evaluate" not in document["paths"]
 
     submission_schema = document["components"]["schemas"]["AssessmentSubmissionInput"]
     assert submission_schema["properties"]["mbti"]["description"] == (

@@ -38,10 +38,6 @@ src/pakit/
 └── services/     # 유스케이스와 룰 기반 결과 조립
 ```
 
-현재 `POST /api/tests/evaluate`는 PRD의 16개 MBTI 캐릭터와 4개 성향 축을
-조합하는 최소 수직 슬라이스입니다. MBTI별 캐릭터 명사는 최종 디자인 에셋과 동일하게
-확정되었으며, 아직 미확정인 형용사 문구는 응답의 `provisional`로 명시합니다.
-
 프론트엔드는 완료된 22개 답변과 선택한 MBTI 유형을
 `POST /api/tests/submissions`로 제출할 수 있습니다. 응답은 결과 페이지의 6개 영역으로
 구성되며, 응답의 `result_code`를 사용해 `GET /api/results/{result_code}`로 다시 조회할 수

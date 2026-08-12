@@ -149,6 +149,7 @@ async def get_assessment_result(
 
 @router.post(
     "/evaluate",
+    include_in_schema=False,
     response_model=AssessmentResult,
     summary="테스트 분류 규칙 확인",
     description=(
