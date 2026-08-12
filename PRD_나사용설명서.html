@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRD — 나 사용 설명서</title>
+<link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF8F1; --ink:#22303F; --ink-soft:#5B6B7C;
+    --blue:#2E5AE8; --blue-soft:#E6ECFD;
+    --kraft:#C9A06B; --kraft-soft:#F3E7D3;
+    --warn:#FFD34D; --line:#D8D2C4; --star:#E8542E;
+    --ok:#2E8B57; --ok-soft:#E3F2E9;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--kraft-soft);font-family:'IBM Plex Sans KR',sans-serif;color:var(--ink);padding:32px 16px 80px;line-height:1.5;}
+  .manual{max-width:920px;margin:0 auto;background:var(--paper);border:2px solid var(--ink);border-radius:10px;box-shadow:8px 8px 0 rgba(34,48,63,.15);overflow:hidden;}
+
+  header{
+    border-bottom:2px solid var(--ink);padding:38px 32px 22px;
+    display:flex;justify-content:space-between;align-items:flex-end;gap:16px;
+    background:repeating-linear-gradient(45deg,var(--warn) 0 14px,var(--ink) 14px 28px) top/100% 10px no-repeat,var(--paper);
+  }
+  .eyebrow{font-size:12px;letter-spacing:.24em;color:var(--ink-soft);text-transform:uppercase;margin-bottom:6px;}
+  h1{font-family:'Do Hyeon',sans-serif;font-size:clamp(26px,4.5vw,38px);line-height:1.15;}
+  h1 em{font-style:normal;color:var(--blue);}
+  h1 .sub{display:block;font-family:'IBM Plex Sans KR',sans-serif;font-weight:500;font-size:clamp(13px,2vw,15px);color:var(--ink-soft);margin-top:8px;line-height:1.4;}
+  .h-spec{text-align:right;font-size:11px;color:var(--ink-soft);border:1.5px solid var(--ink);border-radius:6px;padding:8px 12px;background:#fff;white-space:nowrap;}
+  .h-spec b{display:block;font-size:13px;color:var(--ink);}
+  .barcode{margin-top:6px;height:16px;background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 5px,var(--ink) 5px 6px,transparent 6px 10px);}
+
+  section{padding:30px 32px;border-bottom:2px dashed var(--line);}
+  section:last-of-type{border-bottom:none;}
+  .step{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+  .step .num{font-family:'Do Hyeon',sans-serif;font-size:15px;background:var(--ink);color:var(--paper);min-width:44px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;letter-spacing:.08em;flex:none;padding:0 10px;}
+  .step h2{font-family:'Do Hyeon',sans-serif;font-size:21px;font-weight:400;}
+  .step .note{font-size:12px;color:var(--ink-soft);margin-left:auto;text-align:right;}
+
+  .st{display:inline-block;font-size:10.5px;font-weight:700;border-radius:99px;padding:2px 9px;vertical-align:2px;margin-left:6px;letter-spacing:.04em;}
+  .st.ok{background:var(--ok-soft);color:var(--ok);}
+  .st.tbd{background:var(--blue-soft);color:var(--blue);}
+  .st.risk{background:#FCE8E2;color:var(--star);}
+
+  /* generic table */
+  .tbl{border-collapse:collapse;width:100%;font-size:13px;background:#fff;}
+  .tbl th,.tbl td{border:1.5px solid var(--ink);padding:8px 10px;text-align:left;vertical-align:top;}
+  .tbl thead th{background:var(--ink);color:var(--paper);font-weight:500;font-size:12px;}
+  .tbl td.c,.tbl th.c{text-align:center;}
+  .tbl .mut{color:var(--ink-soft);font-size:12px;}
+  .tbl tr.flag td{background:#FFF4EF;}
+
+  /* callout */
+  .callout{border-left:3px solid var(--warn);background:#fff;padding:10px 14px;font-size:12.5px;color:var(--ink-soft);margin-top:14px;}
+  .callout b{color:var(--ink);}
+  .callout.blue{border-left-color:var(--blue);}
+
+  /* one-liner card */
+  .hero{border:2.5px solid var(--blue);background:var(--blue-soft);border-radius:10px;padding:18px 24px;text-align:center;}
+  .hero .big{font-family:'Do Hyeon',sans-serif;font-size:clamp(18px,3vw,24px);color:var(--blue);line-height:1.35;}
+  .hero .small{font-size:13px;color:var(--ink-soft);margin-top:6px;}
+
+  /* why grid */
+  .why{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px;}
+  .why-card{border:2px solid var(--ink);border-radius:8px;background:#fff;padding:12px 14px;}
+  .why-card .n{font-family:'Do Hyeon',sans-serif;color:var(--blue);font-size:15px;margin-bottom:4px;}
+  .why-card p{font-size:12.5px;color:var(--ink-soft);}
+  .why-card p b{color:var(--ink);}
+
+  /* flow */
+  .flow{border:2px solid var(--ink);border-radius:10px;background:#fff;overflow:hidden;}
+  .frow{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:center;padding:11px 16px;border-top:1.5px dashed var(--line);font-size:14px;}
+  .frow:first-child{border-top:none;}
+  .frow .fn{font-family:'Do Hyeon',sans-serif;color:var(--blue);font-size:16px;text-align:center;}
+  .frow .fd{color:var(--ink-soft);font-size:12px;}
+  .frow.hl{background:var(--blue-soft);}
+  .flow-cap{font-size:12px;color:var(--ink-soft);margin-top:10px;text-align:center;}
+  .flow-cap b{color:var(--star);}
+
+  /* pipeline (compact) */
+  .pipe{display:flex;flex-direction:column;align-items:center;}
+  .pcard{border:2px solid var(--ink);border-radius:8px;background:#fff;padding:10px 16px;text-align:center;min-width:190px;}
+  .pcard .t{font-weight:700;font-size:14px;}
+  .pcard .d{font-size:11.5px;color:var(--ink-soft);}
+  .pcard.hidden-layer{background:var(--ink);color:var(--paper);}
+  .pcard.hidden-layer .d{color:#B9C4D2;}
+  .badge{display:inline-block;font-size:10px;letter-spacing:.12em;border-radius:99px;padding:2px 8px;margin-bottom:4px;font-weight:700;}
+  .badge.dark{background:#3E4E61;color:#fff;}
+  .badge.light{background:var(--blue-soft);color:var(--blue);}
+  .fork{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
+  .fork .col{display:flex;flex-direction:column;align-items:center;}
+  .arrow{width:2px;height:20px;background:var(--ink);position:relative;}
+  .arrow::after{content:'';position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top:8px solid var(--ink);border-bottom:none;}
+  .final{border:2.5px solid var(--blue);background:var(--blue-soft);border-radius:10px;padding:14px 24px;text-align:center;}
+  .final .name{font-family:'Do Hyeon',sans-serif;font-size:22px;color:var(--blue);}
+  .final .sum{font-size:12px;color:var(--ink-soft);margin-top:4px;}
+
+  /* axes */
+  .axis{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:center;margin-bottom:14px;}
+  .axis .name{font-weight:700;font-size:14px;}
+  .axis .name small{display:block;font-weight:400;font-size:11px;color:var(--ink-soft);}
+  .poles{display:flex;justify-content:space-between;align-items:stretch;border:2px solid var(--ink);border-radius:14px;background:#fff;padding:8px 14px;font-size:14px;font-weight:700;position:relative;gap:24px;}
+  .poles::before{content:'↔';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:var(--ink-soft);font-weight:400;}
+  .pole{flex:1;min-width:0;}
+  .pole .pn{display:block;}
+  .pole .pd{display:block;font-weight:400;font-size:11px;color:var(--ink-soft);line-height:1.4;margin-top:2px;}
+  .pole.a{text-align:left;}
+  .pole.a .pn{color:var(--kraft);filter:brightness(.75);}
+  .pole.b{text-align:right;}
+  .pole.b .pn{color:var(--blue);}
+
+  /* sub items */
+  .subwrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .subbox{border:2px solid var(--ink);border-radius:8px;background:#fff;overflow:hidden;}
+  .subbox h3{font-family:'Do Hyeon',sans-serif;font-weight:400;font-size:15px;background:var(--ink);color:var(--paper);padding:8px 14px;}
+  .subbox h3 span{color:var(--warn);}
+  .subrow{display:grid;grid-template-columns:40px 1fr;gap:8px;align-items:center;padding:9px 14px;border-top:1.5px dashed var(--line);font-size:13px;}
+  .subrow:first-of-type{border-top:none;}
+  .subrow .code{font-family:'Do Hyeon',sans-serif;color:var(--blue);}
+  .subrow .who{color:var(--ink-soft);font-size:12px;}
+  .si-row{padding:12px 14px;border-top:1.5px dashed var(--line);}
+  .si-row:first-of-type{border-top:none;}
+  .si-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .si-code{font-family:'Do Hyeon',sans-serif;color:#fff;background:var(--blue);border-radius:5px;padding:1px 8px;font-size:13px;flex:none;}
+  .si-combo{font-weight:700;font-size:13.5px;flex:none;}
+  .si-items{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+  .si-item{background:var(--warn);border:1.5px solid var(--ink);border-radius:6px;padding:2px 9px;font-size:12.5px;font-weight:700;}
+  .si-item.alt{background:var(--paper);font-weight:500;}
+  .si-feat{font-size:12px;color:var(--ink-soft);margin-top:5px;line-height:1.45;}
+
+  /* matrix */
+  .matrix{border-collapse:collapse;width:100%;font-size:13px;}
+  .matrix th,.matrix td{border:1.5px solid var(--ink);padding:0;text-align:center;}
+  .matrix thead th{background:var(--ink);color:var(--paper);font-weight:500;font-size:12px;padding:8px 4px;}
+  .matrix tbody th{background:var(--kraft-soft);font-size:12px;font-weight:700;padding:8px 6px;width:96px;}
+  .cell{display:block;padding:13px 6px;background:#fff;}
+  .cell b{font-size:13px;}
+  td.corner .cell{background:var(--warn);}
+  td.corner .cell b::before{content:'⭐ ';font-size:11px;}
+  .matrix-cap{font-size:12px;color:var(--ink-soft);margin-top:10px;text-align:center;}
+  .matrix-cap b{color:var(--star);}
+
+  /* screens */
+  .screens{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .scr{border:2px solid var(--ink);border-radius:8px;background:#fff;padding:12px 14px;}
+  .scr .sn{font-family:'Do Hyeon',sans-serif;color:var(--blue);font-size:14px;}
+  .scr b{font-size:13.5px;display:block;margin:2px 0;}
+  .scr p{font-size:12px;color:var(--ink-soft);}
+
+  footer{text-align:center;font-size:11px;color:var(--ink-soft);padding:16px;border-top:2px solid var(--ink);letter-spacing:.08em;}
+  footer .leg{margin-top:4px;}
+
+  @media (max-width:640px){
+    section{padding:24px 18px;}
+    header{padding:32px 18px 18px;flex-direction:column;align-items:flex-start;}
+    .h-spec{text-align:left;}
+    .why{grid-template-columns:1fr;}
+    .subwrap{grid-template-columns:1fr;}
+    .screens{grid-template-columns:1fr;}
+    .axis{grid-template-columns:1fr;gap:4px;}
+    .poles{flex-direction:column;gap:8px;padding:10px 14px;border-radius:12px;}
+    .poles::before{content:'↕';position:static;transform:none;text-align:center;}
+    .pole.a,.pole.b{text-align:left;}
+    .matrix tbody th{width:64px;font-size:10.5px;}
+    .cell b{font-size:11px;}
+    .step{flex-wrap:wrap;}
+    .step .note{margin-left:0;text-align:left;flex-basis:100%;}
+    .tbl{font-size:12px;}
+  }
+</style>
+</head>
+<body>
+<div class="manual">
+
+  <header>
+    <div class="h-title">
+      <div class="eyebrow">PRODUCT REQUIREMENTS DOCUMENT</div>
+      <h1>PRD — <em>나 사용 설명서</em><br><span class="sub">이 문서만 보면 우리 서비스를 이해하고 만들 수 있다</span></h1>
+    </div>
+    <div class="h-spec">
+      <b>상태 범례</b>
+      ✅ 확정 · 🔲 논의/작성 중 · ⚠️ 리스크
+      <div class="barcode"></div>
+    </div>
+  </header>
+
+  <!-- 1. 한 줄 정의 -->
+  <section>
+    <div class="step"><div class="num">01</div><h2>한 줄 정의 <span class="st ok">확정</span></h2></div>
+    <div class="hero">
+      <div class="big">AI가 만들어주는 "나 사용 설명서" —<br>3분 테스트를 하면, 나라는 제품의 설명서가 택배 상자에 담겨 도착한다.</div>
+      <div class="small">결과 = 장난감 캐릭터 + 이름 + AI 설명서 · 세상에 하나뿐인 1 of 1</div>
+    </div>
+    <div class="why">
+      <div class="why-card"><div class="n">① 나를 알고 싶다</div><p>유형 일반론이 아닌 <b>내 응답으로 쓰인 설명서</b>. "어 나 진짜 이런데" 하는 순간이 상품</p></div>
+      <div class="why-card"><div class="n">② 나를 보여주고 싶다</div><p>결과가 곧 <b>자랑할 오브젝트</b>. 캐릭터 카드 + 유니크한 이름 = 인스타에 올릴 이유가 형태에 내장</p></div>
+      <div class="why-card"><div class="n">③ 너를 알고 싶다</div><p><b>호환성</b>. "너는 뭐 나왔어?"가 대화가 되고, 케미 결과가 썸·친구 사이 놀거리</p></div>
+    </div>
+    <div class="callout">기존 대안의 빈틈: MBTI류는 <b>재밌지만 뻔하고</b>(친구랑 결과 똑같음), 정밀 검사는 <b>정확하지만 무겁고</b>, AI 직접 분석은 <b>개인화되지만 밋밋함</b>. 우리는 "정확한 개인화 × 가볍게 공유되는 재미"의 양립을 판다.</div>
+  </section>
+
+  <!-- 2. 유저 플로우 -->
+  <section>
+    <div class="step"><div class="num">02</div><h2>핵심 사용자 경험 — 유저 플로우</h2></div>
+    <div class="flow">
+      <div class="frow"><div class="fn">①</div><div>테스트 시작 <span class="fd">— 부담 없음 ("3분 컷" 명시) + 간단한 스토리텔링 (나만의 장난감이 만들어진다는 도입)</span></div></div>
+      <div class="frow"><div class="fn">②</div><div>질문 응답 <span class="st tbd">논의 중</span> <span class="fd">— MBTI 입력 + 객관식 + 주관식 등, 구성 논의 중</span></div></div>
+      <div class="frow"><div class="fn">③</div><div>택배 도착 — 언박싱 연출 <span class="fd">— 상자를 여는 인터랙션</span></div></div>
+      <div class="frow"><div class="fn">④</div><div>결과 확인 <span class="fd">— 캐릭터 + 이름 + AI 설명서 · 예: 「품질보증 거부당한 공구함」</span></div></div>
+      <div class="frow hl"><div class="fn">⑤</div><div><b>공유</b> <span class="fd">— 결과 링크 / 인스타 스토리 or 카카오톡 공유</span></div></div>
+      <div class="frow hl"><div class="fn">⑥</div><div><b>친구 유입</b> <span class="fd">— "너는 뭐 나왔어?" → 친구가 테스트</span></div></div>
+      <div class="frow"><div class="fn">⑦</div><div>호환성 보기 <span class="fd">— 둘의 결과 합쳐 케미 분석</span></div></div>
+    </div>
+    <div class="flow-cap"><b>⑤→⑥이 바이럴 루프.</b> 모든 기능 판단 기준: "이게 공유를 만들거나 강화하는가?"</div>
+  </section>
+
+  <!-- 3. 결과 이름 체계 + 조립 구조 -->
+  <section>
+    <div class="step"><div class="num">03</div><h2>결과 이름 체계 <span class="st ok">확정</span></h2><div class="note">MBTI·축 판정은 내부 엔진 — 화면 노출 안 함 (래핑)</div></div>
+    <table class="tbl" style="margin-bottom:18px;">
+      <thead><tr><th>구성</th><th class="c">개수</th><th>결정 로직</th></tr></thead>
+      <tbody>
+        <tr><td><b>명사</b> (메인 캐릭터)</td><td class="c">16종</td><td>MBTI 판정 → 유형별 고정</td></tr>
+        <tr><td><b>형용사</b></td><td class="c">16종</td><td>성향 축 4개 판정 → 서브아이템 A×B 조합 16칸에 1개씩</td></tr>
+        <tr><td><b>조합</b></td><td class="c"><b>256가지</b></td><td>같은 MBTI여도 형용사·서브아이템·설명서가 다름</td></tr>
+      </tbody>
+    </table>
+    <div class="pipe">
+      <div class="pcard"><div class="t">📝 테스트 응답</div></div>
+      <div class="arrow"></div>
+      <div class="fork">
+        <div class="col">
+          <div class="pcard hidden-layer"><span class="badge dark">내부 · 안 보임</span><div class="t">MBTI 판정</div></div>
+          <div class="arrow"></div>
+          <div class="pcard"><div class="t">🧸 명사 (메인 캐릭터)</div><div class="d">16종</div></div>
+        </div>
+        <div class="col">
+          <div class="pcard hidden-layer"><span class="badge dark">내부 · 안 보임</span><div class="t">성향 축 4개 판정</div></div>
+          <div class="arrow"></div>
+          <div class="pcard"><div class="t">🎁 서브아이템 A·B</div><div class="d">포장지 4종 + 여는 도구 4종</div></div>
+          <div class="arrow"></div>
+          <div class="pcard"><div class="t">🏷️ 형용사</div><div class="d">A×B로 자동 결정</div></div>
+        </div>
+      </div>
+      <div class="arrow"></div>
+      <div class="final"><span class="badge light">유저가 보는 것</span><div class="name">📦 「음소거 안 되는 팽이」</div><div class="sum">형용사 + 명사 + 서브아이템 2개 + AI 설명서</div></div>
+    </div>
+  </section>
+
+  <!-- 4. 명사 16종 -->
+  <section>
+    <div class="step"><div class="num">04</div><h2>메인 캐릭터 — 명사 16종 <span class="st ok">확정</span></h2><div class="note">명사는 수식어 없는 단일 명사 · 특징은 일러스트·설명서가 담당</div></div>
+    <table class="tbl">
+      <thead><tr><th class="c">MBTI</th><th>한 줄 요약</th><th class="c">아이템</th></tr></thead>
+      <tbody>
+        <tr><td class="c"><b>INTJ</b></td><td class="mut">전체 구조를 논리적으로 맞춰 완성하는 유형</td><td class="c"><b>큐브</b></td></tr>
+        <tr><td class="c"><b>ISTJ</b></td><td class="mut">기준과 사실을 지키며 맡은 일을 정확히 끝내는 유형</td><td class="c"><b>로봇</b></td></tr>
+        <tr><td class="c"><b>ENTJ</b></td><td class="mut">큰 목표를 세우고 자원을 모아 현실을 바꾸는 유형</td><td class="c"><b>불도저</b></td></tr>
+        <tr><td class="c"><b>ESTJ</b></td><td class="mut">역할과 순서를 정리해 조직을 안정적으로 굴리는 유형</td><td class="c"><b>헬리콥터</b></td></tr>
+        <tr><td class="c"><b>INFJ</b></td><td class="mut">겉보다 내면의 의도와 의미를 끝까지 들여다보는 유형</td><td class="c"><b>비밀상자</b></td></tr>
+        <tr><td class="c"><b>ISFJ</b></td><td class="mut">관계의 선을 분명히 하고 내 사람을 끝까지 지키는 유형</td><td class="c"><b>테디베어</b></td></tr>
+        <tr><td class="c"><b>ENFJ</b></td><td class="mut">사람의 가능성을 발견해 더 나은 방향으로 이끄는 유형</td><td class="c"><b>기차</b></td></tr>
+        <tr><td class="c"><b>ESFJ</b></td><td class="mut">사람을 세심히 살피며 관계와 공동체를 원활하게 만드는 유형</td><td class="c"><b>티포트</b></td></tr>
+        <tr><td class="c"><b>INFP</b></td><td class="mut">자기 안의 순수한 의미와 상상력을 지키는 유형</td><td class="c"><b>쿠크다스</b></td></tr>
+        <tr><td class="c"><b>ISFP</b></td><td class="mut">경쟁보다 자기 감각과 평온을 자기 속도로 누리는 유형</td><td class="c"><b>침대</b></td></tr>
+        <tr><td class="c"><b>ENFP</b></td><td class="mut">사람과 세상에서 새로운 가능성을 계속 발견하는 유형</td><td class="c"><b>연</b></td></tr>
+        <tr><td class="c"><b>ESFP</b></td><td class="mut">지금 이 순간의 즐거움과 따뜻함을 사람들과 나누는 유형</td><td class="c"><b>실로폰</b></td></tr>
+        <tr><td class="c"><b>INTP</b></td><td class="mut">호기심을 따라 세상의 근본 원리를 끝없이 탐구하는 유형</td><td class="c"><b>망원경</b></td></tr>
+        <tr><td class="c"><b>ISTP</b></td><td class="mut">간섭 없이 직접 다루며 필요한 기술을 숙달하는 유형</td><td class="c"><b>공구함</b></td></tr>
+        <tr><td class="c"><b>ENTP</b></td><td class="mut">당연하게 여겨지는 것을 의심하고 새로운 가능성을 실험하는 유형</td><td class="c"><b>팽이</b></td></tr>
+        <tr><td class="c"><b>ESTP</b></td><td class="mut">눈앞의 기회를 빠르게 읽고 몸으로 부딪쳐 잡는 유형</td><td class="c"><b>RC카</b></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 5. 성향 축 -->
+  <section>
+    <div class="step"><div class="num">05</div><h2>성향 축 4개 — 형용사·설명서의 재료 <span class="st ok">확정</span></h2></div>
+    <div class="axis">
+      <div class="name">① 표현방식<small>말·마음이 나가는 방식 (연애 접근 포함)</small></div>
+      <div class="poles">
+        <span class="pole a"><span class="pn">탐색형</span><span class="pd">돌려 말함 · 맘에 드는 사람 생기면 인스타 정찰부터 함</span></span>
+        <span class="pole b"><span class="pn">직진형</span><span class="pd">생각=발화, 돌직구 · 맘에 드는 사람 생기면 노빠꾸 직진</span></span>
+      </div>
+    </div>
+    <div class="axis">
+      <div class="name">② 애착유형<small>가까운 사람과의 거리</small></div>
+      <div class="poles">
+        <span class="pole a"><span class="pn">밀착형</span><span class="pd">자주 연락해야 안심 · 같이 있는 게 충전</span></span>
+        <span class="pole b"><span class="pn">거리조절형</span><span class="pd">각자의 시간 필수 · 애정과 독립은 별개</span></span>
+      </div>
+    </div>
+    <div class="axis">
+      <div class="name">③ 에겐테토<small>매너·분위기의 결</small></div>
+      <div class="poles">
+        <span class="pole a"><span class="pn">에겐형</span><span class="pd">말투 둥글둥글, 리액션 다정 · 챙김이 디폴트</span></span>
+        <span class="pole b"><span class="pn">테토형</span><span class="pd">무뚝뚝한데 정 있음 · 표현은 투박, 행동으로 챙기는 츤데레</span></span>
+      </div>
+    </div>
+    <div class="axis">
+      <div class="name">④ 자극추구<small>새로움 기본 설정</small></div>
+      <div class="poles">
+        <span class="pole a"><span class="pn">루틴형</span><span class="pd">10년째 같은 메뉴, 검증된 것만 · 루틴이 곧 평화</span></span>
+        <span class="pole b"><span class="pn">탐험형</span><span class="pd">신메뉴·안 가본 길 디폴트 · "일단 해보자"</span></span>
+      </div>
+    </div>
+    <div class="callout">4축 모두 MBTI와 독립 검증 완료 — 단, <b>문항은 MBTI 재탕 금지</b>. 카톡 말투·답장 텀·단골집 같은 구체적 행동·습관만 묻는다.</div>
+  </section>
+
+  <!-- 6. 서브아이템 -->
+  <section>
+    <div class="step"><div class="num">06</div><h2>서브아이템 — 포장지 + 여는 도구 <span class="st ok">확정</span></h2></div>
+    <div class="callout" style="margin-top:0;margin-bottom:16px;">서브아이템 A(<b>포장지</b>)는 <b>택배상자 겉면 패턴</b>으로 구현 — 상자 형태·로고·송장은 공통 1종(브랜드 유지), 겉면 패턴만 4종. 서브아이템 B(<b>여는 도구</b>)는 개봉 인터랙션의 주인공. 개봉은 <b>도구로 한 번에</b> — 까면 바로 본체 등장.</div>
+    <div class="subwrap">
+      <div class="subbox">
+        <h3>서브아이템 A = 포장지 (상자 겉면) <span>← ① 표현방식 × ② 애착유형</span></h3>
+        <div class="si-row">
+          <div class="si-head"><span class="si-code">A1</span><span class="si-combo">직진 × 밀착</span>
+            <span class="si-items"><span class="si-item">🏷️ "취급주의" 스티커 잔뜩</span></span></div>
+          <div class="si-feat">할 말과 마음이 겉면에 다 적혀 있음 · 솔직, 감정이 밖으로 드러남 · 대안: 낙서·메모 가득 상자, 스티커 여러 개 상자</div>
+        </div>
+        <div class="si-row">
+          <div class="si-head"><span class="si-code">A2</span><span class="si-combo">직진 × 거리조절</span>
+            <span class="si-items"><span class="si-item">📦 라벨 하나 미니멀 박스</span></span></div>
+          <div class="si-feat">명확함, 깔끔함, 선이 분명함</div>
+        </div>
+        <div class="si-row">
+          <div class="si-head"><span class="si-code">A3</span><span class="si-combo">탐색 × 밀착</span>
+            <span class="si-items"><span class="si-item">🪆 마트료시카 상자</span></span></div>
+          <div class="si-feat">마음은 가득한데 한 번에 안 보임 · 따뜻함, 섬세함 · 세 번쯤 열어야 나옴</div>
+        </div>
+        <div class="si-row">
+          <div class="si-head"><span class="si-code">A4</span><span class="si-combo">탐색 × 거리조절</span>
+            <span class="si-items"><span class="si-item">🔒 자물쇠 달린 박스</span></span></div>
+          <div class="si-feat">뭐가 들었는지 열기 전엔 모름 · 신비로움, 예측불가, 궁금증</div>
+        </div>
+      </div>
+      <div class="subbox">
+        <h3>서브아이템 B = 여는 도구 <span>← ④ 자극추구 × ③ 에겐테토</span></h3>
+        <div class="si-row">
+          <div class="si-head"><span class="si-code">B1</span><span class="si-combo">루틴 × 에겐</span>
+            <span class="si-items"><span class="si-item">✋ 손 / 장갑</span></span></div>
+          <div class="si-feat">다정하게, 익숙한 방식으로 엶</div>
+        </div>
+        <div class="si-row">
+          <div class="si-head"><span class="si-code">B2</span><span class="si-combo">루틴 × 테토</span>
+            <span class="si-items"><span class="si-item">🔪 커터칼</span></span></div>
+          <div class="si-feat">군말 없이 늘 쓰던 도구로, 실용적으로</div>
+        </div>
+        <div class="si-row">
+          <div class="si-head"><span class="si-code">B3</span><span class="si-combo">탐험 × 에겐</span>
+            <span class="si-items"><span class="si-item">🪄 마술봉</span></span></div>
+          <div class="si-feat">부드러운데 신기한 방식 — 뿅</div>
+        </div>
+        <div class="si-row">
+          <div class="si-head"><span class="si-code">B4</span><span class="si-combo">탐험 × 테토</span>
+            <span class="si-items"><span class="si-item">🪚 전기톱</span></span></div>
+          <div class="si-feat">거침 + 화끈, 고민 없이 냅다</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout">매핑 논리: 포장지 = "겉면에 뭘 드러내고(표현) 얼마나 감싸는가(애착)" / 도구 = "얼마나 화끈하게(자극추구) 어떤 손맛으로(에겐테토) 여는가". 에셋: 상자 베이스 1 + 포장지 패턴 4 + 도구 4 + 본체 16 = <b>25개</b> → 시각 조합 4×4×16 = <b>256가지</b>. 여는 도구의 개봉 애니메이션 자체가 성향 공개 역할 — 축 이름 노출 없이(래핑) 성격이 전달됨.</div>
+  </section>
+
+  <!-- 7. 형용사 매트릭스 -->
+  <section>
+    <div class="step"><div class="num">07</div><h2>형용사 16종 — A × B 매트릭스 <span class="st tbd">후보 수집 중</span></h2><div class="note">칸별 행동 특징 후보 — 형용사 확정 전</div></div>
+    <table class="matrix">
+      <thead><tr><th></th>
+        <th>B1 루틴·에겐 ✋<br><span style="font-weight:400;">다정다감 순둥이</span></th>
+        <th>B2 루틴·테토 🔪<br><span style="font-weight:400;">투박한 실용파</span></th>
+        <th>B3 탐험·에겐 🪄<br><span style="font-weight:400;">신기하면 같이 하자고 끌고 옴</span></th>
+        <th>B4 탐험·테토 🪓<br><span style="font-weight:400;">일단 해보고 생각</span></th></tr></thead>
+      <tbody style="font-size:12px;">
+        <tr><th>A1 직진·밀착<br><span style="font-weight:400;">숨김 없는 껌딱지</span></th>
+          <td><span class="cell">좋아하면 프사에 티 내고 대놓고 자랑하는</span></td>
+          <td><span class="cell">물어보면 팩트부터 날리고 밥은 사주는</span></td>
+          <td><span class="cell">좋으면 새벽 2시에도 카톡 폭탄 보내는</span></td>
+          <td><span class="cell">꽂히면 그날 바로 번호 따는</span></td></tr>
+        <tr><th>A2 직진·거리<br><span style="font-weight:400;">쿨한 직설가</span></th>
+          <td><span class="cell">먼저 연락은 안 하면서 생일은 챙기는</span></td>
+          <td><span class="cell">지적도 매뉴얼인</span></td>
+          <td><span class="cell">"언제 한번 밥 먹자"만 3만 번 말하는</span></td>
+          <td><span class="cell">"어디야" 물을 때마다 다른 나라 가 있는</span></td></tr>
+        <tr><th>A3 탐색·밀착<br><span style="font-weight:400;">조용한 껌딱지</span></th>
+          <td><span class="cell">옷 예쁘게 입고 플러팅 했다고 하는</span></td>
+          <td><span class="cell">답장은 'ㅇㅇ'인데 읽씹은 안 하는</span></td>
+          <td><span class="cell">3년 전 게시물까지 정독하고 안부도 꼬박 묻는</span></td>
+          <td><span class="cell">번따하는 상상만 오만 번 해본</span></td></tr>
+        <tr><th>A4 탐색·거리<br><span style="font-weight:400;">속 안 보여주는 은둔형</span></th>
+          <td><span class="cell">낯가리지만 친해지면 말 많은</span></td>
+          <td><span class="cell">답장 3일 뒤에 오고 프사도 안 바꾸는</span></td>
+          <td><span class="cell">연애 시뮬 10번 하고 첫 데이트 나가는</span></td>
+          <td><span class="cell">뭐 하고 사는지 아무도 모르는</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 8. 결과 페이지 항목 -->
+  <section>
+    <div class="step"><div class="num">08</div><h2>개인 결과 페이지 항목 7개 <span class="st ok">확정</span></h2></div>
+    <table class="tbl">
+      <thead><tr><th>항목</th><th>내용</th><th>예시 문구</th></tr></thead>
+      <tbody>
+        <tr><td><b>제품 소개</b></td><td class="mut">제품명 / 한 줄 설명 / 버전</td><td class="mut">"모델명: 이해선 v28.5 / 하이텐션 리액션형 / ⚠️ 습기(눈물)에 약함"</td></tr>
+        <tr><td><b>⚙️ 제품 핵심 기능</b></td><td class="mut">내 강점, 공유 포인트</td><td class="mut"></td></tr>
+        <tr><td><b>🚫 사용 시 주의사항</b></td><td class="mut">나한테 하면 안 되는 것</td><td class="mut">"주의: 결정을 재촉하면 작동이 멈출 수 있습니다"</td></tr>
+        <tr><td><b>⚠️ 자주 발생하는 버그</b></td><td class="mut">단점을 재밌게</td><td class="mut">"버그: 알람 5개 맞추고 전부 무시함 (수정 불가)"</td></tr>
+        <tr><td><b>🔌 호환 기기</b></td><td class="mut">잘 맞는 유형 (공유 트리거)</td><td class="mut">"호환: 츤데레형, 리액션봇형 / 비호환: 팩폭머신형"</td></tr>
+        <tr><td><b>💎 한정판/발견 확률</b></td><td class="mut">내 유형의 희귀도</td><td class="mut">"등급: 레어 (전체의 7.3%만 보유)"</td></tr>
+        <tr><td><b>🔋 충전 방법</b></td><td class="mut">에너지 충전법</td><td class="mut">"충전 방식: 맛있는 거 + 수다 (고속충전: 여행)"</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 9. 설명서 생성 -->
+  <section>
+    <div class="step"><div class="num">09</div><h2>설명서 생성 <span class="st ok">AI 없이 룰베이스</span></h2></div>
+    <table class="tbl">
+      <tbody>
+        <tr><td style="width:90px;"><b>입력</b></td><td class="mut">MBTI + 축 4개 판정 + 축별 게이지 값(내부) + 주관식 등 응답 재료</td></tr>
+        <tr><td><b>출력</b></td><td class="mut">결과 항목 7개의 텍스트 — 유형 일반론 금지, 응답 재료 기반의 "내 얘기 같은" 문장</td></tr>
+        <tr><td><b>원칙</b></td><td class="mut">너무 딥하지도 가볍지도 않게 / 단점도 애정 어린 유머로 / 게이지 중간값은 문장으로 표현 ("켜지면 파티, 꺼지면 잠수")</td></tr>
+      </tbody>
+    </table>
+    <div class="callout">설명서는 <b>AI 없이 간다. 단, 다양하게</b> — 미리 써둔 문구를 조건별로 조합해 같은 유형끼리도 결과가 갈리게.</div>
+  </section>
+
+  <!-- 10. 테스트 방법 -->
+  <section>
+    <div class="step"><div class="num">10</div><h2>테스트 방법 <span class="st tbd">상세 문항 작성 예정</span></h2></div>
+    <div class="callout">확정된 요구사항: 테스트 결과로 <b>MBTI 판정 + 성향 축 4개(각 2구간) 판정 + 결과 페이지 구성 재료</b>가 나와야 한다.</div>
+    <table class="tbl" style="margin-top:14px;">
+      <tbody>
+        <tr><td style="width:130px;"><b>MBTI 입력</b></td><td class="mut">테스트 <b>마지막에 직접 입력</b>받기로 확정 — 지표별 퍼센티지를 0·20·40·60·80·100으로만 선택 (중간값 50 불가). 모르는 유저 이슈가 생기면 "테스트하러 가기" 옵션 추가 검토</td></tr>
+        <tr><td><b>축 판정 문항</b></td><td class="mut">축당 2문항 × 4축 = 객관식 8문항 (① 표현방식 / ② 애착유형 / ③ 에겐테토 / ④ 자극추구)</td></tr>
+        <tr><td><b>결과 재료</b></td><td class="mut">결과 페이지 항목 7종(제품 소개·핵심 기능·주의사항·버그·충전 방법·한정판·호환 기기)을 구성할 응답 데이터 수집</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 11. 화면 구성 -->
+  <section>
+    <div class="step"><div class="num">11</div><h2>전체 화면 구성 <span class="st tbd">디자인 착수 대기</span></h2></div>
+    <div class="screens">
+      <div class="scr"><div class="sn">SCREEN 1</div><b>온보딩</b><p>컨셉 소개 + "3분 컷" + 시작 버튼</p></div>
+      <div class="scr"><div class="sn">SCREEN 2</div><b>테스트</b><p>진행바, 문항당 1화면, 이탈 시 저장</p></div>
+      <div class="scr"><div class="sn">SCREEN 3</div><b>로딩</b><p>"설명서 인쇄 중 → 포장 중 → 배송 중" 연출</p></div>
+      <div class="scr"><div class="sn">SCREEN 4</div><b>언박싱</b><p>도구 등장 → 포장지 입혀진 상자 → 개봉 액션 1회(쾅) → 본체 + 이름 공개</p></div>
+      <div class="scr"><div class="sn">SCREEN 5</div><b>결과</b><p>캐릭터+이름 → 설명서 항목 7개 → 공유 버튼</p></div>
+      <div class="scr"><div class="sn">SCREEN 6</div><b>공유 화면</b><p>모바일 뷰 기준</p></div>
+    </div>
+  </section>
+
+  <footer>
+    PRD — 나 사용 설명서 · 이 문서가 최신 기준입니다
+    <div class="leg">✅ 확정 · 🔲 논의/작성 중 · ⚠️ 리스크 플래그 · 최종 수정: 2026.07.23</div>
+  </footer>
+</div>
+</body>
+</html>
