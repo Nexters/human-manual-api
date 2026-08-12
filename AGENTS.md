@@ -20,6 +20,9 @@ result content, sharing, compatibility, or persistence behavior.
 
 ## Working agreements
 
+- Build the smallest MVP that satisfies the confirmed requirement. Keep APIs, schemas, modules,
+  configuration, and documentation as simple as possible; add no endpoint, field, abstraction,
+  compatibility layer, or infrastructure without a current need.
 - Use Python 3.12 and `uv`; do not add pip/Poetry requirement files.
 - Keep the modular-monolith boundaries: HTTP in `api`, framework-free concepts in `domain`,
   use cases in `services`, and runtime concerns in `core`.
@@ -28,7 +31,8 @@ result content, sharing, compatibility, or persistence behavior.
 - Do not silently invent unresolved questions, final adjectives, character assets, compatibility
   rules, or retention policy. Mark placeholders and update `docs/architecture.md` when a product
   decision is supplied.
-- Preserve API compatibility under `/api/v1`. If a breaking change is necessary, call it out.
+- Before frontend integration, prefer a simpler breaking contract over unused compatibility code.
+  After a contract is in use, preserve compatibility or explicitly call out the breaking change.
 - Never read or modify `.env` unless the user explicitly asks. Use `.env.example` for configuration
   shape and safe defaults.
 - Never commit secrets or real user response data.
