@@ -15,7 +15,7 @@ uv run uvicorn pakit.main:app --reload
 
 - API 문서: <http://localhost:8000/docs>
 - 상태 확인: <http://localhost:8000/health>
-- API 상태 확인: <http://localhost:8000/api/v1/health>
+- API 상태 확인: <http://localhost:8000/api/health>
 
 ## 자주 쓰는 명령
 
@@ -38,12 +38,12 @@ src/pakit/
 └── services/     # 유스케이스와 룰 기반 결과 조립
 ```
 
-현재 `POST /api/v1/assessments/evaluate`는 PRD의 16개 MBTI 캐릭터와 4개 성향 축을
+현재 `POST /api/tests/evaluate`는 PRD의 16개 MBTI 캐릭터와 4개 성향 축을
 조합하는 최소 수직 슬라이스입니다. MBTI별 캐릭터 명사는 최종 디자인 에셋과 동일하게
 확정되었으며, 아직 미확정인 형용사 문구는 응답의 `provisional`로 명시합니다.
 
 프론트엔드는 완료된 22개 답변과 MBTI 퍼센트를
-`POST /api/v1/assessments/submissions`로 제출할 수 있습니다. 현재 응답은 MBTI별 최종
+`POST /api/tests/submissions`로 제출할 수 있습니다. 현재 응답은 MBTI별 최종
 캐릭터를 사용하되, 채점 규칙과 결과 카피가 확정되기 전까지 `mode: "mock"`으로 반환합니다.
 
 상세 결정 사항과 다음 구현 순서는 [`docs/architecture.md`](./docs/architecture.md)를 참고하세요.

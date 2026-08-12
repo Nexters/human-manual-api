@@ -56,7 +56,7 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
 
     assert response.status_code == 200
     document = response.json()
-    operation = document["paths"]["/api/v1/assessments/submissions"]["post"]
+    operation = document["paths"]["/api/tests/submissions"]["post"]
     assert operation["tags"] == ["테스트"]
     assert operation["summary"] == "테스트 결과 제출"
     assert "요청 데이터" in operation["description"]
@@ -71,6 +71,10 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
 
     test_tag = next(tag for tag in document["tags"] if tag["name"] == "테스트")
     assert "답변 제출" in test_tag["description"]
+    assert "/api/v1/tests/submissions" not in document["paths"]
+    assert "/api/v1/tests/evaluate" not in document["paths"]
+    assert "/api/assessments/submissions" not in document["paths"]
+    assert "/api/assessments/evaluate" not in document["paths"]
 
     mbti_schema = document["components"]["schemas"]["MbtiScoresInput"]
     assert mbti_schema["properties"]["introversion"]["description"] == ("외향형 E 0 ↔ 내향형 I 100")
@@ -78,16 +82,25 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
 
 def test_swagger_submission_example_is_accepted() -> None:
     response = client.post(
-        "/api/v1/assessments/submissions",
+        "/api/tests/submissions",
         json=ASSESSMENT_SUBMISSION_EXAMPLE,
     )
 
     assert response.status_code == 200
 
 
+def test_old_versioned_test_path_is_not_available() -> None:
+    response = client.post(
+        "/api/v1/tests/submissions",
+        json=ASSESSMENT_SUBMISSION_EXAMPLE,
+    )
+
+    assert response.status_code == 404
+
+
 def test_evaluate_assessment() -> None:
     response = client.post(
-        "/api/v1/assessments/evaluate",
+        "/api/tests/evaluate",
         json={
             "mbti": "ENTP",
             "axes": {
@@ -108,7 +121,7 @@ def test_evaluate_assessment() -> None:
 
 def test_rejects_out_of_range_score() -> None:
     response = client.post(
-        "/api/v1/assessments/evaluate",
+        "/api/tests/evaluate",
         json={
             "mbti": "ENTP",
             "axes": {"expression": 101, "attachment": 0, "manner": 0, "novelty": 0},
@@ -119,7 +132,7 @@ def test_rejects_out_of_range_score() -> None:
 
 
 def test_submits_complete_assessment_and_returns_mock_result() -> None:
-    response = client.post("/api/v1/assessments/submissions", json=_valid_submission())
+    response = client.post("/api/tests/submissions", json=_valid_submission())
 
     assert response.status_code == 200
     body = response.json()
@@ -136,7 +149,7 @@ def test_rejects_unsupported_assessment_version() -> None:
     payload = _valid_submission()
     payload["assessment_version"] = "old-version"
 
-    response = client.post("/api/v1/assessments/submissions", json=payload)
+    response = client.post("/api/tests/submissions", json=payload)
 
     assert response.status_code == 409
     assert response.json()["error"]["code"] == "ASSESSMENT_VERSION_UNSUPPORTED"
@@ -148,7 +161,7 @@ def test_rejects_missing_answer() -> None:
     assert isinstance(answers, list)
     answers.pop()
 
-    response = client.post("/api/v1/assessments/submissions", json=payload)
+    response = client.post("/api/tests/submissions", json=payload)
 
     assert response.status_code == 422
     assert response.json()["error"]["code"] == "ASSESSMENT_ANSWERS_INVALID"
@@ -164,7 +177,7 @@ def test_rejects_duplicate_question_answer() -> None:
     assert isinstance(last, dict)
     last["question_id"] = first["question_id"]
 
-    response = client.post("/api/v1/assessments/submissions", json=payload)
+    response = client.post("/api/tests/submissions", json=payload)
 
     assert response.status_code == 422
     assert "중복" in response.json()["error"]["message"]
@@ -178,7 +191,7 @@ def test_rejects_unknown_option_id() -> None:
     assert isinstance(first, dict)
     first["option_id"] = "not-registered"
 
-    response = client.post("/api/v1/assessments/submissions", json=payload)
+    response = client.post("/api/tests/submissions", json=payload)
 
     assert response.status_code == 422
     assert response.json()["error"]["code"] == "ASSESSMENT_ANSWERS_INVALID"
@@ -192,7 +205,7 @@ def test_rejects_unknown_question_id() -> None:
     assert isinstance(first, dict)
     first["question_id"] = "unknown.question"
 
-    response = client.post("/api/v1/assessments/submissions", json=payload)
+    response = client.post("/api/tests/submissions", json=payload)
 
     assert response.status_code == 422
     assert "알 수 없는 문항 ID" in response.json()["error"]["message"]
@@ -208,7 +221,7 @@ def test_rejects_answer_kind_mismatch() -> None:
     first["kind"] = "action"
     first["action_id"] = "press"
 
-    response = client.post("/api/v1/assessments/submissions", json=payload)
+    response = client.post("/api/tests/submissions", json=payload)
 
     assert response.status_code == 422
     assert "답변 타입" in response.json()["error"]["message"]
@@ -220,6 +233,6 @@ def test_rejects_mbti_midpoint() -> None:
     assert isinstance(mbti_scores, dict)
     mbti_scores["intuition"] = 50
 
-    response = client.post("/api/v1/assessments/submissions", json=payload)
+    response = client.post("/api/tests/submissions", json=payload)
 
     assert response.status_code == 422

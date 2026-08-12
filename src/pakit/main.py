@@ -32,7 +32,7 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    application.include_router(api_router, prefix=settings.api_v1_prefix)
+    application.include_router(api_router, prefix=settings.api_prefix)
 
     @application.get("/health", response_model=HealthResponse, tags=["system"])
     async def root_health() -> HealthResponse:

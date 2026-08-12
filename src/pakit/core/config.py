@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     app_name: str = "Pakit API"
     environment: Literal["local", "test", "staging", "production"] = "local"
     debug: bool = False
-    api_v1_prefix: str = "/api/v1"
+    api_prefix: str = "/api"
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
 
 
