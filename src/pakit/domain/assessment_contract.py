@@ -9,7 +9,7 @@ except ImportError:
         pass
 
 
-ASSESSMENT_VERSION = "2026-08-12.1"
+ASSESSMENT_VERSION = "2026-08-12.3"
 
 
 class AnswerKind(StrEnum):
@@ -22,7 +22,7 @@ class AnswerKind(StrEnum):
 @dataclass(frozen=True)
 class QuestionContract:
     answer_kind: AnswerKind
-    allowed_ids: frozenset[str] = frozenset()
+    allowed_values: frozenset[str] = frozenset()
 
 
 QUESTION_CONTRACTS: dict[str, QuestionContract] = {

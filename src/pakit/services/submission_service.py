@@ -1,6 +1,7 @@
 from pakit.domain.assessment_contract import (
     ASSESSMENT_VERSION,
     QUESTION_CONTRACTS,
+    AnswerKind,
 )
 from pakit.domain.assessment_submission import (
     AssessmentSubmission,
@@ -11,7 +12,6 @@ from pakit.domain.assessment_submission import (
     RarityData,
     SubmissionResultData,
     UnboxingData,
-    classify_mbti,
 )
 from pakit.domain.characters import CHARACTERS
 
@@ -40,14 +40,13 @@ def _validate_answers(submission: AssessmentSubmission) -> None:
 
     for answer in submission.answers:
         contract = QUESTION_CONTRACTS[answer.question_id]
-        if answer.kind != contract.answer_kind:
-            raise InvalidSubmissionError(
-                f"{answer.question_id}의 답변 타입은 {contract.answer_kind.value}이어야 합니다."
-            )
-        if contract.allowed_ids and answer.selected_id not in contract.allowed_ids:
-            raise InvalidSubmissionError(
-                f"{answer.question_id}에 허용되지 않은 선택지 또는 행동 ID입니다."
-            )
+        if contract.answer_kind in {AnswerKind.CHOICE, AnswerKind.ACTION}:
+            if not isinstance(answer.value, str):
+                raise InvalidSubmissionError(f"{answer.question_id}의 value는 문자열이어야 합니다.")
+            if answer.value not in contract.allowed_values:
+                raise InvalidSubmissionError(f"{answer.question_id}에 허용되지 않은 value입니다.")
+        elif not isinstance(answer.value, int):
+            raise InvalidSubmissionError(f"{answer.question_id}의 value는 정수여야 합니다.")
 
 
 def submit_assessment(submission: AssessmentSubmission) -> SubmissionResultData:
@@ -55,8 +54,7 @@ def submit_assessment(submission: AssessmentSubmission) -> SubmissionResultData:
         raise UnsupportedAssessmentVersionError
 
     _validate_answers(submission)
-    mbti = classify_mbti(submission.mbti_scores)
-    character = CHARACTERS[mbti]
+    character = CHARACTERS[submission.mbti]
     descriptor = "좋아하면 대놓고 자랑하는"
 
     return SubmissionResultData(

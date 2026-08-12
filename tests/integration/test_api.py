@@ -10,37 +10,20 @@ client = TestClient(app)
 def _valid_submission() -> dict[str, object]:
     answers: list[dict[str, object]] = []
     for question_id, contract in QUESTION_CONTRACTS.items():
-        if contract.answer_kind is AnswerKind.CHOICE:
+        if contract.answer_kind in {AnswerKind.CHOICE, AnswerKind.ACTION}:
             answers.append(
-                {
-                    "question_id": question_id,
-                    "kind": "choice",
-                    "option_id": sorted(contract.allowed_ids)[0],
-                }
-            )
-        elif contract.answer_kind is AnswerKind.ACTION:
-            answers.append(
-                {
-                    "question_id": question_id,
-                    "kind": "action",
-                    "action_id": sorted(contract.allowed_ids)[0],
-                }
+                {"question_id": question_id, "value": sorted(contract.allowed_values)[0]}
             )
         elif contract.answer_kind is AnswerKind.SCALE:
-            answers.append({"question_id": question_id, "kind": "scale", "value": 35})
+            answers.append({"question_id": question_id, "value": 35})
         else:
-            answers.append({"question_id": question_id, "kind": "integer", "value": 247})
+            answers.append({"question_id": question_id, "value": 247})
 
     return {
         "assessment_version": ASSESSMENT_VERSION,
         "participant": {"nickname": "송송"},
         "answers": answers,
-        "mbti_scores": {
-            "introversion": 80,
-            "intuition": 60,
-            "feeling": 40,
-            "perceiving": 80,
-        },
+        "mbti": "INTP",
     }
 
 
@@ -76,8 +59,12 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
     assert "/api/assessments/submissions" not in document["paths"]
     assert "/api/assessments/evaluate" not in document["paths"]
 
-    mbti_schema = document["components"]["schemas"]["MbtiScoresInput"]
-    assert mbti_schema["properties"]["introversion"]["description"] == ("외향형 E 0 ↔ 내향형 I 100")
+    submission_schema = document["components"]["schemas"]["AssessmentSubmissionInput"]
+    assert submission_schema["properties"]["mbti"]["description"] == (
+        "화면에서 선택한 네 글자 MBTI 유형"
+    )
+    answer_schema = document["components"]["schemas"]["AnswerInput"]
+    assert set(answer_schema["properties"]) == {"question_id", "value"}
 
 
 def test_swagger_submission_example_is_accepted() -> None:
@@ -183,18 +170,33 @@ def test_rejects_duplicate_question_answer() -> None:
     assert "중복" in response.json()["error"]["message"]
 
 
-def test_rejects_unknown_option_id() -> None:
+def test_rejects_unknown_answer_value() -> None:
     payload = _valid_submission()
     answers = payload["answers"]
     assert isinstance(answers, list)
     first = answers[0]
     assert isinstance(first, dict)
-    first["option_id"] = "not-registered"
+    first["value"] = "not-registered"
 
     response = client.post("/api/tests/submissions", json=payload)
 
     assert response.status_code == 422
     assert response.json()["error"]["code"] == "ASSESSMENT_ANSWERS_INVALID"
+
+
+def test_rejects_legacy_answer_fields() -> None:
+    payload = _valid_submission()
+    answers = payload["answers"]
+    assert isinstance(answers, list)
+    first = answers[0]
+    assert isinstance(first, dict)
+    first.pop("value")
+    first["kind"] = "choice"
+    first["option_id"] = "restaurant"
+
+    response = client.post("/api/tests/submissions", json=payload)
+
+    assert response.status_code == 422
 
 
 def test_rejects_unknown_question_id() -> None:
@@ -211,27 +213,37 @@ def test_rejects_unknown_question_id() -> None:
     assert "알 수 없는 문항 ID" in response.json()["error"]["message"]
 
 
-def test_rejects_answer_kind_mismatch() -> None:
+def test_rejects_string_answer_with_integer_value() -> None:
     payload = _valid_submission()
     answers = payload["answers"]
     assert isinstance(answers, list)
     first = answers[0]
     assert isinstance(first, dict)
-    first.pop("option_id")
-    first["kind"] = "action"
-    first["action_id"] = "press"
+    first["value"] = 123
 
     response = client.post("/api/tests/submissions", json=payload)
 
     assert response.status_code == 422
-    assert "답변 타입" in response.json()["error"]["message"]
+    assert "문자열" in response.json()["error"]["message"]
 
 
-def test_rejects_mbti_midpoint() -> None:
+def test_rejects_integer_answer_with_string_value() -> None:
     payload = _valid_submission()
-    mbti_scores = payload["mbti_scores"]
-    assert isinstance(mbti_scores, dict)
-    mbti_scores["intuition"] = 50
+    answers = payload["answers"]
+    assert isinstance(answers, list)
+    integer_answer = next(answer for answer in answers if answer["question_id"] == "step2.q06")
+    assert isinstance(integer_answer, dict)
+    integer_answer["value"] = "247"
+
+    response = client.post("/api/tests/submissions", json=payload)
+
+    assert response.status_code == 422
+    assert "정수" in response.json()["error"]["message"]
+
+
+def test_rejects_unknown_mbti() -> None:
+    payload = _valid_submission()
+    payload["mbti"] = "ABCD"
 
     response = client.post("/api/tests/submissions", json=payload)
 

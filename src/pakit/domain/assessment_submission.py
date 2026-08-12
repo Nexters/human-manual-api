@@ -1,23 +1,12 @@
 from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
-from pakit.domain.assessment_contract import AnswerKind
 
 
 @dataclass(frozen=True)
 class SubmittedAnswer:
     question_id: str
-    kind: AnswerKind
-    selected_id: str | None = None
-    value: int | None = None
-
-
-@dataclass(frozen=True)
-class MbtiScores:
-    introversion: int
-    intuition: int
-    feeling: int
-    perceiving: int
+    value: str | int
 
 
 @dataclass(frozen=True)
@@ -25,7 +14,7 @@ class AssessmentSubmission:
     assessment_version: str
     nickname: str
     answers: tuple[SubmittedAnswer, ...]
-    mbti_scores: MbtiScores
+    mbti: MbtiType
 
 
 @dataclass(frozen=True)
@@ -83,11 +72,3 @@ class SubmissionResultData:
     unboxing: UnboxingData
     manual: ManualData
     provisional_fields: tuple[str, ...]
-
-
-def classify_mbti(scores: MbtiScores) -> MbtiType:
-    energy = "I" if scores.introversion >= 50 else "E"
-    perception = "N" if scores.intuition >= 50 else "S"
-    judgment = "F" if scores.feeling >= 50 else "T"
-    lifestyle = "P" if scores.perceiving >= 50 else "J"
-    return MbtiType(f"{energy}{perception}{judgment}{lifestyle}")

@@ -1,55 +1,43 @@
 from dataclasses import asdict
-from typing import Annotated, Literal
+from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr
 
-from pakit.domain.assessment_contract import AnswerKind
+from pakit.domain.assessment import MbtiType
 from pakit.domain.assessment_submission import (
     AssessmentSubmission,
-    MbtiScores,
     SubmissionResultData,
     SubmittedAnswer,
 )
 
-AllowedMbtiScore = Literal[0, 20, 40, 60, 80, 100]
-
 ASSESSMENT_SUBMISSION_EXAMPLE: dict[str, object] = {
-    "assessment_version": "2026-08-12.1",
+    "assessment_version": "2026-08-12.3",
     "participant": {"nickname": "송송"},
     "answers": [
-        {"question_id": "step1.q01", "kind": "choice", "option_id": "restaurant"},
-        {"question_id": "step1.q02", "kind": "choice", "option_id": "navigation"},
-        {"question_id": "step1.q03", "kind": "choice", "option_id": "save_favorites"},
-        {"question_id": "step1.q04", "kind": "choice", "option_id": "phone_overuse"},
-        {"question_id": "step1.q05", "kind": "choice", "option_id": "after_waking"},
-        {"question_id": "step1.q06", "kind": "choice", "option_id": "rush"},
-        {"question_id": "step1.q07", "kind": "choice", "option_id": "sleep_until_noon"},
-        {"question_id": "step1.q08", "kind": "choice", "option_id": "go_to_bed"},
-        {"question_id": "step1.q09", "kind": "choice", "option_id": "tsundere"},
-        {"question_id": "step1.q10", "kind": "choice", "option_id": "morning_person"},
-        {"question_id": "step2.q01", "kind": "choice", "option_id": "inspect_profile"},
-        {"question_id": "step2.q02", "kind": "choice", "option_id": "hint_and_wait"},
-        {"question_id": "step2.q03", "kind": "choice", "option_id": "rehearse_with_ai"},
-        {"question_id": "step2.q04", "kind": "scale", "value": 50},
-        {"question_id": "step2.q05", "kind": "choice", "option_id": "share_everything"},
-        {"question_id": "step2.q06", "kind": "integer", "value": 247},
-        {"question_id": "step2.q07", "kind": "choice", "option_id": "decorate_for_mood"},
-        {"question_id": "step2.q08", "kind": "choice", "option_id": "express_with_words"},
-        {"question_id": "step2.q09", "kind": "choice", "option_id": "ruminate"},
-        {"question_id": "step2.q10", "kind": "choice", "option_id": "order_familiar_menu"},
-        {
-            "question_id": "step2.q11",
-            "kind": "choice",
-            "option_id": "order_familiar_stores",
-        },
-        {"question_id": "step2.q12", "kind": "action", "action_id": "press"},
+        {"question_id": "step1.q01", "value": "restaurant"},
+        {"question_id": "step1.q02", "value": "navigation"},
+        {"question_id": "step1.q03", "value": "save_favorites"},
+        {"question_id": "step1.q04", "value": "phone_overuse"},
+        {"question_id": "step1.q05", "value": "after_waking"},
+        {"question_id": "step1.q06", "value": "rush"},
+        {"question_id": "step1.q07", "value": "sleep_until_noon"},
+        {"question_id": "step1.q08", "value": "go_to_bed"},
+        {"question_id": "step1.q09", "value": "tsundere"},
+        {"question_id": "step1.q10", "value": "morning_person"},
+        {"question_id": "step2.q01", "value": "inspect_profile"},
+        {"question_id": "step2.q02", "value": "hint_and_wait"},
+        {"question_id": "step2.q03", "value": "rehearse_with_ai"},
+        {"question_id": "step2.q04", "value": 50},
+        {"question_id": "step2.q05", "value": "share_everything"},
+        {"question_id": "step2.q06", "value": 247},
+        {"question_id": "step2.q07", "value": "decorate_for_mood"},
+        {"question_id": "step2.q08", "value": "express_with_words"},
+        {"question_id": "step2.q09", "value": "ruminate"},
+        {"question_id": "step2.q10", "value": "order_familiar_menu"},
+        {"question_id": "step2.q11", "value": "order_familiar_stores"},
+        {"question_id": "step2.q12", "value": "press"},
     ],
-    "mbti_scores": {
-        "introversion": 80,
-        "intuition": 60,
-        "feeling": 40,
-        "perceiving": 80,
-    },
+    "mbti": "ENTP",
 }
 
 
@@ -61,51 +49,13 @@ class ParticipantInput(BaseModel):
     nickname: str = Field(min_length=1, description="결과 화면에 표시할 이름 또는 닉네임")
 
 
-class ChoiceAnswerInput(BaseModel):
-    """하나의 선택지를 고르는 문항의 답변입니다."""
+class AnswerInput(BaseModel):
+    """한 문항의 답변입니다."""
+
+    model_config = ConfigDict(extra="forbid")
 
     question_id: str = Field(description="문항 고정 ID")
-    kind: Literal["choice"] = Field(description="객관식 답변 타입")
-    option_id: str = Field(description="선택한 보기의 고정 ID")
-
-
-class ScaleAnswerInput(BaseModel):
-    """슬라이더로 입력하는 문항의 답변입니다."""
-
-    question_id: str = Field(description="문항 고정 ID")
-    kind: Literal["scale"] = Field(description="슬라이더 답변 타입")
-    value: int = Field(strict=True, description="슬라이더에서 선택한 정수 값")
-
-
-class IntegerAnswerInput(BaseModel):
-    """숫자를 직접 입력하는 문항의 답변입니다."""
-
-    question_id: str = Field(description="문항 고정 ID")
-    kind: Literal["integer"] = Field(description="정수 입력 답변 타입")
-    value: int = Field(strict=True, description="사용자가 직접 입력한 정수 값")
-
-
-class ActionAnswerInput(BaseModel):
-    """버튼 누르기 또는 건너뛰기처럼 행동을 선택하는 문항의 답변입니다."""
-
-    question_id: str = Field(description="문항 고정 ID")
-    kind: Literal["action"] = Field(description="행동 선택 답변 타입")
-    action_id: str = Field(description="선택한 행동의 고정 ID")
-
-
-AnswerInput = Annotated[
-    ChoiceAnswerInput | ScaleAnswerInput | IntegerAnswerInput | ActionAnswerInput,
-    Field(discriminator="kind"),
-]
-
-
-class MbtiScoresInput(BaseModel):
-    """MBTI 네 지표의 오른쪽 극점 기준 퍼센트입니다."""
-
-    introversion: AllowedMbtiScore = Field(description="외향형 E 0 ↔ 내향형 I 100")
-    intuition: AllowedMbtiScore = Field(description="감각형 S 0 ↔ 직관형 N 100")
-    feeling: AllowedMbtiScore = Field(description="사고형 T 0 ↔ 감정형 F 100")
-    perceiving: AllowedMbtiScore = Field(description="판단형 J 0 ↔ 인식형 P 100")
+    value: StrictStr | StrictInt = Field(description="선택한 영문 ID 또는 입력한 정수")
 
 
 class AssessmentSubmissionInput(BaseModel):
@@ -118,35 +68,16 @@ class AssessmentSubmissionInput(BaseModel):
         max_length=22,
         description="22개 고정 문항의 답변 목록",
     )
-    mbti_scores: MbtiScoresInput = Field(
-        description="0·20·40·60·80·100 중 하나로 입력한 MBTI 축별 퍼센트"
-    )
+    mbti: MbtiType = Field(description="화면에서 선택한 네 글자 MBTI 유형")
 
     def to_domain(self) -> AssessmentSubmission:
-        answers: list[SubmittedAnswer] = []
-        for answer in self.answers:
-            if isinstance(answer, ChoiceAnswerInput):
-                answers.append(
-                    SubmittedAnswer(answer.question_id, AnswerKind.CHOICE, answer.option_id)
-                )
-            elif isinstance(answer, ActionAnswerInput):
-                answers.append(
-                    SubmittedAnswer(answer.question_id, AnswerKind.ACTION, answer.action_id)
-                )
-            elif isinstance(answer, ScaleAnswerInput):
-                answers.append(
-                    SubmittedAnswer(answer.question_id, AnswerKind.SCALE, value=answer.value)
-                )
-            else:
-                answers.append(
-                    SubmittedAnswer(answer.question_id, AnswerKind.INTEGER, value=answer.value)
-                )
+        answers = [SubmittedAnswer(answer.question_id, answer.value) for answer in self.answers]
 
         return AssessmentSubmission(
             assessment_version=self.assessment_version,
             nickname=self.participant.nickname,
             answers=tuple(answers),
-            mbti_scores=MbtiScores(**self.mbti_scores.model_dump()),
+            mbti=self.mbti,
         )
 
 
