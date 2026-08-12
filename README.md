@@ -50,6 +50,8 @@ src/pakit/
 22개 문항의 기계 판독 가능한 ID 목록은
 [`docs/assessment-identifiers.v1.json`](./docs/assessment-identifiers.v1.json)에 있습니다.
 실행 가능한 요청·응답 명세와 예시는 서버 실행 후 `/docs`의 Swagger에서 확인할 수 있습니다.
+결과 페이지 와이어프레임 기반의 다음 응답 계약 제안은
+[`docs/result-page-contract.md`](./docs/result-page-contract.md)에 있습니다.
 
 ## Codex로 작업하기
 
