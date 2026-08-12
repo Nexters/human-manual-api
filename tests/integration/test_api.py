@@ -1,6 +1,9 @@
 from fastapi.testclient import TestClient
 
-from pakit.api.schemas.assessment_submissions import ASSESSMENT_SUBMISSION_EXAMPLE
+from pakit.api.schemas.assessment_submissions import (
+    ASSESSMENT_SUBMISSION_EXAMPLE,
+    ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE,
+)
 from pakit.domain.assessment_contract import ASSESSMENT_VERSION, QUESTION_CONTRACTS, AnswerKind
 from pakit.main import app
 
@@ -51,6 +54,11 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
     ]
     assert swagger_example["value"] == ASSESSMENT_SUBMISSION_EXAMPLE
     assert "실제 문항·선택지 ID" in swagger_example["description"]
+    response_example = operation["responses"]["200"]["content"]["application/json"]["example"]
+    assert response_example == ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE
+    get_operation = document["paths"]["/api/results/{result_code}"]["get"]
+    assert get_operation["summary"] == "테스트 결과 조회"
+    assert "demo-result-code" in get_operation["description"]
 
     test_tag = next(tag for tag in document["tags"] if tag["name"] == "Test")
     assert "답변 제출" in test_tag["description"]
@@ -65,6 +73,16 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
     )
     answer_schema = document["components"]["schemas"]["AnswerInput"]
     assert set(answer_schema["properties"]) == {"question_id", "value"}
+    result_schema = document["components"]["schemas"]["AssessmentSubmissionOutput"]
+    assert set(result_schema["properties"]) == {
+        "result_code",
+        "overview",
+        "unboxing_kit",
+        "features",
+        "can_do",
+        "warnings",
+        "charging",
+    }
 
 
 def test_swagger_submission_example_is_accepted() -> None:
@@ -74,6 +92,35 @@ def test_swagger_submission_example_is_accepted() -> None:
     )
 
     assert response.status_code == 200
+    body = response.json()
+    expected = ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE | {"result_code": body["result_code"]}
+    assert body == expected
+
+
+def test_gets_submitted_result_by_result_code() -> None:
+    submitted = client.post(
+        "/api/tests/submissions",
+        json=ASSESSMENT_SUBMISSION_EXAMPLE,
+    )
+    assert submitted.status_code == 200
+    submitted_body = submitted.json()
+
+    response = client.get(f"/api/results/{submitted_body['result_code']}")
+
+    assert response.status_code == 200
+    assert response.json() == submitted_body == ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE
+
+
+def test_returns_404_for_unknown_result_code() -> None:
+    response = client.get("/api/results/not-found")
+
+    assert response.status_code == 404
+    assert response.json() == {
+        "error": {
+            "code": "TEST_RESULT_NOT_FOUND",
+            "message": "테스트 결과를 찾을 수 없습니다.",
+        }
+    }
 
 
 def test_old_versioned_test_path_is_not_available() -> None:
@@ -123,13 +170,29 @@ def test_submits_complete_assessment_and_returns_mock_result() -> None:
 
     assert response.status_code == 200
     body = response.json()
-    assert body["mode"] == "mock"
-    assert body["persisted"] is False
-    assert body["result_id"] is None
-    assert body["product"]["noun"] == "망원경"
-    assert body["product"]["character_asset_key"] == "image_telescope_340"
-    assert body["manual"]["introduction"]["model_name"] == "송송"
-    assert body["provisional_fields"] == ["product.name", "unboxing", "manual"]
+    assert set(body) == {
+        "result_code",
+        "overview",
+        "unboxing_kit",
+        "features",
+        "can_do",
+        "warnings",
+        "charging",
+    }
+    assert body["overview"]["noun"] == "망원경"
+    assert body["overview"]["character_id"] == "telescope"
+    assert body["overview"]["result_name"].endswith("망원경")
+    assert len(body["overview"]["tags"]) == 3
+    assert body["unboxing_kit"]["axis_scores"] == {
+        "attachment": 20,
+        "expression": 65,
+        "routine": 20,
+        "egen": 75,
+    }
+    assert len(body["features"]) == 4
+    assert len(body["can_do"]) == 4
+    assert len(body["warnings"]) == 4
+    assert len(body["charging"]["activities"]) == 3
 
 
 def test_rejects_unsupported_assessment_version() -> None:

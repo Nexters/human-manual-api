@@ -43,14 +43,16 @@ src/pakit/
 확정되었으며, 아직 미확정인 형용사 문구는 응답의 `provisional`로 명시합니다.
 
 프론트엔드는 완료된 22개 답변과 선택한 MBTI 유형을
-`POST /api/tests/submissions`로 제출할 수 있습니다. 현재 응답은 MBTI별 최종
-캐릭터를 사용하되, 채점 규칙과 결과 카피가 확정되기 전까지 `mode: "mock"`으로 반환합니다.
+`POST /api/tests/submissions`로 제출할 수 있습니다. 응답은 결과 페이지의 6개 영역으로
+구성되며, 응답의 `result_code`를 사용해 `GET /api/results/{result_code}`로 다시 조회할 수
+있습니다. MBTI별 캐릭터 명사를 제외한 성향 점수·충전 점수·결과 문구는 현재 목업값입니다.
+현재 GET API는 `demo-result-code`만 지원하며 고정 데모 결과를 반환합니다.
 
 상세 결정 사항과 다음 구현 순서는 [`docs/architecture.md`](./docs/architecture.md)를 참고하세요.
 22개 문항의 기계 판독 가능한 ID 목록은
 [`docs/assessment-identifiers.v1.json`](./docs/assessment-identifiers.v1.json)에 있습니다.
 실행 가능한 요청·응답 명세와 예시는 서버 실행 후 `/docs`의 Swagger에서 확인할 수 있습니다.
-결과 페이지 와이어프레임 기반의 다음 응답 계약 제안은
+결과 페이지 와이어프레임 기반의 응답 계약은
 [`docs/result-page-contract.md`](./docs/result-page-contract.md)에 있습니다.
 
 ## Codex로 작업하기

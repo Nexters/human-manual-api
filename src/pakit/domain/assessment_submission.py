@@ -18,57 +18,65 @@ class AssessmentSubmission:
 
 
 @dataclass(frozen=True)
-class ProductData:
-    name: str
+class OverviewData:
+    rarity: str
+    adjective: str
     noun: str
-    character_code: str
-    character_asset_key: str
+    result_name: str
+    character_id: str
+    tags: tuple[str, ...]
 
 
 @dataclass(frozen=True)
-class UnboxingData:
-    packaging_code: str
-    opening_tool_code: str
+class AxisScoresData:
+    attachment: int
+    expression: int
+    routine: int
+    egen: int
 
 
 @dataclass(frozen=True)
-class IntroductionData:
-    model_name: str
-    summary: str
-    version: str
+class UnboxingItemData:
+    type: str
+    name: str
+    tags: tuple[str, ...]
+    reason: str
 
 
 @dataclass(frozen=True)
-class CompatibilityData:
-    compatible: tuple[str, ...]
-    incompatible: tuple[str, ...]
+class UnboxingKitData:
+    axis_scores: AxisScoresData
+    title: str
+    description: str
+    packaging: UnboxingItemData
+    opening_tool: UnboxingItemData
 
 
 @dataclass(frozen=True)
-class RarityData:
-    grade: str | None
-    percentage: float | None
+class FeatureData:
+    title: str
+    description: str
 
 
 @dataclass(frozen=True)
-class ManualData:
-    introduction: IntroductionData
-    core_features: tuple[str, ...]
-    precautions: tuple[str, ...]
-    bugs: tuple[str, ...]
-    compatibility: CompatibilityData
-    rarity: RarityData
-    charging: tuple[str, ...]
+class ChargingActivityData:
+    type: str
+    label: str
+
+
+@dataclass(frozen=True)
+class ChargingData:
+    score: int
+    description: str
+    activities: tuple[ChargingActivityData, ...]
 
 
 @dataclass(frozen=True)
 class SubmissionResultData:
-    result_id: str | None
-    persisted: bool
-    mode: str
-    assessment_version: str
-    content_version: str
-    product: ProductData
-    unboxing: UnboxingData
-    manual: ManualData
-    provisional_fields: tuple[str, ...]
+    result_code: str
+    overview: OverviewData
+    unboxing_kit: UnboxingKitData
+    features: tuple[FeatureData, ...]
+    can_do: tuple[str, ...]
+    warnings: tuple[str, ...]
+    charging: ChargingData

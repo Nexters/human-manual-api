@@ -1,10 +1,11 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, Path
 from fastapi.responses import JSONResponse
 
 from pakit.api.schemas.assessment_submissions import (
     ASSESSMENT_SUBMISSION_EXAMPLE,
+    ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE,
     AssessmentSubmissionInput,
     AssessmentSubmissionOutput,
     ErrorResponse,
@@ -13,11 +14,14 @@ from pakit.domain.assessment import AssessmentInput, AssessmentResult
 from pakit.services.result_builder import build_assessment_result
 from pakit.services.submission_service import (
     InvalidSubmissionError,
+    ResultNotFoundError,
     UnsupportedAssessmentVersionError,
+    get_result,
     submit_assessment,
 )
 
 router = APIRouter(prefix="/tests", tags=["Test"])
+results_router = APIRouter(prefix="/results", tags=["Test"])
 
 
 @router.post(
@@ -37,12 +41,21 @@ router = APIRouter(prefix="/tests", tags=["Test"])
         "- 문항별 `value`가 계약에 맞는 문자열 또는 정수인지 확인합니다.\n"
         "- 선택한 MBTI에 맞는 최종 캐릭터를 선택합니다.\n\n"
         "### 현재 응답 범위\n"
-        "현재는 프론트엔드 개발을 위한 **목업 결과**를 반환합니다. "
-        "`mode`는 `mock`, `persisted`는 `false`, `result_id`는 `null`입니다. "
-        "캐릭터는 실제 MBTI 매핑 결과이며, 제품명·언박싱·사용 설명서 문구는 임시 데이터입니다."
+        "결과 조회용 `result_code`와 결과 페이지에 필요한 `overview`, `unboxing_kit`, "
+        "`features`, `can_do`, "
+        "`warnings`, `charging`을 반환합니다. 캐릭터 명사는 실제 MBTI 매핑 결과이며, "
+        "성향 점수·충전 점수·결과 문구는 프론트엔드 연동용 목업 데이터입니다."
     ),
-    response_description="검증을 통과한 테스트 목업 결과",
+    response_description="결과 페이지 형식의 테스트 목업 결과",
     responses={
+        200: {
+            "description": "결과 페이지 형식의 테스트 목업 결과",
+            "content": {
+                "application/json": {
+                    "example": ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE,
+                }
+            },
+        },
         409: {"model": ErrorResponse, "description": "지원하지 않는 테스트 버전"},
         422: {"model": ErrorResponse, "description": "테스트 답변 검증 실패"},
     },
@@ -85,6 +98,49 @@ async def create_assessment_submission(
                 "error": {
                     "code": "ASSESSMENT_ANSWERS_INVALID",
                     "message": str(error),
+                }
+            },
+        )
+    return AssessmentSubmissionOutput.from_domain(result)
+
+
+@results_router.get(
+    "/{result_code}",
+    response_model=AssessmentSubmissionOutput,
+    summary="테스트 결과 조회",
+    description=(
+        "테스트 제출 API에서 받은 `result_code`로 결과를 조회합니다. "
+        "현재 목업에서는 `demo-result-code`만 사용할 수 있으며 고정 데모 결과를 반환합니다."
+    ),
+    response_description="result_code에 해당하는 테스트 결과",
+    responses={
+        200: {
+            "description": "result_code에 해당하는 테스트 결과",
+            "content": {
+                "application/json": {
+                    "example": ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE,
+                }
+            },
+        },
+        404: {"model": ErrorResponse, "description": "결과를 찾을 수 없음"},
+    },
+)
+async def get_assessment_result(
+    result_code: Annotated[
+        str,
+        Path(description="테스트 제출 응답에서 받은 결과 조회 코드"),
+    ],
+) -> AssessmentSubmissionOutput | JSONResponse:
+    """고정 목업 코드로 데모 테스트 결과를 조회합니다."""
+    try:
+        result = get_result(result_code)
+    except ResultNotFoundError:
+        return JSONResponse(
+            status_code=404,
+            content={
+                "error": {
+                    "code": "TEST_RESULT_NOT_FOUND",
+                    "message": "테스트 결과를 찾을 수 없습니다.",
                 }
             },
         )
