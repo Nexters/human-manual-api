@@ -17,6 +17,20 @@ uv run uvicorn pakit.main:app --reload
 - 상태 확인: <http://localhost:8000/health>
 - API 상태 확인: <http://localhost:8000/api/health>
 
+## Docker Compose로 실행하기
+
+FastAPI와 PostgreSQL을 한 서버에서 함께 실행할 수 있습니다. 먼저 `.env.example`을 복사하고
+`POSTGRES_PASSWORD`에 로컬 또는 운영 환경의 비밀번호를 설정합니다.
+
+```bash
+cp .env.example .env
+docker compose up --build -d
+```
+
+PostgreSQL은 외부 포트를 열지 않고 Compose 내부 네트워크에서만 접근할 수 있습니다. 데이터는
+`postgres_data` 볼륨에 저장되므로 일반적인 컨테이너 재시작과 재배포 후에도 유지됩니다.
+`docker compose down -v`는 데이터 볼륨까지 삭제하므로 운영 서버에서 실행하지 않습니다.
+
 ## 자주 쓰는 명령
 
 ```bash
