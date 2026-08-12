@@ -10,6 +10,7 @@ from pakit.core.config import get_settings
 def create_app() -> FastAPI:
     settings = get_settings()
     application = FastAPI(
+        root_path="",
         title=settings.app_name,
         version=__version__,
         debug=settings.debug,
