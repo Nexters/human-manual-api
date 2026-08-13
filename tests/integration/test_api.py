@@ -218,7 +218,7 @@ def test_rejects_out_of_range_score() -> None:
     assert response.status_code == 422
 
 
-def test_submits_complete_assessment_and_returns_mock_result() -> None:
+def test_submits_complete_assessment_and_returns_mixed_result() -> None:
     response = client.post("/api/tests/submissions", json=_valid_submission())
 
     assert response.status_code == 200
@@ -242,6 +242,55 @@ def test_submits_complete_assessment_and_returns_mock_result() -> None:
     assert len(body["can_do"]) == 4
     assert len(body["warnings"]) == 4
     assert len(body["charging"]["activities"]) == 3
+
+
+def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> None:
+    payload = ASSESSMENT_SUBMISSION_EXAMPLE | {"mbti": "INTP"}
+    example_answers = ASSESSMENT_SUBMISSION_EXAMPLE["answers"]
+    assert isinstance(example_answers, list)
+    payload["answers"] = [
+        answer
+        | {
+            "value": {
+                "step2.q01": "approach_directly",
+                "step2.q02": "resolve_immediately",
+                "step2.q03": "send_immediately",
+                "step2.q04": 100,
+                "step2.q05": "share_selectively",
+                "step2.q06": 999,
+                "step2.q07": "decorate_for_mood",
+                "step2.q08": "express_with_actions",
+                "step2.q09": "forget_quickly",
+                "step2.q10": "try_new_menu",
+                "step2.q11": "try_new_store",
+                "step2.q12": "press",
+            }.get(answer["question_id"], answer["value"])
+        }
+        for answer in example_answers
+    ]
+
+    response = client.post("/api/tests/submissions", json=payload)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["overview"] | {"tags": []} == {
+        "rarity": "상위 4%",
+        "adjective": '"어디야" 물을 때마다 다른 나라 가 있는',
+        "noun": "망원경",
+        "result_name": '"어디야" 물을 때마다 다른 나라 가 있는 망원경',
+        "character_id": "telescope",
+        "image_url": "/assets/characters/telescope.png",
+        "tags": [],
+    }
+    assert body["unboxing_kit"]["axis_scores"] == {
+        "attachment": 0,
+        "expression": 100,
+        "routine": 0,
+        "egen": 33,
+    }
+    assert body["unboxing_kit"]["title"] == "고백도 통보로 하는 사람"
+    assert body["unboxing_kit"]["packaging"]["type"] == "minimal_box"
+    assert body["unboxing_kit"]["opening_tool"]["type"] == "chainsaw"
 
 
 def test_serves_character_image_from_result_url() -> None:

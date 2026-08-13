@@ -85,7 +85,7 @@ def _unboxing_item(item: UnboxingItemCopy) -> UnboxingItemData:
     )
 
 
-def _build_mock_result(
+def _build_result(
     submission: AssessmentSubmission,
     result_code: str,
     classification: AssessmentClassification,
@@ -149,7 +149,7 @@ def submit_assessment(submission: AssessmentSubmission) -> SubmissionResultData:
         raise UnsupportedAssessmentVersionError
 
     _validate_answers(submission)
-    result = _build_mock_result(
+    result = _build_result(
         submission,
         DEMO_RESULT_CODE,
         classify_submission(submission),
@@ -185,7 +185,7 @@ _DEFAULT_DEMO_SUBMISSION = AssessmentSubmission(
     mbti=MbtiType.ENTP,
 )
 _DEMO_RESULTS: dict[str, SubmissionResultData] = {
-    DEMO_RESULT_CODE: _build_mock_result(
+    DEMO_RESULT_CODE: _build_result(
         _DEFAULT_DEMO_SUBMISSION,
         DEMO_RESULT_CODE,
         classify_submission(_DEFAULT_DEMO_SUBMISSION),

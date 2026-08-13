@@ -39,17 +39,19 @@ results_router = APIRouter(prefix="/results", tags=["Test"])
         "- 테스트 버전이 현재 서버 버전과 일치하는지 확인합니다.\n"
         "- 22개 문항이 빠짐없이 한 번씩 제출됐는지 확인합니다.\n"
         "- 문항별 `value`가 계약에 맞는 문자열 또는 정수인지 확인합니다.\n"
-        "- 선택한 MBTI에 맞는 최종 캐릭터를 선택합니다.\n\n"
+        "- STEP 2 답변으로 성향 점수, 형용사, 포장 상자와 개봉 도구를 결정합니다.\n"
+        "- 선택한 MBTI에 맞는 장난감 명사, 캐릭터와 이미지를 결정합니다.\n\n"
         "### 현재 응답 범위\n"
         "결과 조회용 `result_code`와 결과 페이지에 필요한 `overview`, `unboxing_kit`, "
         "`features`, `can_do`, "
-        "`warnings`, `charging`을 반환합니다. 캐릭터 명사는 실제 MBTI 매핑 결과이며, "
-        "성향 점수·충전 점수·결과 문구는 프론트엔드 연동용 목업 데이터입니다."
+        "`warnings`, `charging`을 반환합니다. 형용사·장난감·캐릭터·이미지·성향 점수·"
+        "조합 소개·포장 상자·개봉 도구는 제출값으로 결정됩니다. 희귀도·상단 태그·핵심 특징·"
+        "사용 방법·주의사항·충전 영역은 아직 프론트엔드 연동용 목업 데이터입니다."
     ),
-    response_description="결과 페이지 형식의 테스트 목업 결과",
+    response_description="규칙 기반 분류와 목업 콘텐츠를 조합한 테스트 결과",
     responses={
         200: {
-            "description": "결과 페이지 형식의 테스트 목업 결과",
+            "description": "규칙 기반 분류와 목업 콘텐츠를 조합한 테스트 결과",
             "content": {
                 "application/json": {
                     "example": ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE,
@@ -78,7 +80,7 @@ async def create_assessment_submission(
         ),
     ],
 ) -> AssessmentSubmissionOutput | JSONResponse:
-    """완료한 테스트 답변을 검증하고 목업 결과를 반환합니다."""
+    """완료한 테스트 답변을 검증하고 규칙 기반 결과를 반환합니다."""
     try:
         result = submit_assessment(data.to_domain())
     except UnsupportedAssessmentVersionError:
