@@ -20,10 +20,11 @@ from pakit.services.assessment_classifier import (
     AssessmentClassification,
     classify_submission,
 )
+from pakit.services.emotional_processing_service import build_emotional_processing_feature
 from pakit.services.motivation_service import build_motivation_feature
 from pakit.services.result_content import (
     COMBINATION_COPY,
-    MBTI_FEATURE_COPY,
+    MBTI_STRENGTH_COPY,
     OPENING_TOOL_COPY,
     PACKAGING_COPY,
     RELATIONSHIP_ROLE_COPY,
@@ -105,8 +106,12 @@ def _build_result(
     ]
     answers = {answer.question_id: str(answer.value) for answer in submission.answers}
     relationship_role = RELATIONSHIP_ROLE_COPY[(answers["step1.q01"], answers["step1.q02"])]
-    mbti_features = MBTI_FEATURE_COPY[submission.mbti]
+    mbti_strength = MBTI_STRENGTH_COPY[submission.mbti]
     motivation_feature = build_motivation_feature(answers["step1.q11"], submission.mbti)
+    emotional_processing_feature = build_emotional_processing_feature(
+        classification.axis_scores.expression,
+        classification.axis_scores.egen,
+    )
 
     return SubmissionResultData(
         result_code=result_code,
@@ -127,7 +132,13 @@ def _build_result(
             opening_tool=_unboxing_item(OPENING_TOOL_COPY[classification.opening_tool_code]),
         ),
         features=tuple(
-            _feature(item) for item in (motivation_feature, relationship_role, *mbti_features)
+            _feature(item)
+            for item in (
+                motivation_feature,
+                relationship_role,
+                emotional_processing_feature,
+                mbti_strength,
+            )
         ),
         can_do=(
             "같이 놀아주세요",

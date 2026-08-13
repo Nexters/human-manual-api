@@ -110,12 +110,14 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
             ),
         },
         {
-            "title": "허점 레이더",
-            "description": "모두가 당연하다고 넘긴 곳에서 다른 가능성을 발견해요.",
+            "title": "혼자 곱씹어요",
+            "description": (
+                "마음이 복잡하면 바로 꺼내기보다 충분히 들여다보고, 준비가 되면 차근차근 말해요."
+            ),
         },
         {
-            "title": "아이디어 시동",
-            "description": "생각이 떠오르면 직접 굴려보며 쓸 만한 답을 만들어요.",
+            "title": "다르게 봐요",
+            "description": "모두가 당연하다고 넘긴 곳에서 다른 가능성을 발견해요.",
         },
     ],
     "can_do": [

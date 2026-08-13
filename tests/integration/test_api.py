@@ -308,12 +308,12 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
             ),
         },
         {
-            "title": "원리 해부자",
-            "description": "당연해 보이는 것도 작동 원리를 알 때까지 파고들어요.",
+            "title": "바로 해결해요",
+            "description": "걸리는 건 바로 확인하고, 해결할 일을 끝낸 뒤 다음 행동으로 넘어가요.",
         },
         {
-            "title": "가설 실험실",
-            "description": "떠오른 생각을 여러 가능성에 대입하며 더 나은 답을 찾아요.",
+            "title": "원리를 따져요",
+            "description": "당연해 보이는 것도 작동 원리를 알 때까지 파고들어요.",
         },
     ]
 

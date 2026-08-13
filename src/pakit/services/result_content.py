@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-14.5"
+RESULT_CONTENT_VERSION = "2026-08-14.10"
 
 
 @dataclass(frozen=True)
@@ -218,70 +218,70 @@ RELATIONSHIP_ROLE_COPY: dict[tuple[str, str], FeatureCopy] = {
 }
 
 
-MBTI_FEATURE_COPY: dict[MbtiType, tuple[FeatureCopy, FeatureCopy]] = {
-    MbtiType.INTJ: (
-        FeatureCopy("큰그림 조립", "흩어진 조각을 연결해 전체가 맞아떨어지는 구조를 봐요."),
-        FeatureCopy("허점 봉쇄", "시작하기 전에 막힐 곳을 찾아 오래 가는 답을 만들어요."),
+EMOTIONAL_PROCESSING_COPY: dict[tuple[str, str], FeatureCopy] = {
+    ("explore", "egen"): FeatureCopy(
+        "혼자 곱씹어요",
+        "마음이 복잡하면 바로 꺼내기보다 충분히 들여다보고, 준비가 되면 차근차근 말해요.",
     ),
-    MbtiType.ISTJ: (
-        FeatureCopy("기준 보관함", "바뀌면 안 되는 약속과 원칙을 정확하게 기억해요."),
-        FeatureCopy("끝맺음 장인", "맡은 일은 빠뜨리는 것 없이 마지막 칸까지 채워요."),
+    ("direct", "egen"): FeatureCopy(
+        "서운하면 직구",
+        "서운한 건 쌓아두지 않고 바로 꺼내, 서로의 마음을 확인해야 풀려요.",
     ),
-    MbtiType.ENTJ: (
-        FeatureCopy("목표 견인차", "멀리 있는 목표도 사람과 자원을 모아 앞으로 끌고 가요."),
-        FeatureCopy("판 키우기", "작은 가능성을 발견하면 더 큰 결과가 나도록 규모를 키워요."),
+    ("explore", "teto"): FeatureCopy(
+        "생각정리 먼저",
+        "마음이 복잡할수록 먼저 상황을 정리하고, 말보다 필요한 행동으로 풀어내요.",
     ),
-    MbtiType.ESTJ: (
-        FeatureCopy("질서 복구반", "엉킨 상황에서도 역할과 순서를 빠르게 다시 세워요."),
-        FeatureCopy("운영 자동화", "한 번 정리한 일은 누구나 따라 할 흐름으로 굳혀놔요."),
+    ("direct", "teto"): FeatureCopy(
+        "바로 해결해요",
+        "걸리는 건 바로 확인하고, 해결할 일을 끝낸 뒤 다음 행동으로 넘어가요.",
     ),
-    MbtiType.INFJ: (
-        FeatureCopy("행간 탐지기", "겉으로 한 말보다 그 안에 숨은 의도와 마음을 먼저 읽어요."),
-        FeatureCopy("의미 추적자", "눈앞의 선택이 오래 남길 의미까지 생각하며 움직여요."),
+}
+
+
+MBTI_STRENGTH_COPY: dict[MbtiType, FeatureCopy] = {
+    MbtiType.INTJ: FeatureCopy(
+        "큰그림을 봐요", "흩어진 조각을 연결해 전체가 맞아떨어지는 구조를 봐요."
     ),
-    MbtiType.ISFJ: (
-        FeatureCopy("내편 방어막", "한번 자기 사람으로 받아들이면 필요한 순간을 지켜줘요."),
-        FeatureCopy("기억형 다정", "지나간 취향과 약속을 기억했다가 조용히 행동으로 옮겨요."),
+    MbtiType.ISTJ: FeatureCopy("끝까지 해내요", "맡은 일은 빠뜨리는 것 없이 마지막 칸까지 채워요."),
+    MbtiType.ENTJ: FeatureCopy(
+        "목표를 이뤄요", "멀리 있는 목표도 사람과 자원을 모아 앞으로 끌고 가요."
     ),
-    MbtiType.ENFJ: (
-        FeatureCopy("가능성 조명", "상대도 몰랐던 장점을 발견해 스스로 보게 해줘요."),
-        FeatureCopy("사람 추진력", "혼자 망설이던 사람도 함께 움직일 용기를 얻게 만들어요."),
+    MbtiType.ESTJ: FeatureCopy(
+        "순서대로 해요", "엉킨 상황에서도 역할과 순서를 빠르게 다시 세워요."
     ),
-    MbtiType.ESFJ: (
-        FeatureCopy("분위기 관제", "누가 편하고 불편한지 살피며 모두가 섞일 자리를 만들어요."),
-        FeatureCopy("관계 윤활유", "작은 안부와 배려로 사람 사이가 부드럽게 돌아가게 해요."),
+    MbtiType.INFJ: FeatureCopy(
+        "마음을 읽어요", "겉으로 한 말보다 그 안에 숨은 의도와 마음을 먼저 읽어요."
     ),
-    MbtiType.INFP: (
-        FeatureCopy("마음 원본형", "남의 기준보다 자신이 진짜 중요하게 여기는 것을 지켜요."),
-        FeatureCopy("상상 보존소", "현실에 아직 없는 장면도 오래 품어 자기 방식으로 키워요."),
+    MbtiType.ISFJ: FeatureCopy(
+        "내편은 지켜요", "한번 자기 사람으로 받아들이면 필요한 순간을 지켜줘요."
     ),
-    MbtiType.ISFP: (
-        FeatureCopy("감각 나침반", "말로 설명하기 전에도 자신에게 맞는 결을 알아봐요."),
-        FeatureCopy("평온 수호자", "경쟁에 휩쓸리기보다 자기 속도로 좋은 순간을 지켜요."),
+    MbtiType.ENFJ: FeatureCopy("용기를 줘요", "상대도 몰랐던 장점을 발견해 스스로 보게 해줘요."),
+    MbtiType.ESFJ: FeatureCopy(
+        "모두를 챙겨요", "작은 안부와 배려로 사람 사이가 부드럽게 돌아가게 해요."
     ),
-    MbtiType.ENFP: (
-        FeatureCopy("가능성 레이더", "사람과 상황에서 아직 펼쳐지지 않은 재미를 먼저 발견해요."),
-        FeatureCopy("호기심 전염", "자신이 발견한 가능성에 주변까지 함께 설레게 만들어요."),
+    MbtiType.INFP: FeatureCopy(
+        "소신을 지켜요", "남의 기준보다 자신이 진짜 중요하게 여기는 것을 지켜요."
     ),
-    MbtiType.ESFP: (
-        FeatureCopy("현재 점화기", "지금 이 순간 즐길 수 있는 것을 놓치지 않고 켜요."),
-        FeatureCopy("즐거움 배달", "혼자 신나는 데서 끝나지 않고 주변까지 기분 좋게 만들어요."),
+    MbtiType.ISFP: FeatureCopy(
+        "감각을 믿어요", "말로 설명하기 전에도 자신에게 맞는 결을 알아봐요."
     ),
-    MbtiType.INTP: (
-        FeatureCopy("원리 해부자", "당연해 보이는 것도 작동 원리를 알 때까지 파고들어요."),
-        FeatureCopy("가설 실험실", "떠오른 생각을 여러 가능성에 대입하며 더 나은 답을 찾아요."),
+    MbtiType.ENFP: FeatureCopy(
+        "가능성을 봐요", "사람과 상황에서 아직 펼쳐지지 않은 재미를 먼저 발견해요."
     ),
-    MbtiType.ISTP: (
-        FeatureCopy("손끝 해결사", "설명만 늘이기보다 직접 만져 가장 빠른 해결책을 찾아요."),
-        FeatureCopy("실전 최적화", "필요한 기술을 익혀 복잡한 문제를 단순하게 처리해요."),
+    MbtiType.ESFP: FeatureCopy(
+        "지금을 즐겨요", "지금 이 순간의 즐거움을 찾아 주변 사람과 함께 나눠요."
     ),
-    MbtiType.ENTP: (
-        FeatureCopy("허점 레이더", "모두가 당연하다고 넘긴 곳에서 다른 가능성을 발견해요."),
-        FeatureCopy("아이디어 시동", "생각이 떠오르면 직접 굴려보며 쓸 만한 답을 만들어요."),
+    MbtiType.INTP: FeatureCopy(
+        "원리를 따져요", "당연해 보이는 것도 작동 원리를 알 때까지 파고들어요."
     ),
-    MbtiType.ESTP: (
-        FeatureCopy("기회 포착기", "눈앞의 변화를 빠르게 읽고 잡을 수 있을 때 움직여요."),
-        FeatureCopy("현장 돌파력", "계획이 어긋나도 바로 반응해 지금 통하는 방법을 찾아요."),
+    MbtiType.ISTP: FeatureCopy(
+        "직접 해결해요", "설명만 늘이기보다 직접 만져 가장 빠른 해결책을 찾아요."
+    ),
+    MbtiType.ENTP: FeatureCopy(
+        "다르게 봐요", "모두가 당연하다고 넘긴 곳에서 다른 가능성을 발견해요."
+    ),
+    MbtiType.ESTP: FeatureCopy(
+        "기회를 잡아요", "눈앞의 변화를 빠르게 읽고 잡을 수 있을 때 움직여요."
     ),
 }
 

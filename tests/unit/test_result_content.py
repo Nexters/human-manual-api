@@ -1,8 +1,9 @@
 from pakit.domain.assessment import MbtiType
 from pakit.services.result_content import (
     COMBINATION_COPY,
-    MBTI_FEATURE_COPY,
+    EMOTIONAL_PROCESSING_COPY,
     MBTI_MOTIVATION_GROUP,
+    MBTI_STRENGTH_COPY,
     MOTIVATION_COPY,
     MOTIVATION_DESCRIPTION,
     OPENING_TOOL_COPY,
@@ -61,9 +62,39 @@ def test_relationship_roles_do_not_repeat_answer_labels() -> None:
     assert all(label not in rendered_copy for label in answer_labels)
 
 
-def test_defines_two_features_for_every_mbti() -> None:
-    assert set(MBTI_FEATURE_COPY) == set(MbtiType)
-    assert all(len(features) == 2 for features in MBTI_FEATURE_COPY.values())
+def test_defines_one_distinct_strength_for_every_mbti() -> None:
+    assert set(MBTI_STRENGTH_COPY) == set(MbtiType)
+    assert len({copy.title for copy in MBTI_STRENGTH_COPY.values()}) == len(MbtiType)
+    assert len({copy.description for copy in MBTI_STRENGTH_COPY.values()}) == len(MbtiType)
+    assert {mbti.value: copy.title for mbti, copy in MBTI_STRENGTH_COPY.items()} == {
+        "INTJ": "큰그림을 봐요",
+        "ISTJ": "끝까지 해내요",
+        "ENTJ": "목표를 이뤄요",
+        "ESTJ": "순서대로 해요",
+        "INFJ": "마음을 읽어요",
+        "ISFJ": "내편은 지켜요",
+        "ENFJ": "용기를 줘요",
+        "ESFJ": "모두를 챙겨요",
+        "INFP": "소신을 지켜요",
+        "ISFP": "감각을 믿어요",
+        "ENFP": "가능성을 봐요",
+        "ESFP": "지금을 즐겨요",
+        "INTP": "원리를 따져요",
+        "ISTP": "직접 해결해요",
+        "ENTP": "다르게 봐요",
+        "ESTP": "기회를 잡아요",
+    }
+
+
+def test_defines_every_emotional_processing_quadrant() -> None:
+    assert set(EMOTIONAL_PROCESSING_COPY) == {
+        ("explore", "egen"),
+        ("direct", "egen"),
+        ("explore", "teto"),
+        ("direct", "teto"),
+    }
+    assert len({copy.title for copy in EMOTIONAL_PROCESSING_COPY.values()}) == 4
+    assert len({copy.description for copy in EMOTIONAL_PROCESSING_COPY.values()}) == 4
 
 
 def test_defines_motivation_copy_and_grouped_descriptions_for_every_allowed_input() -> None:
@@ -84,9 +115,13 @@ def test_defines_motivation_copy_and_grouped_descriptions_for_every_allowed_inpu
 
 def test_feature_titles_are_at_most_seven_characters() -> None:
     relationship_roles = list(RELATIONSHIP_ROLE_COPY.values())
-    mbti_features = [feature for features in MBTI_FEATURE_COPY.values() for feature in features]
+    emotional_processing = list(EMOTIONAL_PROCESSING_COPY.values())
+    mbti_features = list(MBTI_STRENGTH_COPY.values())
 
-    assert all(len(feature.title) <= 7 for feature in (*relationship_roles, *mbti_features))
+    assert all(
+        len(feature.title) <= 7
+        for feature in (*relationship_roles, *emotional_processing, *mbti_features)
+    )
     assert all(len(copy.title) <= 7 for copy in MOTIVATION_COPY.values())
 
 
@@ -118,4 +153,4 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-14.5"
+    assert RESULT_CONTENT_VERSION == "2026-08-14.10"
