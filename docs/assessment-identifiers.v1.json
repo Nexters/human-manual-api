@@ -1,5 +1,5 @@
 {
-  "assessment_version": "2026-08-14.1",
+  "assessment_version": "2026-08-14.2",
   "identifier_status": "published",
   "id_policy": {
     "question_id": "step{number}.q{two_digit_order}",
@@ -20,18 +20,18 @@
     {
       "question_id": "step1.q01",
       "answer_kind": "choice",
-      "values": ["restaurant", "worries", "hangout", "information"]
+      "values": ["decision", "worries", "hangout", "information"]
     },
     {
       "question_id": "step1.q02",
       "answer_kind": "choice",
       "values": [
-        "navigation",
+        "set_direction",
         "lift_mood",
-        "planning",
-        "reacting",
-        "mediate_conflict",
-        "choose_gift"
+        "make_it_happen",
+        "draw_people_out",
+        "coordinate_opinions",
+        "remember_and_care"
       ]
     },
     {

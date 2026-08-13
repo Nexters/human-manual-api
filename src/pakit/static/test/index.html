@@ -76,8 +76,8 @@
   <script>
     const choices = (id, prompt, options, defaultValue) => ({ id, prompt, options, defaultValue });
     const questions = [
-      choices("step1.q01", "친구들이 나를 찾는 순간은 언제인가요?", [["restaurant","맛집 정할 때"],["worries","고민 있을 때"],["hangout","놀 사람 필요할 때"],["information","정보 필요할 때"]], "hangout"),
-      choices("step1.q02", "가장 자신있는 것은 무엇인가요?", [["navigation","길찾기"],["lift_mood","분위기 살리기"],["planning","계획 짜기"],["reacting","리액션하기"],["mediate_conflict","싸움 말리기"],["choose_gift","선물 고르기"]], "lift_mood"),
+      choices("step1.q01", "친구들이 유독 나부터 찾는 순간은 언제인가요?", [["decision","다들 ‘아무거나’만 반복하고 결정을 못 할 때"],["worries","혼자 생각해도 답이 안 나는 고민이 생겼을 때"],["hangout","심심한데 누구를 불러야 재밌을지 고민될 때"],["information","검색해도 원하는 정보를 찾지 못했을 때"]], "hangout"),
+      choices("step1.q02", "친구들과 함께 있으면 나도 모르게 맡게 되는 역할은?", [["set_direction","다들 우왕좌왕하면 방향부터 정한다"],["lift_mood","어색해지면 먼저 분위기를 푼다"],["make_it_happen","말만 나온 일을 실제 계획으로 만든다"],["draw_people_out","누가 이야기하면 잘 받아줘 더 말하게 한다"],["coordinate_opinions","의견이 부딪히면 중간에서 정리한다"],["remember_and_care","각자 좋아하는 걸 기억해 챙긴다"]], "lift_mood"),
       choices("step1.q03", "남들은 이해 못하는 습관이 있나요?", [["save_favorites","좋아하는 물건은 아까워서 쉽게 사용하지 못한다"],["multiple_alarms","알람을 하나보다 여러 개 맞춰두는 편이다"],["duplicate_clothes","마음에 드는 옷은 같은 걸 여러 벌 사는 편이다"],["check_spoilers","영화를 보기 전에 결말을 먼저 찾아보는 편이다"]], "multiple_alarms"),
       choices("step1.q04", "자주 듣는 잔소리는 무엇인가요?", [["phone_overuse","폰 좀 그만봐 진짜."],["sleep_late","니가 올빼미냐 잠 좀 자"],["overspending","거지가 꿈이니?"],["slow_reply","읽씹 ㄴㄴ 대답 좀 해라"],["messy_room","돼지우리냐 방 좀 치우고 살아라"],["low_battery","폰 충전 좀 해라"]], "low_battery"),
       choices("step1.q05", "하루 중 절대 건드리면 안 되는 시간은 언제인가요?", [["after_waking","기상 직후"],["during_meal","밥 먹을 때"],["after_work","퇴근 직후"],["late_night","새벽 감성 타임"]], "after_waking"),
@@ -138,7 +138,7 @@
         const response = await fetch("/api/tests/submissions", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ assessment_version:"2026-08-14.1", participant:{ nickname:document.querySelector("#nickname").value }, answers, mbti:mbti.value })
+          body: JSON.stringify({ assessment_version:"2026-08-14.2", participant:{ nickname:document.querySelector("#nickname").value }, answers, mbti:mbti.value })
         });
         const data = await response.json();
         if (!response.ok) throw new Error(JSON.stringify(data, null, 2));

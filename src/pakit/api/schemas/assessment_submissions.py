@@ -11,11 +11,11 @@ from pakit.domain.assessment_submission import (
 )
 
 ASSESSMENT_SUBMISSION_EXAMPLE: dict[str, object] = {
-    "assessment_version": "2026-08-14.1",
+    "assessment_version": "2026-08-14.2",
     "participant": {"nickname": "송송"},
     "answers": [
-        {"question_id": "step1.q01", "value": "restaurant"},
-        {"question_id": "step1.q02", "value": "navigation"},
+        {"question_id": "step1.q01", "value": "decision"},
+        {"question_id": "step1.q02", "value": "set_direction"},
         {"question_id": "step1.q03", "value": "save_favorites"},
         {"question_id": "step1.q04", "value": "phone_overuse"},
         {"question_id": "step1.q05", "value": "after_waking"},
@@ -104,8 +104,10 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
             ),
         },
         {
-            "title": "맛길 내비",
-            "description": "취향과 동선을 한꺼번에 맞춰 실패 없는 한 끼를 찾아요.",
+            "title": "결정 대장",
+            "description": (
+                "친구들이 아무거나만 반복하면 조건을 딱 정리해 선택지를 좁혀주는 사람이에요."
+            ),
         },
         {
             "title": "허점 레이더",

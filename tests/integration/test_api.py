@@ -302,8 +302,10 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
             ),
         },
         {
-            "title": "맛길 내비",
-            "description": "취향과 동선을 한꺼번에 맞춰 실패 없는 한 끼를 찾아요.",
+            "title": "결정 대장",
+            "description": (
+                "친구들이 아무거나만 반복하면 조건을 딱 정리해 선택지를 좁혀주는 사람이에요."
+            ),
         },
         {
             "title": "원리 해부자",
@@ -340,6 +342,38 @@ def test_submission_uses_q11_for_the_motivation_feature_only() -> None:
     assert curiosity_features[0]["title"] == "궁금하면 직진"
     assert fun_features[0]["title"] == "재미 못 참아"
     assert curiosity_features[1:] == fun_features[1:]
+
+
+def test_submission_uses_q01_and_q02_for_the_relationship_role_only() -> None:
+    decision_payload = _valid_submission()
+    worries_payload = _valid_submission()
+    decision_answers = decision_payload["answers"]
+    worries_answers = worries_payload["answers"]
+    assert isinstance(decision_answers, list)
+    assert isinstance(worries_answers, list)
+
+    for answer in decision_answers:
+        if answer["question_id"] == "step1.q01":
+            answer["value"] = "decision"
+        elif answer["question_id"] == "step1.q02":
+            answer["value"] = "set_direction"
+    for answer in worries_answers:
+        if answer["question_id"] == "step1.q01":
+            answer["value"] = "worries"
+        elif answer["question_id"] == "step1.q02":
+            answer["value"] = "make_it_happen"
+
+    decision_response = client.post("/api/tests/submissions", json=decision_payload)
+    worries_response = client.post("/api/tests/submissions", json=worries_payload)
+
+    assert decision_response.status_code == 200
+    assert worries_response.status_code == 200
+    decision_features = decision_response.json()["features"]
+    worries_features = worries_response.json()["features"]
+    assert decision_features[1]["title"] == "결정 대장"
+    assert worries_features[1]["title"] == "현실 해결사"
+    assert decision_features[0] == worries_features[0]
+    assert decision_features[2:] == worries_features[2:]
 
 
 def test_serves_character_image_from_result_url() -> None:
@@ -412,7 +446,7 @@ def test_rejects_legacy_answer_fields() -> None:
     assert isinstance(first, dict)
     first.pop("value")
     first["kind"] = "choice"
-    first["option_id"] = "restaurant"
+    first["option_id"] = "decision"
 
     response = client.post("/api/tests/submissions", json=payload)
 

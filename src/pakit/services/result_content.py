@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-14.3"
+RESULT_CONTENT_VERSION = "2026-08-14.5"
 
 
 @dataclass(frozen=True)
@@ -118,102 +118,102 @@ MOTIVATION_DESCRIPTION: dict[tuple[str, str], str] = {
 }
 
 
-FEATURE_COMBINATION_COPY: dict[tuple[str, str], tuple[FeatureCopy, FeatureCopy]] = {
-    ("restaurant", "navigation"): (
-        FeatureCopy("맛길 내비", "취향과 동선을 한꺼번에 맞춰 실패 없는 한 끼를 찾아요."),
-        FeatureCopy("헤맬 틈 없음", "목적지가 정해지면 모두를 가장 편한 길로 데려가요."),
+RELATIONSHIP_ROLE_COPY: dict[tuple[str, str], FeatureCopy] = {
+    ("decision", "set_direction"): FeatureCopy(
+        "결정 대장",
+        "친구들이 아무거나만 반복하면 조건을 딱 정리해 선택지를 좁혀주는 사람이에요.",
     ),
-    ("restaurant", "lift_mood"): (
-        FeatureCopy("식탁 점화", "메뉴를 고르는 순간부터 식사 자리를 하나의 놀이로 만들어요."),
-        FeatureCopy("한입 분위기", "첫 한입의 반응만으로 테이블 전체의 텐션을 끌어올려요."),
+    ("decision", "lift_mood"): FeatureCopy(
+        "말문 트기왕",
+        "의견이 안 모여 답답해질 때 농담 한마디로 다시 말문을 트는 사람이에요.",
     ),
-    ("restaurant", "planning"): (
-        FeatureCopy("예약 총괄", "말로만 돌던 약속을 날짜와 장소가 있는 일정으로 완성해요."),
-        FeatureCopy("약속 완성형", "인원과 취향을 맞춰 누구도 난감하지 않은 자리를 만들어요."),
+    ("decision", "make_it_happen"): FeatureCopy(
+        "실행 총무",
+        "여기까지 정했으면 끝을 봐야 해서, 누가 언제 할지까지 정해주는 사람이에요.",
     ),
-    ("restaurant", "reacting"): (
-        FeatureCopy("먹방 부스터", "누군가 고른 메뉴를 세상 잘 고른 선택처럼 신나게 즐겨줘요."),
-        FeatureCopy("맛표현 장인", "평범한 한 끼도 같이 먹은 사람들이 기억할 장면으로 바꿔요."),
+    ("decision", "draw_people_out"): FeatureCopy(
+        "의견 소환사",
+        "말 없는 친구에게도 슬쩍 물어봐, 모두의 진짜 의견을 꺼내는 사람이에요.",
     ),
-    ("restaurant", "mediate_conflict"): (
-        FeatureCopy("입맛 통역사", "서로 다른 취향 사이에서 모두가 괜찮은 답을 찾아내요."),
-        FeatureCopy("평화 한상", "메뉴 때문에 갈라질 뻔한 자리도 기분 좋게 한 상에 모아요."),
+    ("decision", "coordinate_opinions"): FeatureCopy(
+        "평화 협상가",
+        "하고 싶은 게 제각각이어도 겹치는 지점을 찾아 결론을 만드는 사람이에요.",
     ),
-    ("restaurant", "choose_gift"): (
-        FeatureCopy("취향 감별사", "사소한 반응을 기억해 그 사람에게 딱 맞는 선택을 해요."),
-        FeatureCopy("한입 적중", "여럿의 취향을 읽고 예상보다 만족스러운 답을 골라내요."),
+    ("decision", "remember_and_care"): FeatureCopy(
+        "취향 기억왕",
+        "누가 뭘 좋아하고 싫어하는지 기억해 모두가 만족할 답을 고르는 사람이에요.",
     ),
-    ("worries", "navigation"): (
-        FeatureCopy("마음 길잡이", "생각이 엉킨 사람에게 지금 갈 수 있는 길부터 보여줘요."),
-        FeatureCopy("출구 탐색", "막막한 이야기 속에서도 빠져나갈 다음 방향을 찾아내요."),
+    ("worries", "set_direction"): FeatureCopy(
+        "고민 길잡이",
+        "친구의 생각이 엉켜 있으면 지금 할 수 있는 일부터 짚어주는 사람이에요.",
     ),
-    ("worries", "lift_mood"): (
-        FeatureCopy("기분 환기구", "무거운 마음이 숨을 돌릴 수 있게 분위기를 가볍게 바꿔요."),
-        FeatureCopy("웃음 응급팩", "위로가 길어질 때 필요한 웃음을 정확한 순간에 꺼내요."),
+    ("worries", "lift_mood"): FeatureCopy(
+        "기분 환기담당",
+        "고민은 가볍게 넘기지 않으면서도 웃을 틈을 만들어주는 사람이에요.",
     ),
-    ("worries", "planning"): (
-        FeatureCopy("고민 정리함", "뒤엉킨 문제를 당장 할 수 있는 일부터 차례대로 풀어줘요."),
-        FeatureCopy("다음칸 안내", "걱정만 맴돌지 않도록 현실적인 다음 행동을 함께 정해요."),
+    ("worries", "make_it_happen"): FeatureCopy(
+        "현실 해결사",
+        "친구가 고민만 맴돌고 있으면 당장 해볼 수 있는 방법을 함께 정하는 사람이에요.",
     ),
-    ("worries", "reacting"): (
-        FeatureCopy("공감 확성기", "작게 꺼낸 마음도 별일 아닌 것처럼 넘기지 않고 받아줘요."),
-        FeatureCopy("말맛 복구", "이야기할수록 속이 풀리게 반응하며 끝까지 말할 힘을 줘요."),
+    ("worries", "draw_people_out"): FeatureCopy(
+        "고민 대나무숲",
+        "말하기 힘든 속마음도 어느새 전부 털어놓게 만드는 사람이에요.",
     ),
-    ("worries", "mediate_conflict"): (
-        FeatureCopy("감정 통역사", "누가 맞는지보다 서로 왜 그랬는지를 먼저 알아들어요."),
-        FeatureCopy("관계 완충재", "날카로워진 말 사이에 들어가 누구도 다치지 않게 풀어요."),
+    ("worries", "coordinate_opinions"): FeatureCopy(
+        "관계 통역사",
+        "친구가 사람 때문에 힘들어하면 서로 왜 그랬는지 풀어서 설명해주는 사람이에요.",
     ),
-    ("worries", "choose_gift"): (
-        FeatureCopy("마음 채집가", "지나가듯 흘린 말까지 기억해 필요한 순간에 꺼내줘요."),
-        FeatureCopy("위로 맞춤형", "말보다 작은 행동이 필요할 때 정확히 맞는 위로를 건네요."),
+    ("worries", "remember_and_care"): FeatureCopy(
+        "맞춤 위로왕",
+        "지나가듯 했던 말까지 기억했다가 꼭 필요한 방식으로 위로하는 사람이에요.",
     ),
-    ("hangout", "navigation"): (
-        FeatureCopy("동선 대장", "어디서 만나든 헤매는 시간 없이 재미있는 곳으로 이끌어요."),
-        FeatureCopy("길 위의 판", "이동하는 순간까지 놀 거리로 바꿔 지루할 틈을 없애요."),
+    ("hangout", "set_direction"): FeatureCopy(
+        "모임 대장",
+        "심심하다는 말이 나오면 어디서 뭘 할지부터 빠르게 정하는 사람이에요.",
     ),
-    ("hangout", "lift_mood"): (
-        FeatureCopy("판 깔기 장인", "심심하다는 한마디면 사람과 할 일을 엮어 판을 만들어요."),
-        FeatureCopy("정적 해제", "어색한 순간에 엉뚱한 화제를 던져 흐름을 다시 살려요."),
+    ("hangout", "lift_mood"): FeatureCopy(
+        "분위기 메이커",
+        "친구들이 모이면 먼저 웃길 거리를 꺼내 그 자리를 신나게 만드는 사람이에요.",
     ),
-    ("hangout", "planning"): (
-        FeatureCopy("약속 발전기", "언젠가 하자는 말을 진짜 모이는 일정으로 바꿔버려요."),
-        FeatureCopy("번개 현실화", "갑작스러운 제안도 사람과 장소를 맞춰 그날 성사시켜요."),
+    ("hangout", "make_it_happen"): FeatureCopy(
+        "약속 추진대장",
+        "언제 한번 보자는 말을 진짜 날짜와 장소가 있는 약속으로 만드는 사람이에요.",
     ),
-    ("hangout", "reacting"): (
-        FeatureCopy("텐션 증폭기", "누군가 신나기 시작하면 반응을 보태 모두의 흥으로 키워요."),
-        FeatureCopy("리액션 연쇄", "한 사람의 이야기를 받아 다음 사람까지 말하고 싶게 만들어요."),
+    ("hangout", "draw_people_out"): FeatureCopy(
+        "리액션 부자",
+        "친구의 이야기를 신나게 받아줘 모두가 한마디씩 끼어들게 만드는 사람이에요.",
     ),
-    ("hangout", "mediate_conflict"): (
-        FeatureCopy("모임 완충재", "서먹한 사람들이 섞여도 누구 하나 겉돌지 않게 연결해요."),
-        FeatureCopy("자리 접착제", "분위기가 갈라질 때 공통의 재미를 찾아 다시 한데 모아요."),
+    ("hangout", "coordinate_opinions"): FeatureCopy(
+        "어색함 해결사",
+        "서로 안 친한 친구들이 섞여도 누구 하나 겉돌지 않게 이어주는 사람이에요.",
     ),
-    ("hangout", "choose_gift"): (
-        FeatureCopy("재미 큐레이터", "누구와 함께하느냐에 따라 가장 잘 맞는 놀 거리를 골라요."),
-        FeatureCopy("취향 소환술", "친구들이 좋아할 만한 것을 기억해 모임 한가운데 꺼내요."),
+    ("hangout", "remember_and_care"): FeatureCopy(
+        "취향 맞춤대장",
+        "오늘 모인 친구들의 취향을 보고 다 같이 즐길 만한 걸 골라오는 사람이에요.",
     ),
-    ("information", "navigation"): (
-        FeatureCopy("정보 길잡이", "복잡한 선택지 속에서 지금 필요한 방향부터 짚어줘요."),
-        FeatureCopy("검색 후 출발", "찾아보는 데서 끝내지 않고 바로 움직일 길까지 연결해요."),
+    ("information", "set_direction"): FeatureCopy(
+        "핵심 요약왕",
+        "검색 결과가 너무 많아도 지금 필요한 정보부터 딱 짚어주는 사람이에요.",
     ),
-    ("information", "lift_mood"): (
-        FeatureCopy("설명 예능화", "어려운 이야기도 듣는 사람이 지치지 않게 재미있게 풀어요."),
-        FeatureCopy("궁금증 점화", "답 하나를 알려주고 더 알고 싶은 마음까지 켜놓아요."),
+    ("information", "lift_mood"): FeatureCopy(
+        "설명 예능인",
+        "어려운 내용도 비유와 농담을 섞어 재미있게 이해시키는 사람이에요.",
     ),
-    ("information", "planning"): (
-        FeatureCopy("정보 설계자", "흩어진 자료를 순서와 우선순서가 보이는 형태로 정리해요."),
-        FeatureCopy("실행 번역기", "알아낸 내용을 당장 써먹을 수 있는 계획으로 바꿔줘요."),
+    ("information", "make_it_happen"): FeatureCopy(
+        "실행 설계자",
+        "찾은 정보를 그래서 뭘 하면 되는지까지 정리해주는 사람이에요.",
     ),
-    ("information", "reacting"): (
-        FeatureCopy("질문 증폭기", "사소한 궁금증도 흥미롭게 받아 더 좋은 질문으로 키워요."),
-        FeatureCopy("대화형 검색", "묻고 답하는 동안 상대가 진짜 원한 정보까지 찾아가요."),
+    ("information", "draw_people_out"): FeatureCopy(
+        "질문 맛집",
+        "뭘 물어봐도 귀찮아하지 않고, 궁금한 걸 더 편하게 묻게 만드는 사람이에요.",
     ),
-    ("information", "mediate_conflict"): (
-        FeatureCopy("팩트 중재자", "의견이 부딪힐 때 감정 대신 함께 볼 기준을 꺼내요."),
-        FeatureCopy("쟁점 정리함", "말이 엇갈린 자리에서 무엇이 다른지부터 선명하게 나눠요."),
+    ("information", "coordinate_opinions"): FeatureCopy(
+        "팩트 정리왕",
+        "서로 다른 말을 할 때 확인된 사실부터 나눠 혼란을 정리하는 사람이에요.",
     ),
-    ("information", "choose_gift"): (
-        FeatureCopy("취향 탐지기", "작은 단서를 모아 상대가 아직 말하지 않은 취향도 찾아요."),
-        FeatureCopy("정보 맞춤형", "많이 아는 데서 끝나지 않고 그 사람에게 맞는 답만 골라줘요."),
+    ("information", "remember_and_care"): FeatureCopy(
+        "맞춤 정보통",
+        "친구의 상황과 취향을 기억해 그 사람에게 필요한 정보만 골라주는 사람이에요.",
     ),
 }
 

@@ -1,6 +1,6 @@
 # 테스트 질문지 기준 자료
 
-이 문서는 제공된 테스트 화면을 `assessment_version` `2026-08-14.1`의 질문 원문과 선택지에
+이 문서는 제공된 테스트 화면을 `assessment_version` `2026-08-14.2`의 질문 원문과 선택지에
 연결한 사람이 읽기 위한 목록이다. 백엔드에서 읽을 수 있는 동일 기준 데이터는
 [`assessment-content.v1.json`](./assessment-content.v1.json)에 있다. ID와 제출 값의 불변 계약은
 [`assessment-identifiers.v1.json`](./assessment-identifiers.v1.json)이 계속 담당한다.
@@ -15,8 +15,8 @@
 
 | ID | 질문 | 선택지 (`value` → 화면 문구) |
 |---|---|---|
-| `step1.q01` | 친구들이 나를 찾는 순간은 언제인가요? | `restaurant` → 맛집 정할 때<br>`worries` → 고민 있을 때<br>`hangout` → 놀 사람 필요할 때<br>`information` → 정보 필요할 때 |
-| `step1.q02` | 가장 자신있는 것은 무엇인가요? | `navigation` → 길찾기<br>`lift_mood` → 분위기 살리기<br>`planning` → 계획 짜기<br>`reacting` → 리액션하기<br>`mediate_conflict` → 싸움 말리기<br>`choose_gift` → 선물 고르기 |
+| `step1.q01` | 친구들이 유독 나부터 찾는 순간은 언제인가요? | `decision` → 다들 “아무거나”만 반복하고 결정을 못 할 때<br>`worries` → 혼자 생각해도 답이 안 나는 고민이 생겼을 때<br>`hangout` → 심심한데 누구를 불러야 재밌을지 고민될 때<br>`information` → 검색해도 원하는 정보를 찾지 못했을 때 |
+| `step1.q02` | 친구들과 함께 있으면 나도 모르게 맡게 되는 역할은? | `set_direction` → 다들 우왕좌왕하면 방향부터 정한다<br>`lift_mood` → 어색해지면 먼저 분위기를 푼다<br>`make_it_happen` → 말만 나온 일을 실제 계획으로 만든다<br>`draw_people_out` → 누가 이야기하면 잘 받아줘 더 말하게 한다<br>`coordinate_opinions` → 의견이 부딪히면 중간에서 정리한다<br>`remember_and_care` → 각자 좋아하는 걸 기억해 챙긴다 |
 | `step1.q03` | 남들은 이해 못하는 습관이 있나요? | `save_favorites` → 좋아하는 물건은 아까워서 쉽게 사용하지 못한다<br>`multiple_alarms` → 알람을 하나보다 여러 개 맞춰두는 편이다<br>`duplicate_clothes` → 마음에 드는 옷은 같은 걸 여러 벌 사는 편이다<br>`check_spoilers` → 영화를 보기 전에 결말을 먼저 찾아보는 편이다 |
 | `step1.q04` | 자주 듣는 잔소리는 무엇인가요? | `phone_overuse` → 폰 좀 그만봐 진짜.<br>`sleep_late` → 니가 올빼미냐 잠 좀 자<br>`overspending` → 거지가 꿈이니?<br>`slow_reply` → 읽씹 ㄴㄴ 대답 좀 해라<br>`messy_room` → 돼지우리냐 방 좀 치우고 살아라<br>`low_battery` → 폰 충전 좀 해라 |
 | `step1.q05` | 하루 중 절대 건드리면 안 되는 시간은 언제인가요? | `after_waking` → 기상 직후<br>`during_meal` → 밥 먹을 때<br>`after_work` → 퇴근 직후<br>`late_night` → 새벽 감성 타임 |
@@ -68,7 +68,7 @@ STEP 2 마지막 두 화면의 바깥 프레임명은 `STEP2_12`, `STEP2_11` 순
 `step1.q01 × step1.q02`, 마음 정리법은 분류된 `표현방식 × 에겐테토` 두 축, 타고난 무기는
 제출된 MBTI 네 글자 전체만 사용한다. 타고난 무기는 MBTI를 유형군으로 묶지 않으므로 16개
 유형이 각각 다른 결과를 갖는다. 마음 정리법에는 애착유형과 자극추구 축을 사용하지 않는다. 조합별 카피는
-아직 확정하지 않았으며 세부 기획은
+동원력과 관계 속의 나까지 구현됐으며, 나머지는 아직 확정하지 않았다. 세부 기획은
 [`key-feature-product-plan.md`](./key-feature-product-plan.md)를 따른다.
 
 ### 3. 이렇게 다뤄주세요 (`can_do`)

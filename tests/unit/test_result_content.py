@@ -1,13 +1,13 @@
 from pakit.domain.assessment import MbtiType
 from pakit.services.result_content import (
     COMBINATION_COPY,
-    FEATURE_COMBINATION_COPY,
     MBTI_FEATURE_COPY,
     MBTI_MOTIVATION_GROUP,
     MOTIVATION_COPY,
     MOTIVATION_DESCRIPTION,
     OPENING_TOOL_COPY,
     PACKAGING_COPY,
+    RELATIONSHIP_ROLE_COPY,
     RESULT_CONTENT_VERSION,
 )
 
@@ -22,21 +22,43 @@ def test_defines_copy_for_all_unboxing_combinations() -> None:
     assert len({copy.description for copy in COMBINATION_COPY.values()}) == 16
 
 
-def test_defines_two_features_for_every_q01_q02_combination() -> None:
-    q01_values = {"restaurant", "worries", "hangout", "information"}
+def test_defines_one_relationship_role_for_every_q01_q02_combination() -> None:
+    q01_values = {"decision", "worries", "hangout", "information"}
     q02_values = {
-        "navigation",
+        "set_direction",
         "lift_mood",
-        "planning",
-        "reacting",
-        "mediate_conflict",
-        "choose_gift",
+        "make_it_happen",
+        "draw_people_out",
+        "coordinate_opinions",
+        "remember_and_care",
     }
 
-    assert set(FEATURE_COMBINATION_COPY) == {
+    assert set(RELATIONSHIP_ROLE_COPY) == {
         (q01_value, q02_value) for q01_value in q01_values for q02_value in q02_values
     }
-    assert all(len(features) == 2 for features in FEATURE_COMBINATION_COPY.values())
+    assert len({copy.title for copy in RELATIONSHIP_ROLE_COPY.values()}) == 24
+    assert len({copy.description for copy in RELATIONSHIP_ROLE_COPY.values()}) == 24
+    assert all(len(copy.description) <= 50 for copy in RELATIONSHIP_ROLE_COPY.values())
+
+
+def test_relationship_roles_do_not_repeat_answer_labels() -> None:
+    answer_labels = {
+        '다들 "아무거나"만 반복하고 결정을 못 할 때',
+        "혼자 생각해도 답이 안 나는 고민이 생겼을 때",
+        "심심한데 누구를 불러야 재밌을지 고민될 때",
+        "검색해도 원하는 정보를 찾지 못했을 때",
+        "다들 우왕좌왕하면 방향부터 정한다",
+        "어색해지면 먼저 분위기를 푼다",
+        "말만 나온 일을 실제 계획으로 만든다",
+        "누가 이야기하면 잘 받아줘 더 말하게 한다",
+        "의견이 부딪히면 중간에서 정리한다",
+        "각자 좋아하는 걸 기억해 챙긴다",
+    }
+
+    rendered_copy = " ".join(
+        f"{copy.title} {copy.description}" for copy in RELATIONSHIP_ROLE_COPY.values()
+    )
+    assert all(label not in rendered_copy for label in answer_labels)
 
 
 def test_defines_two_features_for_every_mbti() -> None:
@@ -61,12 +83,10 @@ def test_defines_motivation_copy_and_grouped_descriptions_for_every_allowed_inpu
 
 
 def test_feature_titles_are_at_most_seven_characters() -> None:
-    answer_features = [
-        feature for features in FEATURE_COMBINATION_COPY.values() for feature in features
-    ]
+    relationship_roles = list(RELATIONSHIP_ROLE_COPY.values())
     mbti_features = [feature for features in MBTI_FEATURE_COPY.values() for feature in features]
 
-    assert all(len(feature.title) <= 7 for feature in (*answer_features, *mbti_features))
+    assert all(len(feature.title) <= 7 for feature in (*relationship_roles, *mbti_features))
     assert all(len(copy.title) <= 7 for copy in MOTIVATION_COPY.values())
 
 
@@ -98,4 +118,4 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-14.3"
+    assert RESULT_CONTENT_VERSION == "2026-08-14.5"
