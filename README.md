@@ -56,9 +56,9 @@ src/pakit/
 프론트엔드는 완료된 22개 답변과 선택한 MBTI 유형을
 `POST /api/tests/submissions`로 제출할 수 있습니다. 응답은 결과 페이지의 6개 영역으로
 구성되며, 응답의 `result_code`를 사용해 `GET /api/results/{result_code}`로 다시 조회할 수
-있습니다. 성향 점수·형용사·MBTI별 캐릭터 명사·언박싱 아이템은 룰로 결정하며, 충전 점수와
-나머지 결과 문구는 현재 목업값입니다. 현재 GET API는 `demo-result-code`만 지원하며 최근 제출
-결과를 프로세스 메모리에 보관합니다.
+있습니다. 성향 점수·형용사·MBTI별 캐릭터 명사·언박싱 아이템과 언박싱 소개 문구는 룰로
+결정하며, 충전 점수와 그 밖의 결과 문구는 현재 목업값입니다. 현재 GET API는
+`demo-result-code`만 지원하며 최근 제출 결과를 프로세스 메모리에 보관합니다.
 
 친구 궁합은
 `GET /api/compatibility?mine=demo-result-code&friend=demo-friend-code`로 확인할 수 있습니다.

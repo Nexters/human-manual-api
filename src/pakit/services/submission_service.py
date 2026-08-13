@@ -20,6 +20,12 @@ from pakit.services.assessment_classifier import (
     AssessmentClassification,
     classify_submission,
 )
+from pakit.services.result_content import (
+    COMBINATION_COPY,
+    OPENING_TOOL_COPY,
+    PACKAGING_COPY,
+    UnboxingItemCopy,
+)
 
 
 class UnsupportedAssessmentVersionError(ValueError):
@@ -70,66 +76,13 @@ def _validate_answers(submission: AssessmentSubmission) -> None:
             )
 
 
-PACKAGING_ITEMS: dict[str, tuple[str, str, tuple[str, str], str]] = {
-    "A1": (
-        "fragile_box",
-        "취급주의 상자",
-        ("직진형", "밀착형"),
-        "할 말과 마음이 겉으로 잘 드러나는 조합이에요.",
-    ),
-    "A2": (
-        "minimal_box",
-        "미니멀 상자",
-        ("직진형", "거리조절형"),
-        "표현은 명확하고 관계의 선도 분명한 조합이에요.",
-    ),
-    "A3": (
-        "matryoshka_box",
-        "마트료시카 상자",
-        ("탐색형", "밀착형"),
-        "마음은 깊지만 여러 겹을 열어야 드러나는 조합이에요.",
-    ),
-    "A4": (
-        "locked_box",
-        "자물쇠 상자",
-        ("탐색형", "거리조절형"),
-        "속마음과 거리를 천천히 보여주는 조합이에요.",
-    ),
-}
-
-OPENING_TOOL_ITEMS: dict[str, tuple[str, str, tuple[str, str], str]] = {
-    "B1": (
-        "glove",
-        "장갑",
-        ("루틴형", "에겐형"),
-        "익숙한 방식을 다정하고 부드럽게 다루는 조합이에요.",
-    ),
-    "B2": (
-        "utility_knife",
-        "커터칼",
-        ("루틴형", "테토형"),
-        "검증된 도구를 군더더기 없이 실용적으로 쓰는 조합이에요.",
-    ),
-    "B3": (
-        "magic_wand",
-        "마술봉",
-        ("탐험형", "에겐형"),
-        "새로운 방식을 부드럽고 신기하게 시도하는 조합이에요.",
-    ),
-    "B4": (
-        "chainsaw",
-        "전기톱",
-        ("탐험형", "테토형"),
-        "새로운 일에 거침없이 뛰어드는 조합이에요.",
-    ),
-}
-
-
-def _unboxing_item(
-    item: tuple[str, str, tuple[str, str], str],
-) -> UnboxingItemData:
-    item_type, name, tags, reason = item
-    return UnboxingItemData(type=item_type, name=name, tags=tags, reason=reason)
+def _unboxing_item(item: UnboxingItemCopy) -> UnboxingItemData:
+    return UnboxingItemData(
+        type=item.type,
+        name=item.name,
+        tags=item.tags,
+        reason=item.reason,
+    )
 
 
 def _build_mock_result(
@@ -139,6 +92,9 @@ def _build_mock_result(
 ) -> SubmissionResultData:
     character = CHARACTERS[submission.mbti]
     adjective = classification.adjective
+    combination_copy = COMBINATION_COPY[
+        (classification.packaging_code, classification.opening_tool_code)
+    ]
 
     return SubmissionResultData(
         result_code=result_code,
@@ -153,10 +109,10 @@ def _build_mock_result(
         ),
         unboxing_kit=UnboxingKitData(
             axis_scores=classification.axis_scores,
-            title="밤이 깊어질수록 텐션이 올라가는 장난꾸러기",
-            description="해가 지면 비로소 에너지가 충전되는 타입이에요.",
-            packaging=_unboxing_item(PACKAGING_ITEMS[classification.packaging_code]),
-            opening_tool=_unboxing_item(OPENING_TOOL_ITEMS[classification.opening_tool_code]),
+            title=combination_copy.title,
+            description=combination_copy.description,
+            packaging=_unboxing_item(PACKAGING_COPY[classification.packaging_code]),
+            opening_tool=_unboxing_item(OPENING_TOOL_COPY[classification.opening_tool_code]),
         ),
         features=(
             FeatureData("분위기를 띄워요", "생각보다 빠른 행동력"),
