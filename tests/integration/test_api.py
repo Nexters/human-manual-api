@@ -47,6 +47,7 @@ def test_serves_manual_assessment_test_page() -> None:
     assert "/api/tests/submissions" in response.text
     assert 'id="features"' in response.text
     assert "data.features.map" in response.text
+    assert 'choices("step1.q11"' in response.text
 
 
 def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
@@ -58,7 +59,7 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
     assert operation["tags"] == ["Test"]
     assert operation["summary"] == "테스트 결과 제출"
     assert "요청 데이터" in operation["description"]
-    assert "22개 문항" in operation["description"]
+    assert "23개 문항" in operation["description"]
     assert "서버에서 확인하는 항목" in operation["description"]
     assert "현재 응답 범위" in operation["description"]
     swagger_example = operation["requestBody"]["content"]["application/json"]["examples"][
@@ -295,12 +296,14 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
     assert body["unboxing_kit"]["opening_tool"]["type"] == "chainsaw"
     assert body["features"] == [
         {
-            "title": "맛길 내비",
-            "description": "취향과 동선을 한꺼번에 맞춰 실패 없는 한 끼를 찾아요.",
+            "title": "궁금하면 직진",
+            "description": (
+                "궁금한 건 검색만으로 넘기지 않고, 원리와 다른 가능성까지 직접 확인해요."
+            ),
         },
         {
-            "title": "헤맬 틈 없음",
-            "description": "목적지가 정해지면 모두를 가장 편한 길로 데려가요.",
+            "title": "맛길 내비",
+            "description": "취향과 동선을 한꺼번에 맞춰 실패 없는 한 끼를 찾아요.",
         },
         {
             "title": "원리 해부자",
@@ -311,6 +314,32 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
             "description": "떠오른 생각을 여러 가능성에 대입하며 더 나은 답을 찾아요.",
         },
     ]
+
+
+def test_submission_uses_q11_for_the_motivation_feature_only() -> None:
+    curiosity_payload = _valid_submission()
+    fun_payload = _valid_submission()
+    curiosity_answers = curiosity_payload["answers"]
+    fun_answers = fun_payload["answers"]
+    assert isinstance(curiosity_answers, list)
+    assert isinstance(fun_answers, list)
+    for answer in curiosity_answers:
+        if answer["question_id"] == "step1.q11":
+            answer["value"] = "curiosity"
+    for answer in fun_answers:
+        if answer["question_id"] == "step1.q11":
+            answer["value"] = "fun"
+
+    curiosity_response = client.post("/api/tests/submissions", json=curiosity_payload)
+    fun_response = client.post("/api/tests/submissions", json=fun_payload)
+
+    assert curiosity_response.status_code == 200
+    assert fun_response.status_code == 200
+    curiosity_features = curiosity_response.json()["features"]
+    fun_features = fun_response.json()["features"]
+    assert curiosity_features[0]["title"] == "궁금하면 직진"
+    assert fun_features[0]["title"] == "재미 못 참아"
+    assert curiosity_features[1:] == fun_features[1:]
 
 
 def test_serves_character_image_from_result_url() -> None:

@@ -1,6 +1,6 @@
 # 테스트 질문지 기준 자료
 
-이 문서는 제공된 테스트 화면을 `assessment_version` `2026-08-12.3`의 질문 원문과 선택지에
+이 문서는 제공된 테스트 화면을 `assessment_version` `2026-08-14.1`의 질문 원문과 선택지에
 연결한 사람이 읽기 위한 목록이다. 백엔드에서 읽을 수 있는 동일 기준 데이터는
 [`assessment-content.v1.json`](./assessment-content.v1.json)에 있다. ID와 제출 값의 불변 계약은
 [`assessment-identifiers.v1.json`](./assessment-identifiers.v1.json)이 계속 담당한다.
@@ -25,6 +25,7 @@
 | `step1.q08` | 금요일 저녁, 약속이 갑자기 취소됐을 때 송송님은 | `go_to_bed` → 개꿀! 당장 침대로 간다<br>`contact_others` → 다른 친구한테 연락 돌린다<br>`eat_alone` → 혼자라도 식당 가서 먹고 온다<br>`go_for_drive` → 이 때다, 안 가 본 곳으로 드라이브! |
 | `step1.q09` | 송송님은 어떤 친구랑 오랫동안 놀 수 있나요? | `tsundere` → 츤데레<br>`planner` → 계획형<br>`meme_addict` → 밈 중독자<br>`foodie` → 먹짱 |
 | `step1.q10` | 이 친구랑은 절대 같이 여행가기 싫다! | `morning_person` → 아침형 인간<br>`no_plan` → 무계획형<br>`photo_obsessed` → 사진 집착러<br>`hates_walking` → 걷기 싫어하는 친구 |
+| `step1.q11` | 주말 내내 집에만 있으려고 했는데, 결국 밖에 나와버리고 말았다. 그 이유는? | `curiosity` → SNS에서 처음 보는, 흥미로워 보이는 팝업을 봤다.<br>`needed_by_someone` → 친구가 “이건 진짜 너밖에 못 도와줘”라며 불러냈다.<br>`clear_goal` → 러닝 앱을 켜보니 이번 주 목표까지 딱 한 번만 남아 있었다.<br>`responsibility` → 친구의 이사를 도와주기로 한 시간이 다가오고 있었다.<br>`last_chance` → 계속 미뤄둔 전시가 오늘 문을 닫는다는 걸 알았다.<br>`fun` → 친구들이 벌써 모여 웃고 난리 난 영상을 단톡방에 올리며 당장 나오라고 했다. |
 
 ## STEP 2
 
@@ -50,7 +51,7 @@ STEP 2 마지막 두 화면의 바깥 프레임명은 `STEP2_12`, `STEP2_11` 순
 ## MBTI 입력
 
 문항 응답 이후 `E/I`, `S/N`, `T/F`, `J/P`를 각각 선택하고 조합한 네 글자 값을 API의
-`mbti` 필드로 제출한다. 이 값은 22개 문항에서 채점해 산출하지 않는다.
+`mbti` 필드로 제출한다. 이 값은 23개 문항에서 채점해 산출하지 않는다.
 
 ## 결과 재료 매핑
 
@@ -61,25 +62,12 @@ STEP 2 마지막 두 화면의 바깥 프레임명은 `STEP2_12`, `STEP2_11` 순
 
 ### 2. 핵심 특징 (`features`)
 
-항상 4개를 반환한다. 첫 2개는 `step1.q01 × step1.q02`의 24개 조합별 고정 카피이고,
-나머지 2개는 MBTI별 사고방식과 실행방식의 고정 카피다. 선택지 원문을 결과에 반복하지 않고
-관계에서 맡는 역할과 실제 작동 방식으로 해석한다. 모든 특징 제목은 공백을 포함해 7자 이하다.
-
-#### `step1.q01` 친구들이 나를 찾는 순간은 언제인가요?
-
-- `restaurant` → 맛집 정할 때
-- `worries` → 고민 있을 때
-- `hangout` → 놀 사람 필요할 때
-- `information` → 정보 필요할 때
-
-#### `step1.q02` 가장 자신있는 것은 무엇인가요?
-
-- `navigation` → 길찾기
-- `lift_mood` → 분위기 살리기
-- `planning` → 계획 짜기
-- `reacting` → 리액션하기
-- `mediate_conflict` → 싸움 말리기
-- `choose_gift` → 선물 고르기
+항상 `동원력`, `관계 속의 나`, `마음 정리법`, `타고난 무기` 순서로 4개를 반환한다.
+앞의 세 슬롯은 테스트 답변을 근거로 하고, 마지막 슬롯은 MBTI별 대표 사고 강점을 사용한다.
+동원력은 `step1.q11 + MBTI 보조`, 관계 속의 나는
+`step1.q01 × step1.q02`, 마음 정리법은 `step2.q02 × step2.q03 × step2.q09`, 타고난
+무기는 MBTI만 사용한다. 조합별 카피는 아직 확정하지 않았으며 세부 기획은
+[`key-feature-product-plan.md`](./key-feature-product-plan.md)를 따른다.
 
 ### 3. 이렇게 다뤄주세요 (`can_do`)
 

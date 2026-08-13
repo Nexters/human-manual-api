@@ -20,6 +20,7 @@ from pakit.services.assessment_classifier import (
     AssessmentClassification,
     classify_submission,
 )
+from pakit.services.motivation_service import build_motivation_feature
 from pakit.services.result_content import (
     COMBINATION_COPY,
     FEATURE_COMBINATION_COPY,
@@ -105,6 +106,7 @@ def _build_result(
     answers = {answer.question_id: str(answer.value) for answer in submission.answers}
     answer_features = FEATURE_COMBINATION_COPY[(answers["step1.q01"], answers["step1.q02"])]
     mbti_features = MBTI_FEATURE_COPY[submission.mbti]
+    motivation_feature = build_motivation_feature(answers["step1.q11"], submission.mbti)
 
     return SubmissionResultData(
         result_code=result_code,
@@ -124,7 +126,9 @@ def _build_result(
             packaging=_unboxing_item(PACKAGING_COPY[classification.packaging_code]),
             opening_tool=_unboxing_item(OPENING_TOOL_COPY[classification.opening_tool_code]),
         ),
-        features=tuple(_feature(item) for item in (*answer_features, *mbti_features)),
+        features=tuple(
+            _feature(item) for item in (motivation_feature, answer_features[0], *mbti_features)
+        ),
         can_do=(
             "같이 놀아주세요",
             "새로운 제안을 던져주세요",
@@ -176,6 +180,7 @@ _DEFAULT_DEMO_SUBMISSION = AssessmentSubmission(
     answers=(
         SubmittedAnswer("step1.q01", "restaurant"),
         SubmittedAnswer("step1.q02", "navigation"),
+        SubmittedAnswer("step1.q11", "curiosity"),
         SubmittedAnswer("step2.q01", "inspect_profile"),
         SubmittedAnswer("step2.q02", "hint_and_wait"),
         SubmittedAnswer("step2.q03", "rehearse_with_ai"),

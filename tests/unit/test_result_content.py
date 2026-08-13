@@ -3,6 +3,9 @@ from pakit.services.result_content import (
     COMBINATION_COPY,
     FEATURE_COMBINATION_COPY,
     MBTI_FEATURE_COPY,
+    MBTI_MOTIVATION_GROUP,
+    MOTIVATION_COPY,
+    MOTIVATION_DESCRIPTION,
     OPENING_TOOL_COPY,
     PACKAGING_COPY,
     RESULT_CONTENT_VERSION,
@@ -41,6 +44,22 @@ def test_defines_two_features_for_every_mbti() -> None:
     assert all(len(features) == 2 for features in MBTI_FEATURE_COPY.values())
 
 
+def test_defines_motivation_copy_and_grouped_descriptions_for_every_allowed_input() -> None:
+    assert set(MOTIVATION_COPY) == {
+        "curiosity",
+        "needed_by_someone",
+        "clear_goal",
+        "responsibility",
+        "last_chance",
+        "fun",
+    }
+    assert set(MBTI_MOTIVATION_GROUP) == set(MbtiType)
+    assert set(MBTI_MOTIVATION_GROUP.values()) == {"NT", "ST", "NF", "SF"}
+    assert set(MOTIVATION_DESCRIPTION) == {
+        (answer, group) for answer in MOTIVATION_COPY for group in {"NT", "ST", "NF", "SF"}
+    }
+
+
 def test_feature_titles_are_at_most_seven_characters() -> None:
     answer_features = [
         feature for features in FEATURE_COMBINATION_COPY.values() for feature in features
@@ -48,6 +67,7 @@ def test_feature_titles_are_at_most_seven_characters() -> None:
     mbti_features = [feature for features in MBTI_FEATURE_COPY.values() for feature in features]
 
     assert all(len(feature.title) <= 7 for feature in (*answer_features, *mbti_features))
+    assert all(len(copy.title) <= 7 for copy in MOTIVATION_COPY.values())
 
 
 def test_uses_confirmed_titles_for_revised_combinations() -> None:
@@ -78,4 +98,4 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-13.9"
+    assert RESULT_CONTENT_VERSION == "2026-08-14.3"

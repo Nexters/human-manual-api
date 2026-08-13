@@ -11,7 +11,7 @@ from pakit.domain.assessment_submission import (
 )
 
 ASSESSMENT_SUBMISSION_EXAMPLE: dict[str, object] = {
-    "assessment_version": "2026-08-12.3",
+    "assessment_version": "2026-08-14.1",
     "participant": {"nickname": "송송"},
     "answers": [
         {"question_id": "step1.q01", "value": "restaurant"},
@@ -24,6 +24,7 @@ ASSESSMENT_SUBMISSION_EXAMPLE: dict[str, object] = {
         {"question_id": "step1.q08", "value": "go_to_bed"},
         {"question_id": "step1.q09", "value": "tsundere"},
         {"question_id": "step1.q10", "value": "morning_person"},
+        {"question_id": "step1.q11", "value": "curiosity"},
         {"question_id": "step2.q01", "value": "inspect_profile"},
         {"question_id": "step2.q02", "value": "hint_and_wait"},
         {"question_id": "step2.q03", "value": "rehearse_with_ai"},
@@ -97,12 +98,14 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
     },
     "features": [
         {
-            "title": "맛길 내비",
-            "description": "취향과 동선을 한꺼번에 맞춰 실패 없는 한 끼를 찾아요.",
+            "title": "궁금하면 직진",
+            "description": (
+                "궁금한 건 검색만으로 넘기지 않고, 원리와 다른 가능성까지 직접 확인해요."
+            ),
         },
         {
-            "title": "헤맬 틈 없음",
-            "description": "목적지가 정해지면 모두를 가장 편한 길로 데려가요.",
+            "title": "맛길 내비",
+            "description": "취향과 동선을 한꺼번에 맞춰 실패 없는 한 끼를 찾아요.",
         },
         {
             "title": "허점 레이더",
@@ -161,8 +164,8 @@ class AssessmentSubmissionInput(BaseModel):
     participant: ParticipantInput = Field(description="테스트 참여자 정보")
     answers: list[AnswerInput] = Field(
         min_length=1,
-        max_length=22,
-        description="22개 고정 문항의 답변 목록",
+        max_length=23,
+        description="23개 고정 문항의 답변 목록",
     )
     mbti: MbtiType = Field(description="화면에서 선택한 네 글자 MBTI 유형")
 

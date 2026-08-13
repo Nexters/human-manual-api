@@ -1,11 +1,11 @@
 {
-  "assessment_version": "2026-08-12.3",
+  "assessment_version": "2026-08-14.1",
   "content_status": "baseline_with_product_mapping",
   "locale": "ko-KR",
   "source": {
     "type": "user_provided_test_screen_images",
     "received_on": "2026-08-13",
-    "scope": "STEP 1 10문항, STEP 2 12문항, MBTI 선택 화면"
+    "scope": "STEP 1 11문항, STEP 2 12문항, MBTI 선택 화면"
   },
   "identifier_contract": "docs/assessment-identifiers.v1.json",
   "result_material_contract": {
@@ -15,10 +15,50 @@
       "status": "copy_and_statistics_rule_pending"
     },
     "features": {
-      "question_ids": ["step1.q01", "step1.q02"],
-      "additional_input": "mbti",
-      "rule": "q01_x_q02_two_copies_plus_mbti_two_copies",
-      "title_max_length": 7
+      "slots": [
+        {"id": "motivation", "label": "동원력", "meaning": "나를 움직이게 만드는 것"},
+        {
+          "id": "role_in_relationships",
+          "label": "관계 속의 나",
+          "meaning": "사람들 사이에서 자연스럽게 맡는 역할"
+        },
+        {
+          "id": "emotional_processing",
+          "label": "마음 정리법",
+          "meaning": "생각과 감정을 내 안에서 정리하는 방식"
+        },
+        {
+          "id": "innate_strength",
+          "label": "타고난 무기",
+          "meaning": "MBTI에서 가져온 가장 대표적인 강점"
+        }
+      ],
+      "answer_based_slots": ["motivation", "role_in_relationships", "emotional_processing"],
+      "mbti_based_slots": ["innate_strength"],
+      "matching_status": "motivation_implemented_remaining_slots_pending",
+      "slot_inputs": {
+        "motivation": {
+          "question_ids": ["step1.q11"],
+          "additional_input": "mbti",
+          "mbti_role": "copy_modifier"
+        },
+        "role_in_relationships": {
+          "question_ids": ["step1.q01", "step1.q02"],
+          "rule": "q01_x_q02",
+          "additional_input": null
+        },
+        "emotional_processing": {
+          "question_ids": ["step2.q02", "step2.q03", "step2.q09"],
+          "rule": "q02_x_q03_x_q09",
+          "additional_input": null
+        },
+        "innate_strength": {
+          "question_ids": [],
+          "additional_input": "mbti",
+          "mbti_role": "primary_input"
+        }
+      },
+      "product_plan": "docs/key-feature-product-plan.md"
     },
     "can_do": {"question_ids": ["step1.q03", "step1.q04"]},
     "warnings": {"question_ids": ["step1.q05", "step1.q06"]},
@@ -35,6 +75,9 @@
     "aggregation": "equal_weight_rounded_mean",
     "classification_boundary": {"operator": ">=", "threshold": 50, "side": "score_100"},
     "unresolved_fields": [
+      "features 슬롯 2의 24개 조합별 최종 카피",
+      "features 슬롯 3의 8개 조합별 최종 카피",
+      "features MBTI 16종 대표 강점과 최종 카피",
       "can_do 결과 재료를 실제 문구로 조합하는 규칙",
       "warnings 결과 재료를 실제 문구로 조합하는 규칙",
       "charging 결과 재료를 실제 문구로 조합하는 규칙"
@@ -75,7 +118,12 @@
         {"value": "hangout", "label": "놀 사람 필요할 때"},
         {"value": "information", "label": "정보 필요할 때"}
       ],
-      "calculation": {"status": "mapped", "role": "result_material", "result_section": "features"}
+      "calculation": {
+        "status": "mapped",
+        "role": "result_material",
+        "result_section": "features",
+        "feature_slot": "role_in_relationships"
+      }
     },
     {
       "question_id": "step1.q02",
@@ -91,7 +139,12 @@
         {"value": "mediate_conflict", "label": "싸움 말리기"},
         {"value": "choose_gift", "label": "선물 고르기"}
       ],
-      "calculation": {"status": "mapped", "role": "result_material", "result_section": "features"}
+      "calculation": {
+        "status": "mapped",
+        "role": "result_material",
+        "result_section": "features",
+        "feature_slot": "role_in_relationships"
+      }
     },
     {
       "question_id": "step1.q03",
@@ -214,6 +267,28 @@
       "calculation": {"status": "mapped", "role": "result_material", "result_section": "friend_compatibility", "relationship": "incompatible"}
     },
     {
+      "question_id": "step1.q11",
+      "step": 1,
+      "order": 11,
+      "prompt": "주말 내내 집에만 있으려고 했는데, 결국 밖에 나와버리고 말았다. 그 이유는?",
+      "answer_kind": "choice",
+      "options": [
+        {"value": "curiosity", "label": "SNS에서 처음 보는, 흥미로워 보이는 팝업을 봤다."},
+        {"value": "needed_by_someone", "label": "친구가 ‘이건 진짜 너밖에 못 도와줘’라며 불러냈다."},
+        {"value": "clear_goal", "label": "러닝 앱을 켜보니 이번 주 목표까지 딱 한 번만 남아 있었다."},
+        {"value": "responsibility", "label": "친구의 이사를 도와주기로 한 시간이 다가오고 있었다."},
+        {"value": "last_chance", "label": "계속 미뤄둔 전시가 오늘 문을 닫는다는 걸 알았다."},
+        {"value": "fun", "label": "친구들이 벌써 모여 웃고 난리 난 영상을 단톡방에 올리며 당장 나오라고 했다."}
+      ],
+      "calculation": {
+        "status": "mapped",
+        "role": "result_material",
+        "result_section": "features",
+        "feature_slot": "motivation",
+        "additional_input": "mbti"
+      }
+    },
+    {
       "question_id": "step2.q01",
       "step": 2,
       "order": 1,
@@ -247,6 +322,11 @@
         "status": "mapped",
         "role": "axis_signal",
         "axis": "expression",
+        "result_material": {
+          "result_section": "features",
+          "feature_slot": "emotional_processing",
+          "stage": "initial_response"
+        },
         "signals": {
           "hint_and_wait": {"pole": "탐색", "canonical_score": 0},
           "resolve_immediately": {"pole": "직진", "canonical_score": 100}
@@ -268,6 +348,11 @@
         "role": "axis_signal",
         "axis": "expression",
         "mapping_note": "초기 문항의 전송 전 숙고/즉시 표현 의도가 AI 상담 후 전송/바로 전송 문구로 변경됨",
+        "result_material": {
+          "result_section": "features",
+          "feature_slot": "emotional_processing",
+          "stage": "pre_expression_review"
+        },
         "signals": {
           "rehearse_with_ai": {"pole": "탐색", "canonical_score": 0},
           "send_immediately": {"pole": "직진", "canonical_score": 100}
@@ -388,6 +473,11 @@
         "status": "mapped",
         "role": "axis_signal",
         "axis": "egen",
+        "result_material": {
+          "result_section": "features",
+          "feature_slot": "emotional_processing",
+          "stage": "emotional_aftereffect"
+        },
         "signals": {
           "ruminate": {"pole": "에겐", "canonical_score": 100},
           "forget_quickly": {"pole": "테토", "canonical_score": 0}

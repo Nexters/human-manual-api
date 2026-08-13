@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-13.9"
+RESULT_CONTENT_VERSION = "2026-08-14.3"
 
 
 @dataclass(frozen=True)
@@ -18,11 +18,104 @@ class FeatureCopy:
 
 
 @dataclass(frozen=True)
+class MotivationCopy:
+    title: str
+
+
+@dataclass(frozen=True)
 class UnboxingItemCopy:
     type: str
     name: str
     tags: tuple[str, str]
     reason: str
+
+
+MOTIVATION_COPY: dict[str, MotivationCopy] = {
+    "curiosity": MotivationCopy(
+        "궁금하면 직진",
+    ),
+    "needed_by_someone": MotivationCopy(
+        "필요하면 출동",
+    ),
+    "clear_goal": MotivationCopy(
+        "목표 채워야지",
+    ),
+    "responsibility": MotivationCopy(
+        "맡으면 끝까지",
+    ),
+    "last_chance": MotivationCopy(
+        "기회 안 놓쳐",
+    ),
+    "fun": MotivationCopy(
+        "재미 못 참아",
+    ),
+}
+
+
+MBTI_MOTIVATION_GROUP: dict[MbtiType, str] = {
+    MbtiType.INTJ: "NT",
+    MbtiType.ENTJ: "NT",
+    MbtiType.INTP: "NT",
+    MbtiType.ENTP: "NT",
+    MbtiType.ISTJ: "ST",
+    MbtiType.ESTJ: "ST",
+    MbtiType.ISTP: "ST",
+    MbtiType.ESTP: "ST",
+    MbtiType.INFJ: "NF",
+    MbtiType.ENFJ: "NF",
+    MbtiType.INFP: "NF",
+    MbtiType.ENFP: "NF",
+    MbtiType.ISFJ: "SF",
+    MbtiType.ESFJ: "SF",
+    MbtiType.ISFP: "SF",
+    MbtiType.ESFP: "SF",
+}
+
+
+MOTIVATION_DESCRIPTION: dict[tuple[str, str], str] = {
+    ("curiosity", "NT"): "궁금한 건 검색만으로 넘기지 않고, 원리와 다른 가능성까지 직접 확인해요.",
+    ("curiosity", "ST"): "궁금한 건 설명만 듣지 않고, 직접 보고 해봐야 믿고 넘어가요.",
+    ("curiosity", "NF"): "궁금한 건 정보만 찾지 않고, 그 안의 의미와 사람 이야기까지 들여다봐요.",
+    ("curiosity", "SF"): "궁금한 건 직접 경험해보고, 그 순간의 느낌까지 확인해야 마음이 놓여요.",
+    ("needed_by_someone", "NT"): (
+        "누가 나를 꼭 찾으면 문제부터 파악하고, 가장 확실한 해결책을 들고 나서요."
+    ),
+    ("needed_by_someone", "ST"): (
+        "누가 나를 꼭 찾으면 말보다 몸부터 움직여, 필요한 일을 바로 처리해요."
+    ),
+    ("needed_by_someone", "NF"): (
+        "누가 나를 꼭 찾으면 왜 힘든지부터 살피고, 혼자 두지 않으려고 나서요."
+    ),
+    ("needed_by_someone", "SF"): (
+        "누가 나를 꼭 찾으면 하던 걸 멈추고, 당장 필요한 것부터 챙겨 나서요."
+    ),
+    ("clear_goal", "NT"): (
+        "끝이 보이는 목표는 더 나은 방법까지 찾아, 마지막 한 칸을 채워야 마음이 놓여요."
+    ),
+    ("clear_goal", "ST"): "끝이 보이는 목표는 정한 순서대로 밀어붙여, 마지막 한 칸까지 끝내요.",
+    ("clear_goal", "NF"): "끝이 보이는 목표는 처음 품은 이유를 떠올리며, 마지막 한 칸까지 채워요.",
+    ("clear_goal", "SF"): (
+        "끝이 보이는 목표는 자기 속도를 지키며, 빠진 것 없이 마지막 한 칸까지 채워요."
+    ),
+    ("responsibility", "NT"): (
+        "하기로 한 일은 방법을 다시 짜서라도, 결과가 나올 때까지 자기 몫을 해요."
+    ),
+    ("responsibility", "ST"): "하기로 한 일은 귀찮아도 빠지지 않고, 맡은 순서대로 끝까지 해요.",
+    ("responsibility", "NF"): "하기로 한 일은 누가 기다리는지 알기에, 마음을 다해 끝까지 지켜요.",
+    ("responsibility", "SF"): (
+        "하기로 한 일은 주변에 필요한 것까지 살피며, 자기 몫을 끝까지 챙겨요."
+    ),
+    ("last_chance", "NT"): (
+        "지금뿐인 기회는 가능성을 빠르게 따져보고, 잡을 가치가 있으면 바로 움직여요."
+    ),
+    ("last_chance", "ST"): "지금뿐인 기회는 오래 재지 않고, 놓치기 전에 몸부터 움직여요.",
+    ("last_chance", "NF"): "지금뿐인 기회는 오래 남을 의미를 느끼면, 미루던 마음도 접고 움직여요.",
+    ("last_chance", "SF"): "지금뿐인 기회는 그 순간의 끌림을 따라, 직접 경험하는 쪽을 골라요.",
+    ("fun", "NT"): "재밌는 일이 시작되면 구경만 하지 않고, 더 재밌게 만들 방법까지 보태요.",
+    ("fun", "ST"): "재밌는 일이 시작되면 오래 고민하지 않고, 지금 즐길 수 있는 자리부터 찾아가요.",
+    ("fun", "NF"): "재밌는 일이 시작되면 마음 맞는 사람도 불러, 함께 웃을 판에 합류해요.",
+    ("fun", "SF"): "재밌는 일이 시작되면 그 순간의 분위기를 타고, 같이 있는 사람까지 챙겨요.",
+}
 
 
 FEATURE_COMBINATION_COPY: dict[tuple[str, str], tuple[FeatureCopy, FeatureCopy]] = {
