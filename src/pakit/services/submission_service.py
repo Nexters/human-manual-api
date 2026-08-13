@@ -22,8 +22,11 @@ from pakit.services.assessment_classifier import (
 )
 from pakit.services.result_content import (
     COMBINATION_COPY,
+    FEATURE_COMBINATION_COPY,
+    MBTI_FEATURE_COPY,
     OPENING_TOOL_COPY,
     PACKAGING_COPY,
+    FeatureCopy,
     UnboxingItemCopy,
 )
 
@@ -85,6 +88,10 @@ def _unboxing_item(item: UnboxingItemCopy) -> UnboxingItemData:
     )
 
 
+def _feature(item: FeatureCopy) -> FeatureData:
+    return FeatureData(title=item.title, description=item.description)
+
+
 def _build_result(
     submission: AssessmentSubmission,
     result_code: str,
@@ -95,6 +102,9 @@ def _build_result(
     combination_copy = COMBINATION_COPY[
         (classification.packaging_code, classification.opening_tool_code)
     ]
+    answers = {answer.question_id: str(answer.value) for answer in submission.answers}
+    answer_features = FEATURE_COMBINATION_COPY[(answers["step1.q01"], answers["step1.q02"])]
+    mbti_features = MBTI_FEATURE_COPY[submission.mbti]
 
     return SubmissionResultData(
         result_code=result_code,
@@ -114,12 +124,7 @@ def _build_result(
             packaging=_unboxing_item(PACKAGING_COPY[classification.packaging_code]),
             opening_tool=_unboxing_item(OPENING_TOOL_COPY[classification.opening_tool_code]),
         ),
-        features=(
-            FeatureData("분위기를 띄워요", "생각보다 빠른 행동력"),
-            FeatureData("일단 해봐요", "생각보다 빠른 행동력"),
-            FeatureData("변화를 즐겨요", "새로운 방식에 열린 태도"),
-            FeatureData("탐험형", "직접 부딪히며 발견"),
-        ),
+        features=tuple(_feature(item) for item in (*answer_features, *mbti_features)),
         can_do=(
             "같이 놀아주세요",
             "새로운 제안을 던져주세요",
@@ -169,6 +174,8 @@ _DEFAULT_DEMO_SUBMISSION = AssessmentSubmission(
     assessment_version=ASSESSMENT_VERSION,
     nickname="송송",
     answers=(
+        SubmittedAnswer("step1.q01", "restaurant"),
+        SubmittedAnswer("step1.q02", "navigation"),
         SubmittedAnswer("step2.q01", "inspect_profile"),
         SubmittedAnswer("step2.q02", "hint_and_wait"),
         SubmittedAnswer("step2.q03", "rehearse_with_ai"),

@@ -1,10 +1,18 @@
 from dataclasses import dataclass
 
-RESULT_CONTENT_VERSION = "2026-08-13.8"
+from pakit.domain.assessment import MbtiType
+
+RESULT_CONTENT_VERSION = "2026-08-13.9"
 
 
 @dataclass(frozen=True)
 class CombinationCopy:
+    title: str
+    description: str
+
+
+@dataclass(frozen=True)
+class FeatureCopy:
     title: str
     description: str
 
@@ -15,6 +23,174 @@ class UnboxingItemCopy:
     name: str
     tags: tuple[str, str]
     reason: str
+
+
+FEATURE_COMBINATION_COPY: dict[tuple[str, str], tuple[FeatureCopy, FeatureCopy]] = {
+    ("restaurant", "navigation"): (
+        FeatureCopy("맛길 내비", "취향과 동선을 한꺼번에 맞춰 실패 없는 한 끼를 찾아요."),
+        FeatureCopy("헤맬 틈 없음", "목적지가 정해지면 모두를 가장 편한 길로 데려가요."),
+    ),
+    ("restaurant", "lift_mood"): (
+        FeatureCopy("식탁 점화", "메뉴를 고르는 순간부터 식사 자리를 하나의 놀이로 만들어요."),
+        FeatureCopy("한입 분위기", "첫 한입의 반응만으로 테이블 전체의 텐션을 끌어올려요."),
+    ),
+    ("restaurant", "planning"): (
+        FeatureCopy("예약 총괄", "말로만 돌던 약속을 날짜와 장소가 있는 일정으로 완성해요."),
+        FeatureCopy("약속 완성형", "인원과 취향을 맞춰 누구도 난감하지 않은 자리를 만들어요."),
+    ),
+    ("restaurant", "reacting"): (
+        FeatureCopy("먹방 부스터", "누군가 고른 메뉴를 세상 잘 고른 선택처럼 신나게 즐겨줘요."),
+        FeatureCopy("맛표현 장인", "평범한 한 끼도 같이 먹은 사람들이 기억할 장면으로 바꿔요."),
+    ),
+    ("restaurant", "mediate_conflict"): (
+        FeatureCopy("입맛 통역사", "서로 다른 취향 사이에서 모두가 괜찮은 답을 찾아내요."),
+        FeatureCopy("평화 한상", "메뉴 때문에 갈라질 뻔한 자리도 기분 좋게 한 상에 모아요."),
+    ),
+    ("restaurant", "choose_gift"): (
+        FeatureCopy("취향 감별사", "사소한 반응을 기억해 그 사람에게 딱 맞는 선택을 해요."),
+        FeatureCopy("한입 적중", "여럿의 취향을 읽고 예상보다 만족스러운 답을 골라내요."),
+    ),
+    ("worries", "navigation"): (
+        FeatureCopy("마음 길잡이", "생각이 엉킨 사람에게 지금 갈 수 있는 길부터 보여줘요."),
+        FeatureCopy("출구 탐색", "막막한 이야기 속에서도 빠져나갈 다음 방향을 찾아내요."),
+    ),
+    ("worries", "lift_mood"): (
+        FeatureCopy("기분 환기구", "무거운 마음이 숨을 돌릴 수 있게 분위기를 가볍게 바꿔요."),
+        FeatureCopy("웃음 응급팩", "위로가 길어질 때 필요한 웃음을 정확한 순간에 꺼내요."),
+    ),
+    ("worries", "planning"): (
+        FeatureCopy("고민 정리함", "뒤엉킨 문제를 당장 할 수 있는 일부터 차례대로 풀어줘요."),
+        FeatureCopy("다음칸 안내", "걱정만 맴돌지 않도록 현실적인 다음 행동을 함께 정해요."),
+    ),
+    ("worries", "reacting"): (
+        FeatureCopy("공감 확성기", "작게 꺼낸 마음도 별일 아닌 것처럼 넘기지 않고 받아줘요."),
+        FeatureCopy("말맛 복구", "이야기할수록 속이 풀리게 반응하며 끝까지 말할 힘을 줘요."),
+    ),
+    ("worries", "mediate_conflict"): (
+        FeatureCopy("감정 통역사", "누가 맞는지보다 서로 왜 그랬는지를 먼저 알아들어요."),
+        FeatureCopy("관계 완충재", "날카로워진 말 사이에 들어가 누구도 다치지 않게 풀어요."),
+    ),
+    ("worries", "choose_gift"): (
+        FeatureCopy("마음 채집가", "지나가듯 흘린 말까지 기억해 필요한 순간에 꺼내줘요."),
+        FeatureCopy("위로 맞춤형", "말보다 작은 행동이 필요할 때 정확히 맞는 위로를 건네요."),
+    ),
+    ("hangout", "navigation"): (
+        FeatureCopy("동선 대장", "어디서 만나든 헤매는 시간 없이 재미있는 곳으로 이끌어요."),
+        FeatureCopy("길 위의 판", "이동하는 순간까지 놀 거리로 바꿔 지루할 틈을 없애요."),
+    ),
+    ("hangout", "lift_mood"): (
+        FeatureCopy("판 깔기 장인", "심심하다는 한마디면 사람과 할 일을 엮어 판을 만들어요."),
+        FeatureCopy("정적 해제", "어색한 순간에 엉뚱한 화제를 던져 흐름을 다시 살려요."),
+    ),
+    ("hangout", "planning"): (
+        FeatureCopy("약속 발전기", "언젠가 하자는 말을 진짜 모이는 일정으로 바꿔버려요."),
+        FeatureCopy("번개 현실화", "갑작스러운 제안도 사람과 장소를 맞춰 그날 성사시켜요."),
+    ),
+    ("hangout", "reacting"): (
+        FeatureCopy("텐션 증폭기", "누군가 신나기 시작하면 반응을 보태 모두의 흥으로 키워요."),
+        FeatureCopy("리액션 연쇄", "한 사람의 이야기를 받아 다음 사람까지 말하고 싶게 만들어요."),
+    ),
+    ("hangout", "mediate_conflict"): (
+        FeatureCopy("모임 완충재", "서먹한 사람들이 섞여도 누구 하나 겉돌지 않게 연결해요."),
+        FeatureCopy("자리 접착제", "분위기가 갈라질 때 공통의 재미를 찾아 다시 한데 모아요."),
+    ),
+    ("hangout", "choose_gift"): (
+        FeatureCopy("재미 큐레이터", "누구와 함께하느냐에 따라 가장 잘 맞는 놀 거리를 골라요."),
+        FeatureCopy("취향 소환술", "친구들이 좋아할 만한 것을 기억해 모임 한가운데 꺼내요."),
+    ),
+    ("information", "navigation"): (
+        FeatureCopy("정보 길잡이", "복잡한 선택지 속에서 지금 필요한 방향부터 짚어줘요."),
+        FeatureCopy("검색 후 출발", "찾아보는 데서 끝내지 않고 바로 움직일 길까지 연결해요."),
+    ),
+    ("information", "lift_mood"): (
+        FeatureCopy("설명 예능화", "어려운 이야기도 듣는 사람이 지치지 않게 재미있게 풀어요."),
+        FeatureCopy("궁금증 점화", "답 하나를 알려주고 더 알고 싶은 마음까지 켜놓아요."),
+    ),
+    ("information", "planning"): (
+        FeatureCopy("정보 설계자", "흩어진 자료를 순서와 우선순서가 보이는 형태로 정리해요."),
+        FeatureCopy("실행 번역기", "알아낸 내용을 당장 써먹을 수 있는 계획으로 바꿔줘요."),
+    ),
+    ("information", "reacting"): (
+        FeatureCopy("질문 증폭기", "사소한 궁금증도 흥미롭게 받아 더 좋은 질문으로 키워요."),
+        FeatureCopy("대화형 검색", "묻고 답하는 동안 상대가 진짜 원한 정보까지 찾아가요."),
+    ),
+    ("information", "mediate_conflict"): (
+        FeatureCopy("팩트 중재자", "의견이 부딪힐 때 감정 대신 함께 볼 기준을 꺼내요."),
+        FeatureCopy("쟁점 정리함", "말이 엇갈린 자리에서 무엇이 다른지부터 선명하게 나눠요."),
+    ),
+    ("information", "choose_gift"): (
+        FeatureCopy("취향 탐지기", "작은 단서를 모아 상대가 아직 말하지 않은 취향도 찾아요."),
+        FeatureCopy("정보 맞춤형", "많이 아는 데서 끝나지 않고 그 사람에게 맞는 답만 골라줘요."),
+    ),
+}
+
+
+MBTI_FEATURE_COPY: dict[MbtiType, tuple[FeatureCopy, FeatureCopy]] = {
+    MbtiType.INTJ: (
+        FeatureCopy("큰그림 조립", "흩어진 조각을 연결해 전체가 맞아떨어지는 구조를 봐요."),
+        FeatureCopy("허점 봉쇄", "시작하기 전에 막힐 곳을 찾아 오래 가는 답을 만들어요."),
+    ),
+    MbtiType.ISTJ: (
+        FeatureCopy("기준 보관함", "바뀌면 안 되는 약속과 원칙을 정확하게 기억해요."),
+        FeatureCopy("끝맺음 장인", "맡은 일은 빠뜨리는 것 없이 마지막 칸까지 채워요."),
+    ),
+    MbtiType.ENTJ: (
+        FeatureCopy("목표 견인차", "멀리 있는 목표도 사람과 자원을 모아 앞으로 끌고 가요."),
+        FeatureCopy("판 키우기", "작은 가능성을 발견하면 더 큰 결과가 나도록 규모를 키워요."),
+    ),
+    MbtiType.ESTJ: (
+        FeatureCopy("질서 복구반", "엉킨 상황에서도 역할과 순서를 빠르게 다시 세워요."),
+        FeatureCopy("운영 자동화", "한 번 정리한 일은 누구나 따라 할 흐름으로 굳혀놔요."),
+    ),
+    MbtiType.INFJ: (
+        FeatureCopy("행간 탐지기", "겉으로 한 말보다 그 안에 숨은 의도와 마음을 먼저 읽어요."),
+        FeatureCopy("의미 추적자", "눈앞의 선택이 오래 남길 의미까지 생각하며 움직여요."),
+    ),
+    MbtiType.ISFJ: (
+        FeatureCopy("내편 방어막", "한번 자기 사람으로 받아들이면 필요한 순간을 지켜줘요."),
+        FeatureCopy("기억형 다정", "지나간 취향과 약속을 기억했다가 조용히 행동으로 옮겨요."),
+    ),
+    MbtiType.ENFJ: (
+        FeatureCopy("가능성 조명", "상대도 몰랐던 장점을 발견해 스스로 보게 해줘요."),
+        FeatureCopy("사람 추진력", "혼자 망설이던 사람도 함께 움직일 용기를 얻게 만들어요."),
+    ),
+    MbtiType.ESFJ: (
+        FeatureCopy("분위기 관제", "누가 편하고 불편한지 살피며 모두가 섞일 자리를 만들어요."),
+        FeatureCopy("관계 윤활유", "작은 안부와 배려로 사람 사이가 부드럽게 돌아가게 해요."),
+    ),
+    MbtiType.INFP: (
+        FeatureCopy("마음 원본형", "남의 기준보다 자신이 진짜 중요하게 여기는 것을 지켜요."),
+        FeatureCopy("상상 보존소", "현실에 아직 없는 장면도 오래 품어 자기 방식으로 키워요."),
+    ),
+    MbtiType.ISFP: (
+        FeatureCopy("감각 나침반", "말로 설명하기 전에도 자신에게 맞는 결을 알아봐요."),
+        FeatureCopy("평온 수호자", "경쟁에 휩쓸리기보다 자기 속도로 좋은 순간을 지켜요."),
+    ),
+    MbtiType.ENFP: (
+        FeatureCopy("가능성 레이더", "사람과 상황에서 아직 펼쳐지지 않은 재미를 먼저 발견해요."),
+        FeatureCopy("호기심 전염", "자신이 발견한 가능성에 주변까지 함께 설레게 만들어요."),
+    ),
+    MbtiType.ESFP: (
+        FeatureCopy("현재 점화기", "지금 이 순간 즐길 수 있는 것을 놓치지 않고 켜요."),
+        FeatureCopy("즐거움 배달", "혼자 신나는 데서 끝나지 않고 주변까지 기분 좋게 만들어요."),
+    ),
+    MbtiType.INTP: (
+        FeatureCopy("원리 해부자", "당연해 보이는 것도 작동 원리를 알 때까지 파고들어요."),
+        FeatureCopy("가설 실험실", "떠오른 생각을 여러 가능성에 대입하며 더 나은 답을 찾아요."),
+    ),
+    MbtiType.ISTP: (
+        FeatureCopy("손끝 해결사", "설명만 늘이기보다 직접 만져 가장 빠른 해결책을 찾아요."),
+        FeatureCopy("실전 최적화", "필요한 기술을 익혀 복잡한 문제를 단순하게 처리해요."),
+    ),
+    MbtiType.ENTP: (
+        FeatureCopy("허점 레이더", "모두가 당연하다고 넘긴 곳에서 다른 가능성을 발견해요."),
+        FeatureCopy("아이디어 시동", "생각이 떠오르면 직접 굴려보며 쓸 만한 답을 만들어요."),
+    ),
+    MbtiType.ESTP: (
+        FeatureCopy("기회 포착기", "눈앞의 변화를 빠르게 읽고 잡을 수 있을 때 움직여요."),
+        FeatureCopy("현장 돌파력", "계획이 어긋나도 바로 반응해 지금 통하는 방법을 찾아요."),
+    ),
+}
 
 
 COMBINATION_COPY: dict[tuple[str, str], CombinationCopy] = {

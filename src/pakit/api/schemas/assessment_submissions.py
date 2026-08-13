@@ -96,10 +96,22 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
         },
     },
     "features": [
-        {"title": "분위기를 띄워요", "description": "생각보다 빠른 행동력"},
-        {"title": "일단 해봐요", "description": "생각보다 빠른 행동력"},
-        {"title": "변화를 즐겨요", "description": "새로운 방식에 열린 태도"},
-        {"title": "탐험형", "description": "직접 부딪히며 발견"},
+        {
+            "title": "맛길 내비",
+            "description": "취향과 동선을 한꺼번에 맞춰 실패 없는 한 끼를 찾아요.",
+        },
+        {
+            "title": "헤맬 틈 없음",
+            "description": "목적지가 정해지면 모두를 가장 편한 길로 데려가요.",
+        },
+        {
+            "title": "허점 레이더",
+            "description": "모두가 당연하다고 넘긴 곳에서 다른 가능성을 발견해요.",
+        },
+        {
+            "title": "아이디어 시동",
+            "description": "생각이 떠오르면 직접 굴려보며 쓸 만한 답을 만들어요.",
+        },
     ],
     "can_do": [
         "같이 놀아주세요",
@@ -221,7 +233,7 @@ class UnboxingKitOutput(BaseModel):
 class FeatureOutput(BaseModel):
     """장난감의 핵심 특징 한 개입니다."""
 
-    title: str = Field(description="특징 제목")
+    title: str = Field(max_length=7, description="공백 포함 7자 이하의 특징 제목")
     description: str = Field(description="특징 보조 설명")
 
 

@@ -45,6 +45,8 @@ def test_serves_manual_assessment_test_page() -> None:
     assert response.status_code == 200
     assert "나 사용 설명서 테스트" in response.text
     assert "/api/tests/submissions" in response.text
+    assert 'id="features"' in response.text
+    assert "data.features.map" in response.text
 
 
 def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
@@ -291,6 +293,24 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
     assert body["unboxing_kit"]["title"] == "고백도 통보로 하는 사람"
     assert body["unboxing_kit"]["packaging"]["type"] == "minimal_box"
     assert body["unboxing_kit"]["opening_tool"]["type"] == "chainsaw"
+    assert body["features"] == [
+        {
+            "title": "맛길 내비",
+            "description": "취향과 동선을 한꺼번에 맞춰 실패 없는 한 끼를 찾아요.",
+        },
+        {
+            "title": "헤맬 틈 없음",
+            "description": "목적지가 정해지면 모두를 가장 편한 길로 데려가요.",
+        },
+        {
+            "title": "원리 해부자",
+            "description": "당연해 보이는 것도 작동 원리를 알 때까지 파고들어요.",
+        },
+        {
+            "title": "가설 실험실",
+            "description": "떠오른 생각을 여러 가능성에 대입하며 더 나은 답을 찾아요.",
+        },
+    ]
 
 
 def test_serves_character_image_from_result_url() -> None:

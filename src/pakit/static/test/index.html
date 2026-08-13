@@ -22,6 +22,12 @@
     .copy-card { margin-top: 16px; padding: 16px; border-radius: 10px; background: white; }
     .copy-card h3 { margin: 0 0 8px; }
     .copy-card p { margin: 6px 0 0; line-height: 1.65; }
+    .section-title { margin: 28px 0 12px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .feature-card { padding: 16px; border-radius: 10px; background: white; }
+    .feature-card h4 { margin: 0 0 6px; font-size: 17px; }
+    .feature-card p { margin: 0; color: #666; line-height: 1.5; }
+    @media (max-width: 600px) { .feature-grid { grid-template-columns: 1fr; } }
     pre { overflow: auto; padding: 16px; background: #1d1f21; color: #eee; border-radius: 10px; }
     details { margin-top: 20px; }
   </style>
@@ -59,6 +65,8 @@
       <p id="tool-tags"></p>
       <p id="tool-reason"></p>
     </div>
+    <h3 class="section-title">핵심 특징</h3>
+    <div id="features" class="feature-grid"></div>
     <details>
       <summary>원본 JSON 보기</summary>
       <pre id="json"></pre>
@@ -144,6 +152,17 @@
         document.querySelector("#tool-name").textContent = `개봉 도구: ${data.unboxing_kit.opening_tool.name}`;
         document.querySelector("#tool-tags").textContent = data.unboxing_kit.opening_tool.tags.join(" · ");
         document.querySelector("#tool-reason").textContent = data.unboxing_kit.opening_tool.reason;
+        const features = document.querySelector("#features");
+        features.replaceChildren(...data.features.map((feature) => {
+          const card = document.createElement("article");
+          card.className = "feature-card";
+          const title = document.createElement("h4");
+          title.textContent = feature.title;
+          const description = document.createElement("p");
+          description.textContent = feature.description;
+          card.append(title, description);
+          return card;
+        }));
         document.querySelector("#json").textContent = JSON.stringify(data, null, 2);
         document.querySelector("#result").style.display = "block";
         document.querySelector("#result").scrollIntoView({ behavior:"smooth" });

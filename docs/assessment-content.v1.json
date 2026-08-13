@@ -14,7 +14,12 @@
       "source": "통계 기반이며 초기 데이터가 없을 때 MBTI 통계를 사용하는 기획",
       "status": "copy_and_statistics_rule_pending"
     },
-    "features": {"question_ids": ["step1.q01", "step1.q02"]},
+    "features": {
+      "question_ids": ["step1.q01", "step1.q02"],
+      "additional_input": "mbti",
+      "rule": "q01_x_q02_two_copies_plus_mbti_two_copies",
+      "title_max_length": 7
+    },
     "can_do": {"question_ids": ["step1.q03", "step1.q04"]},
     "warnings": {"question_ids": ["step1.q05", "step1.q06"]},
     "charging": {"question_ids": ["step1.q07", "step1.q08"]},
@@ -30,7 +35,9 @@
     "aggregation": "equal_weight_rounded_mean",
     "classification_boundary": {"operator": ">=", "threshold": 50, "side": "score_100"},
     "unresolved_fields": [
-      "결과 재료를 실제 문구로 조합하는 규칙"
+      "can_do 결과 재료를 실제 문구로 조합하는 규칙",
+      "warnings 결과 재료를 실제 문구로 조합하는 규칙",
+      "charging 결과 재료를 실제 문구로 조합하는 규칙"
     ],
     "known_axes": [
       {

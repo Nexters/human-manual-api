@@ -1,5 +1,8 @@
+from pakit.domain.assessment import MbtiType
 from pakit.services.result_content import (
     COMBINATION_COPY,
+    FEATURE_COMBINATION_COPY,
+    MBTI_FEATURE_COPY,
     OPENING_TOOL_COPY,
     PACKAGING_COPY,
     RESULT_CONTENT_VERSION,
@@ -14,6 +17,37 @@ def test_defines_copy_for_all_unboxing_combinations() -> None:
     assert set(COMBINATION_COPY) == expected_keys
     assert len({copy.title for copy in COMBINATION_COPY.values()}) == 16
     assert len({copy.description for copy in COMBINATION_COPY.values()}) == 16
+
+
+def test_defines_two_features_for_every_q01_q02_combination() -> None:
+    q01_values = {"restaurant", "worries", "hangout", "information"}
+    q02_values = {
+        "navigation",
+        "lift_mood",
+        "planning",
+        "reacting",
+        "mediate_conflict",
+        "choose_gift",
+    }
+
+    assert set(FEATURE_COMBINATION_COPY) == {
+        (q01_value, q02_value) for q01_value in q01_values for q02_value in q02_values
+    }
+    assert all(len(features) == 2 for features in FEATURE_COMBINATION_COPY.values())
+
+
+def test_defines_two_features_for_every_mbti() -> None:
+    assert set(MBTI_FEATURE_COPY) == set(MbtiType)
+    assert all(len(features) == 2 for features in MBTI_FEATURE_COPY.values())
+
+
+def test_feature_titles_are_at_most_seven_characters() -> None:
+    answer_features = [
+        feature for features in FEATURE_COMBINATION_COPY.values() for feature in features
+    ]
+    mbti_features = [feature for features in MBTI_FEATURE_COPY.values() for feature in features]
+
+    assert all(len(feature.title) <= 7 for feature in (*answer_features, *mbti_features))
 
 
 def test_uses_confirmed_titles_for_revised_combinations() -> None:
@@ -44,4 +78,4 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-13.8"
+    assert RESULT_CONTENT_VERSION == "2026-08-13.9"
