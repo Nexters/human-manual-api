@@ -44,4 +44,4 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-13.7"
+    assert RESULT_CONTENT_VERSION == "2026-08-13.8"
