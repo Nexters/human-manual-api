@@ -20,6 +20,9 @@ def test_runtime_contract_matches_published_identifier_document() -> None:
         contract = QUESTION_CONTRACTS[question["question_id"]]
         assert contract.answer_kind is AnswerKind(question["answer_kind"])
         assert contract.allowed_values == frozenset(question.get("values", []))
+        constraints = question.get("constraints", {})
+        assert contract.minimum == constraints.get("minimum")
+        assert contract.maximum == constraints.get("maximum")
 
     example_answers = ASSESSMENT_SUBMISSION_EXAMPLE["answers"]
     assert isinstance(example_answers, list)

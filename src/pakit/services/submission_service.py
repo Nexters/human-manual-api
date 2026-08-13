@@ -56,6 +56,14 @@ def _validate_answers(submission: AssessmentSubmission) -> None:
                 raise InvalidSubmissionError(f"{answer.question_id}에 허용되지 않은 value입니다.")
         elif not isinstance(answer.value, int):
             raise InvalidSubmissionError(f"{answer.question_id}의 value는 정수여야 합니다.")
+        elif contract.minimum is not None and answer.value < contract.minimum:
+            raise InvalidSubmissionError(
+                f"{answer.question_id}의 value는 {contract.minimum} 이상이어야 합니다."
+            )
+        elif contract.maximum is not None and answer.value > contract.maximum:
+            raise InvalidSubmissionError(
+                f"{answer.question_id}의 value는 {contract.maximum} 이하여야 합니다."
+            )
 
 
 def _build_mock_result(mbti: MbtiType, result_code: str) -> SubmissionResultData:

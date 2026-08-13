@@ -1,3 +1,4 @@
+import pytest
 from fastapi.testclient import TestClient
 
 from pakit.api.schemas.assessment_submissions import (
@@ -346,6 +347,48 @@ def test_rejects_integer_answer_with_string_value() -> None:
 
     assert response.status_code == 422
     assert "정수" in response.json()["error"]["message"]
+
+
+@pytest.mark.parametrize(
+    ("question_id", "value", "expected_limit"),
+    [
+        ("step2.q04", -1, "0 이상"),
+        ("step2.q04", 101, "100 이하"),
+        ("step2.q06", -1, "0 이상"),
+        ("step2.q06", 1000, "999 이하"),
+    ],
+)
+def test_rejects_out_of_range_numeric_answer(
+    question_id: str, value: int, expected_limit: str
+) -> None:
+    payload = _valid_submission()
+    answers = payload["answers"]
+    assert isinstance(answers, list)
+    answer = next(answer for answer in answers if answer["question_id"] == question_id)
+    assert isinstance(answer, dict)
+    answer["value"] = value
+
+    response = client.post("/api/tests/submissions", json=payload)
+
+    assert response.status_code == 422
+    assert expected_limit in response.json()["error"]["message"]
+
+
+@pytest.mark.parametrize(
+    ("question_id", "value"),
+    [("step2.q04", 0), ("step2.q04", 100), ("step2.q06", 0), ("step2.q06", 999)],
+)
+def test_accepts_numeric_answer_boundaries(question_id: str, value: int) -> None:
+    payload = _valid_submission()
+    answers = payload["answers"]
+    assert isinstance(answers, list)
+    answer = next(answer for answer in answers if answer["question_id"] == question_id)
+    assert isinstance(answer, dict)
+    answer["value"] = value
+
+    response = client.post("/api/tests/submissions", json=payload)
+
+    assert response.status_code == 200
 
 
 def test_rejects_unknown_mbti() -> None:

@@ -1,13 +1,5 @@
 from dataclasses import dataclass
-
-try:
-    from enum import StrEnum
-except ImportError:
-    from enum import Enum
-
-    class StrEnum(str, Enum):  # noqa: UP042  # type: ignore[no-redef]
-        pass
-
+from enum import StrEnum
 
 ASSESSMENT_VERSION = "2026-08-12.3"
 
@@ -23,6 +15,8 @@ class AnswerKind(StrEnum):
 class QuestionContract:
     answer_kind: AnswerKind
     allowed_values: frozenset[str] = frozenset()
+    minimum: int | None = None
+    maximum: int | None = None
 
 
 QUESTION_CONTRACTS: dict[str, QuestionContract] = {
@@ -91,11 +85,11 @@ QUESTION_CONTRACTS: dict[str, QuestionContract] = {
     "step2.q03": QuestionContract(
         AnswerKind.CHOICE, frozenset({"rehearse_with_ai", "send_immediately"})
     ),
-    "step2.q04": QuestionContract(AnswerKind.SCALE),
+    "step2.q04": QuestionContract(AnswerKind.SCALE, minimum=0, maximum=100),
     "step2.q05": QuestionContract(
         AnswerKind.CHOICE, frozenset({"share_everything", "share_selectively"})
     ),
-    "step2.q06": QuestionContract(AnswerKind.INTEGER),
+    "step2.q06": QuestionContract(AnswerKind.INTEGER, minimum=0, maximum=999),
     "step2.q07": QuestionContract(
         AnswerKind.CHOICE, frozenset({"decorate_for_mood", "essentials_only"})
     ),
