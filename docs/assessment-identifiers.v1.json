@@ -111,7 +111,7 @@
     {
       "question_id": "step2.q04",
       "answer_kind": "scale",
-      "constraints": {"status": "pending"}
+      "constraints": {"minimum": 0, "maximum": 100, "step": 1}
     },
     {
       "question_id": "step2.q05",
@@ -121,7 +121,7 @@
     {
       "question_id": "step2.q06",
       "answer_kind": "integer",
-      "constraints": {"status": "pending"}
+      "constraints": {"minimum": 0, "maximum": 999, "step": 1}
     },
     {
       "question_id": "step2.q07",
