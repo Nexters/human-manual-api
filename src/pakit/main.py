@@ -1,5 +1,8 @@
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from pakit import __version__
 from pakit.api.router import api_router
@@ -36,6 +39,16 @@ def create_app() -> FastAPI:
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
+    )
+    application.mount(
+        "/assets",
+        StaticFiles(directory=Path(__file__).parent / "static"),
+        name="assets",
+    )
+    application.mount(
+        "/test",
+        StaticFiles(directory=Path(__file__).parent / "static" / "test", html=True),
+        name="test-page",
     )
     application.include_router(api_router, prefix=settings.api_prefix)
 

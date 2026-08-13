@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pakit 테스트 페이지</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; }
+    body { max-width: 880px; margin: 0 auto; padding: 32px 20px 80px; color: #202124; }
+    h1 { margin-bottom: 4px; }
+    .muted { color: #666; }
+    fieldset { margin: 20px 0; padding: 18px; border: 1px solid #ddd; border-radius: 12px; }
+    legend { padding: 0 8px; font-weight: 700; }
+    label.option { display: block; padding: 7px 0; cursor: pointer; }
+    input[type="text"], input[type="number"], select { padding: 9px; font-size: 16px; }
+    input[type="range"] { width: min(500px, 80%); vertical-align: middle; }
+    button { padding: 12px 20px; border: 0; border-radius: 9px; background: #111; color: white; font-size: 16px; cursor: pointer; }
+    button:disabled { opacity: .5; }
+    #error { color: #b42318; white-space: pre-wrap; }
+    #result { display: none; margin-top: 32px; padding: 22px; border-radius: 14px; background: #f5f5f5; }
+    #character { max-width: 260px; max-height: 260px; object-fit: contain; }
+    pre { overflow: auto; padding: 16px; background: #1d1f21; color: #eee; border-radius: 10px; }
+    details { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>나 사용 설명서 테스트</h1>
+  <p class="muted">디자인 없는 효용 검증용 페이지입니다. 제출하면 현재 서버의 룰 기반 결과를 생성합니다.</p>
+
+  <form id="assessment-form">
+    <label>닉네임 <input id="nickname" type="text" value="해서니" required></label>
+    <div id="questions"></div>
+    <fieldset>
+      <legend>MBTI</legend>
+      <select id="mbti" required></select>
+    </fieldset>
+    <button id="submit" type="submit">결과 만들기</button>
+    <p id="error"></p>
+  </form>
+
+  <section id="result">
+    <img id="character" alt="결과 캐릭터">
+    <h2 id="result-name"></h2>
+    <p id="axes"></p>
+    <p id="kit"></p>
+    <details>
+      <summary>원본 JSON 보기</summary>
+      <pre id="json"></pre>
+    </details>
+  </section>
+
+  <script>
+    const choices = (id, prompt, options, defaultValue) => ({ id, prompt, options, defaultValue });
+    const questions = [
+      choices("step1.q01", "친구들이 나를 찾는 순간은 언제인가요?", [["restaurant","맛집 정할 때"],["worries","고민 있을 때"],["hangout","놀 사람 필요할 때"],["information","정보 필요할 때"]], "hangout"),
+      choices("step1.q02", "가장 자신있는 것은 무엇인가요?", [["navigation","길찾기"],["lift_mood","분위기 살리기"],["planning","계획 짜기"],["reacting","리액션하기"],["mediate_conflict","싸움 말리기"],["choose_gift","선물 고르기"]], "lift_mood"),
+      choices("step1.q03", "남들은 이해 못하는 습관이 있나요?", [["save_favorites","좋아하는 물건은 아까워서 쉽게 사용하지 못한다"],["multiple_alarms","알람을 하나보다 여러 개 맞춰두는 편이다"],["duplicate_clothes","마음에 드는 옷은 같은 걸 여러 벌 사는 편이다"],["check_spoilers","영화를 보기 전에 결말을 먼저 찾아보는 편이다"]], "multiple_alarms"),
+      choices("step1.q04", "자주 듣는 잔소리는 무엇인가요?", [["phone_overuse","폰 좀 그만봐 진짜."],["sleep_late","니가 올빼미냐 잠 좀 자"],["overspending","거지가 꿈이니?"],["slow_reply","읽씹 ㄴㄴ 대답 좀 해라"],["messy_room","돼지우리냐 방 좀 치우고 살아라"],["low_battery","폰 충전 좀 해라"]], "low_battery"),
+      choices("step1.q05", "하루 중 절대 건드리면 안 되는 시간은 언제인가요?", [["after_waking","기상 직후"],["during_meal","밥 먹을 때"],["after_work","퇴근 직후"],["late_night","새벽 감성 타임"]], "after_waking"),
+      choices("step1.q06", "나를 화나게 하는 가장 빠른 방법", [["rush","재촉하기"],["interrupt","말 끊기"],["take_food","음식 뺏어먹기"],["arrive_late","약속 늦기"],["nag","잔소리"],["change_plan","내 계획 바꾸기"]], "nag"),
+      choices("step1.q07", "기다리고 기다리던 휴일, 첫 스케줄은 무엇인가요?", [["sleep_until_noon","낮 12시 기상"],["morning_run","아침 러닝"],["brunch_cafe","브런치 카페"],["stay_in_bed","이불 밖은 위험해"],["watch_streaming","밀린 OTT 시청"],["self_development","자기개발"]], "stay_in_bed"),
+      choices("step1.q08", "금요일 저녁, 약속이 갑자기 취소됐다면", [["go_to_bed","개꿀! 당장 침대로 간다"],["contact_others","다른 친구한테 연락 돌린다"],["eat_alone","혼자라도 식당 가서 먹고 온다"],["go_for_drive","이 때다, 안 가 본 곳으로 드라이브!"]], "go_for_drive"),
+      choices("step1.q09", "어떤 친구랑 오랫동안 놀 수 있나요?", [["tsundere","츤데레"],["planner","계획형"],["meme_addict","밈 중독자"],["foodie","먹짱"]], "tsundere"),
+      choices("step1.q10", "이 친구랑은 절대 같이 여행가기 싫다!", [["morning_person","아침형 인간"],["no_plan","무계획형"],["photo_obsessed","사진 집착러"],["hates_walking","걷기 싫어하는 친구"]], "hates_walking"),
+      choices("step2.q01", "마음에 드는 사람을 발견했을 때 첫 반응은?", [["inspect_profile","프로필부터 정독하며 성향 파악"],["approach_directly","오늘 시간 되세요? 바로 직진"]], "approach_directly"),
+      choices("step2.q02", "방금 그 말이 서운할 때 대처 방식은?", [["hint_and_wait","말없이 티 내며 알아채길 기다린다"],["resolve_immediately","그 자리에서 묻고 푼다"]], "resolve_immediately"),
+      choices("step2.q03", "친구랑 싸운 뒤 전송 버튼을 누르기 직전에는?", [["rehearse_with_ai","AI와 몇 번이고 상담한다"],["send_immediately","고민 없이 바로 보낸다"]], "send_immediately"),
+      { id:"step2.q04", prompt:"연애할 때, 우리 사이는 어느 정도가 편한가요?", kind:"scale", defaultValue:50 },
+      choices("step2.q05", "소소한 일상, 얼마나 공유하나요?", [["share_everything","오늘 뭐 먹었는지까지 다 말한다"],["share_selectively","하나하나 보고할 필요는 없다"]], "share_selectively"),
+      { id:"step2.q06", prompt:"지금 쌓여있는 카톡 개수는?", kind:"integer", defaultValue:558 },
+      choices("step2.q07", "첫 자취방을 어떻게 꾸미나요?", [["decorate_for_mood","조명과 포스터까지 감성은 필수"],["essentials_only","매트리스와 가전만 있으면 충분"]], "decorate_for_mood"),
+      choices("step2.q08", "애정을 어떻게 표현하나요?", [["express_with_words","다정한 말과 리액션으로 표현한다"],["express_with_actions","말보다 행동으로 보여준다"]], "express_with_actions"),
+      choices("step2.q09", "단톡방에 보낸 드립이 무시당했을 때", [["ruminate","계속 곱씹어본다"],["forget_quickly","보낸 기억도 없다"]], "forget_quickly"),
+      choices("step2.q10", "단골카페에 신메뉴가 생겼다면", [["order_familiar_menu","늘 먹던 메뉴를 주문한다"],["try_new_menu","신메뉴부터 도전한다"]], "try_new_menu"),
+      choices("step2.q11", "배달 앱 주문 내역은?", [["order_familiar_stores","늘 시키던 맛집만 돌아가며 주문한다"],["try_new_store","리뷰가 없어도 새 가게에 도전한다"]], "try_new_store"),
+      choices("step2.q12", "금지 버튼이 나타난다면", [["press","PUSH 버튼 누르기"],["skip","건너뛰기"]], "press")
+    ];
+
+    const root = document.querySelector("#questions");
+    questions.forEach((question) => {
+      const fieldset = document.createElement("fieldset");
+      fieldset.innerHTML = `<legend>${question.id} · ${question.prompt}</legend>`;
+      if (question.kind === "scale") {
+        fieldset.innerHTML += `<span>밀착</span> <input name="${question.id}" type="range" min="0" max="100" step="1" value="${question.defaultValue}"> <output>${question.defaultValue}</output> <span>거리조절</span>`;
+        fieldset.querySelector("input").addEventListener("input", (event) => fieldset.querySelector("output").value = event.target.value);
+      } else if (question.kind === "integer") {
+        fieldset.innerHTML += `<input name="${question.id}" type="number" min="0" max="999" step="1" value="${question.defaultValue}" required>`;
+      } else {
+        question.options.forEach(([value, label]) => {
+          fieldset.innerHTML += `<label class="option"><input type="radio" name="${question.id}" value="${value}" ${value === question.defaultValue ? "checked" : ""} required> ${label}</label>`;
+        });
+      }
+      root.appendChild(fieldset);
+    });
+
+    const mbti = document.querySelector("#mbti");
+    ["INTJ","ISTJ","ENTJ","ESTJ","INFJ","ISFJ","ENFJ","ESFJ","INFP","ISFP","ENFP","ESFP","INTP","ISTP","ENTP","ESTP"].forEach((value) => {
+      mbti.add(new Option(value, value, value === "ENTP", value === "ENTP"));
+    });
+
+    document.querySelector("#assessment-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const submit = document.querySelector("#submit");
+      const error = document.querySelector("#error");
+      submit.disabled = true;
+      error.textContent = "";
+      const form = new FormData(event.currentTarget);
+      const answers = questions.map((question) => ({
+        question_id: question.id,
+        value: question.kind === "scale" || question.kind === "integer" ? Number(form.get(question.id)) : form.get(question.id)
+      }));
+      try {
+        const response = await fetch("/api/tests/submissions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ assessment_version:"2026-08-12.3", participant:{ nickname:document.querySelector("#nickname").value }, answers, mbti:mbti.value })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(JSON.stringify(data, null, 2));
+        document.querySelector("#character").src = data.overview.image_url;
+        document.querySelector("#result-name").textContent = data.overview.result_name;
+        document.querySelector("#axes").textContent = Object.entries(data.unboxing_kit.axis_scores).map(([key,value]) => `${key}: ${value}`).join(" · ");
+        document.querySelector("#kit").textContent = `포장: ${data.unboxing_kit.packaging.name} · 개봉 도구: ${data.unboxing_kit.opening_tool.name}`;
+        document.querySelector("#json").textContent = JSON.stringify(data, null, 2);
+        document.querySelector("#result").style.display = "block";
+        document.querySelector("#result").scrollIntoView({ behavior:"smooth" });
+      } catch (reason) {
+        error.textContent = `결과 생성 실패\n${reason.message}`;
+      } finally {
+        submit.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

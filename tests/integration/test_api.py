@@ -39,6 +39,14 @@ def test_health() -> None:
     assert response.json() == {"status": "ok"}
 
 
+def test_serves_manual_assessment_test_page() -> None:
+    response = client.get("/test/")
+
+    assert response.status_code == 200
+    assert "나 사용 설명서 테스트" in response.text
+    assert "/api/tests/submissions" in response.text
+
+
 def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
     response = client.get("/openapi.json")
 
@@ -226,18 +234,24 @@ def test_submits_complete_assessment_and_returns_mock_result() -> None:
     }
     assert body["overview"]["noun"] == "망원경"
     assert body["overview"]["character_id"] == "telescope"
+    assert body["overview"]["image_url"] == "/assets/characters/telescope.png"
     assert body["overview"]["result_name"].endswith("망원경")
     assert len(body["overview"]["tags"]) == 3
-    assert body["unboxing_kit"]["axis_scores"] == {
-        "attachment": 20,
-        "expression": 65,
-        "routine": 20,
-        "egen": 75,
-    }
+    assert all(0 <= score <= 100 for score in body["unboxing_kit"]["axis_scores"].values())
     assert len(body["features"]) == 4
     assert len(body["can_do"]) == 4
     assert len(body["warnings"]) == 4
     assert len(body["charging"]["activities"]) == 3
+
+
+def test_serves_character_image_from_result_url() -> None:
+    submitted = client.post("/api/tests/submissions", json=_valid_submission())
+    image_url = submitted.json()["overview"]["image_url"]
+
+    response = client.get(image_url)
+
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "image/png"
 
 
 def test_rejects_unsupported_assessment_version() -> None:

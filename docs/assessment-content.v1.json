@@ -25,13 +25,11 @@
     }
   },
   "calculation_contract": {
-    "status": "mapping_confirmed_scoring_pending",
+    "status": "scoring_confirmed",
     "mapping_source": "temp.txt",
+    "aggregation": "equal_weight_rounded_mean",
+    "classification_boundary": {"operator": ">=", "threshold": 50, "side": "score_100"},
     "unresolved_fields": [
-      "문항별 가중치와 축 신호 집계 방식",
-      "step2.q06 값의 축 점수 정규화 규칙",
-      "step2.q06 값 300의 경계 판정",
-      "축별 신호 집계 및 50점 경계 규칙",
       "결과 재료를 실제 문구로 조합하는 규칙"
     ],
     "known_axes": [
@@ -319,14 +317,14 @@
       "placeholder": "갯수를 입력하세요",
       "constraints": {"minimum": 0, "maximum": 999, "step": 1},
       "calculation": {
-        "status": "mapped_boundary_conflict",
+        "status": "mapped",
         "role": "axis_signal",
         "axis": "attachment",
-        "source_rules": [
-          {"operator": ">=", "threshold": 300, "pole": "거리조절", "canonical_score": 0},
-          {"operator": "<=", "threshold": 300, "pole": "밀착", "canonical_score": 100}
-        ],
-        "conflict": "값 300이 두 규칙에 동시에 포함되므로 경계 판정 확정 필요"
+        "rules": [
+          {"operator": "<", "threshold": 300, "pole": "밀착", "canonical_score": 100},
+          {"operator": "=", "threshold": 300, "pole": "중립", "canonical_score": 50},
+          {"operator": ">", "threshold": 300, "pole": "거리조절", "canonical_score": 0}
+        ]
       }
     },
     {

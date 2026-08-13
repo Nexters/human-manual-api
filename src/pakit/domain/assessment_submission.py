@@ -24,6 +24,7 @@ class OverviewData:
     noun: str
     result_name: str
     character_id: str
+    image_url: str
     tags: tuple[str, ...]
 
 

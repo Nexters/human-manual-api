@@ -1,6 +1,9 @@
+from pathlib import Path
+
 import pytest
 
 from pakit.domain.assessment import AssessmentInput, AxisScores, MbtiType
+from pakit.domain.characters import CHARACTERS
 from pakit.services.result_builder import NOUNS, build_assessment_result
 
 EXPECTED_NOUNS = {
@@ -58,6 +61,14 @@ def test_builds_all_axis_quadrants(
 
 def test_all_mbti_characters_match_final_assets() -> None:
     assert NOUNS == EXPECTED_NOUNS
+
+
+def test_all_character_asset_keys_match_existing_static_files() -> None:
+    static_root = Path(__file__).parents[2] / "src" / "pakit" / "static"
+
+    for character in CHARACTERS.values():
+        assert character.asset_key == f"characters/{character.code}.png"
+        assert (static_root / character.asset_key).is_file()
 
 
 @pytest.mark.parametrize(("mbti", "noun"), EXPECTED_NOUNS.items())

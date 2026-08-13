@@ -110,7 +110,8 @@ async def create_assessment_submission(
     summary="테스트 결과 조회",
     description=(
         "테스트 제출 API에서 받은 `result_code`로 결과를 조회합니다. "
-        "현재 목업에서는 `demo-result-code`만 사용할 수 있으며 고정 데모 결과를 반환합니다."
+        "현재 목업에서는 `demo-result-code`만 사용할 수 있으며 "
+        "최근 제출 결과를 메모리에 보관합니다."
     ),
     response_description="result_code에 해당하는 테스트 결과",
     responses={

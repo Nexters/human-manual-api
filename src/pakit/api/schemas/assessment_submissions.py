@@ -44,32 +44,33 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
     "result_code": "demo-result-code",
     "overview": {
         "rarity": "상위 4%",
-        "adjective": "새벽 2시에도 카톡 폭격하는",
+        "adjective": "옷 예쁘게 입고 플러팅 했다고 하는",
         "noun": "팽이",
-        "result_name": "새벽 2시에도 카톡 폭격하는 팽이",
+        "result_name": "옷 예쁘게 입고 플러팅 했다고 하는 팽이",
         "character_id": "spinning_top",
+        "image_url": "/assets/characters/spinning_top.png",
         "tags": ["도파민 MAX", "장난꾸러기", "혼자서도 잘 놀아요"],
     },
     "unboxing_kit": {
         "axis_scores": {
-            "attachment": 20,
-            "expression": 65,
-            "routine": 20,
-            "egen": 75,
+            "attachment": 83,
+            "expression": 0,
+            "routine": 67,
+            "egen": 100,
         },
         "title": "밤이 깊어질수록 텐션이 올라가는 장난꾸러기",
         "description": "해가 지면 비로소 에너지가 충전되는 타입이에요.",
         "packaging": {
-            "type": "fragile_box",
-            "name": "취급주의 상자",
-            "tags": ["직진형", "거리조절형"],
-            "reason": "마음을 크게 담아 쉽게 드러내는 성향을 표현한 상자예요.",
+            "type": "matryoshka_box",
+            "name": "마트료시카 상자",
+            "tags": ["탐색형", "밀착형"],
+            "reason": "마음은 깊지만 여러 겹을 열어야 드러나는 조합이에요.",
         },
         "opening_tool": {
-            "type": "magic_wand",
-            "name": "마술봉",
-            "tags": ["탐험형", "에겐형"],
-            "reason": "새로운 경험을 흥미롭게 바꾸는 모습을 닮았어요.",
+            "type": "glove",
+            "name": "장갑",
+            "tags": ["루틴형", "에겐형"],
+            "reason": "익숙한 방식을 다정하고 부드럽게 다루는 조합이에요.",
         },
     },
     "features": [
@@ -150,6 +151,7 @@ class OverviewOutput(BaseModel):
     noun: str = Field(description="MBTI에 따라 결정된 장난감 명사")
     result_name: str = Field(description="형용사와 명사를 합친 최종 결과명")
     character_id: str = Field(description="캐릭터 이미지 매핑용 고정 ID")
+    image_url: str = Field(description="서버가 제공하는 캐릭터 이미지 경로")
     tags: list[str] = Field(min_length=3, max_length=3, description="말풍선 태그 3개")
 
 
