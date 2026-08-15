@@ -39,17 +39,21 @@ def test_health() -> None:
     assert response.json() == {"status": "ok"}
 
 
-def test_allows_cors_from_production_frontend() -> None:
+@pytest.mark.parametrize(
+    "origin",
+    ["http://localhost:3000", "http://localhost:5173", "https://pakit.kr"],
+)
+def test_allows_cors_from_frontend(origin: str) -> None:
     response = client.options(
         "/api/tests/submissions",
         headers={
-            "Origin": "https://pakit.kr",
+            "Origin": origin,
             "Access-Control-Request-Method": "POST",
         },
     )
 
     assert response.status_code == 200
-    assert response.headers["access-control-allow-origin"] == "https://pakit.kr"
+    assert response.headers["access-control-allow-origin"] == origin
     assert response.headers["access-control-allow-credentials"] == "true"
 
 

@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from pakit import __version__
 from pakit.api.router import api_router
 from pakit.api.routes.health import HealthResponse
-from pakit.core.config import get_settings
+from pakit.core.config import ALLOWED_CORS_ORIGINS, get_settings
 
 
 def create_app() -> FastAPI:
@@ -35,7 +35,7 @@ def create_app() -> FastAPI:
     )
     application.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.allowed_cors_origins,
+        allow_origins=list(ALLOWED_CORS_ORIGINS),
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

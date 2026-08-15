@@ -18,9 +18,9 @@ uv run uvicorn pakit.main:app --reload
 - 상태 확인: <http://localhost:8000/health>
 - API 상태 확인: <http://localhost:8000/api/health>
 
-브라우저 요청은 로컬 프론트엔드와 운영 프론트엔드 `https://pakit.kr`에서 허용됩니다.
-추가 origin은 `.env`의 `PAKIT_CORS_ORIGINS` JSON 배열에 등록합니다. API 주소나 경로가 아닌
-origin만 입력해야 합니다.
+브라우저 요청은 로컬 프론트엔드 `http://localhost:3000`, `http://localhost:5173`과 운영
+프론트엔드 `https://pakit.kr`에서 허용됩니다. 이 목록은 서버 코드에 고정되어 있으며 `.env`로
+재정의하지 않습니다.
 
 ## Docker Compose로 실행하기
 
