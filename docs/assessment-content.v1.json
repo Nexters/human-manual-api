@@ -66,7 +66,17 @@
       },
       "product_plan": "docs/key-feature-product-plan.md"
     },
-    "can_do": {"question_ids": ["step1.q03", "step1.q04", "step1.q12"]},
+    "can_do": {
+      "question_ids": ["step1.q12", "step2.q02", "step2.q08"],
+      "axes": ["attachment"],
+      "slot_order": [
+        "support_preference",
+        "relationship_distance",
+        "conflict_support",
+        "affection_recognition"
+      ],
+      "status": "implemented"
+    },
     "warnings": {"question_ids": ["step1.q05", "step1.q06"]},
     "charging": {"question_ids": ["step1.q07", "step1.q08"]},
     "friend_compatibility": {
@@ -82,7 +92,6 @@
     "classification_boundary": {"operator": ">=", "threshold": 50, "side": "score_100"},
     "unresolved_fields": [
       "features MBTI 16종 대표 특징의 최종 콘텐츠 검수",
-      "can_do 결과 재료를 실제 문구로 조합하는 규칙",
       "warnings 결과 재료를 실제 문구로 조합하는 규칙",
       "charging 결과 재료를 실제 문구로 조합하는 규칙"
     ],
@@ -162,7 +171,7 @@
         {"value": "duplicate_clothes", "label": "마음에 드는 옷은 같은 걸 여러 벌 사는 편이다"},
         {"value": "check_spoilers", "label": "영화를 보기 전에 결말을 먼저 찾아보는 편이다"}
       ],
-      "calculation": {"status": "mapped", "role": "result_material", "result_section": "can_do"}
+      "calculation": {"status": "retained_unmapped", "role": "unused_result_material"}
     },
     {
       "question_id": "step1.q04",
@@ -178,7 +187,7 @@
         {"value": "messy_room", "label": "돼지우리냐 방 좀 치우고 살아라"},
         {"value": "low_battery", "label": "폰 충전 좀 해라"}
       ],
-      "calculation": {"status": "mapped", "role": "result_material", "result_section": "can_do"}
+      "calculation": {"status": "retained_unmapped", "role": "unused_result_material"}
     },
     {
       "question_id": "step1.q05",
@@ -306,9 +315,10 @@
         {"value": "make_me_laugh", "label": "“이거 보고 일단 웃어ㅋㅋ”"}
       ],
       "calculation": {
-        "status": "input_collection_implemented_result_mapping_pending",
+        "status": "mapped",
         "role": "result_material",
         "result_section": "can_do",
+        "result_slot": "support_preference",
         "additional_input": "mbti",
         "mbti_role": "copy_modifier"
       }
@@ -350,7 +360,8 @@
         "signals": {
           "hint_and_wait": {"pole": "탐색", "canonical_score": 0},
           "resolve_immediately": {"pole": "직진", "canonical_score": 100}
-        }
+        },
+        "result_material": {"result_section": "can_do", "result_slot": "conflict_support"}
       }
     },
     {
@@ -471,6 +482,10 @@
         "signals": {
           "express_with_words": {"pole": "에겐", "canonical_score": 100},
           "express_with_actions": {"pole": "테토", "canonical_score": 0}
+        },
+        "result_material": {
+          "result_section": "can_do",
+          "result_slot": "affection_recognition"
         }
       }
     },

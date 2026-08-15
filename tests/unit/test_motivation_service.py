@@ -1,7 +1,7 @@
 from pakit.domain.assessment import MbtiType
 from pakit.services.motivation_service import build_motivation_feature
 from pakit.services.result_content import (
-    MBTI_MOTIVATION_GROUP,
+    MBTI_MIDDLE_GROUP,
     MOTIVATION_COPY,
     MOTIVATION_DESCRIPTION,
 )
@@ -18,7 +18,7 @@ def test_builds_every_motivation_and_mbti_combination() -> None:
     assert len({feature.description for feature in results.values()}) == 6 * 4
     for (answer, mbti), feature in results.items():
         assert feature.title == MOTIVATION_COPY[answer].title
-        group = MBTI_MOTIVATION_GROUP[mbti]
+        group = MBTI_MIDDLE_GROUP[mbti]
         assert feature.description == MOTIVATION_DESCRIPTION[(answer, group)]
         assert feature.description.count(".") == 1
         assert len(feature.description) <= 50

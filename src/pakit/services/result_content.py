@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-15.1"
+RESULT_CONTENT_VERSION = "2026-08-15.2"
 
 
 @dataclass(frozen=True)
@@ -58,7 +58,7 @@ MOTIVATION_COPY: dict[str, MotivationCopy] = {
 }
 
 
-MBTI_MOTIVATION_GROUP: dict[MbtiType, str] = {
+MBTI_MIDDLE_GROUP: dict[MbtiType, str] = {
     MbtiType.INTJ: "NT",
     MbtiType.ENTJ: "NT",
     MbtiType.INTP: "NT",
@@ -75,6 +75,48 @@ MBTI_MOTIVATION_GROUP: dict[MbtiType, str] = {
     MbtiType.ESFJ: "SF",
     MbtiType.ISFP: "SF",
     MbtiType.ESFP: "SF",
+}
+
+
+SUPPORT_PREFERENCE_COPY: dict[tuple[str, str], str] = {
+    ("listen_to_me", "NT"): "결론을 재촉하지 말고 생각의 흐름을 들어주세요",
+    ("listen_to_me", "ST"): "무슨 일이 있었는지 처음부터 차근차근 들어주세요",
+    ("listen_to_me", "NF"): "해결책보다 지금 느끼는 마음부터 들어주세요",
+    ("listen_to_me", "SF"): "편하게 말할 수 있도록 곁에서 들어주세요",
+    ("take_me_out", "NT"): "생각이 막히면 새로운 장소로 데려가주세요",
+    ("take_me_out", "ST"): "기분이 가라앉으면 맛있는 걸 먹으러 불러내주세요",
+    ("take_me_out", "NF"): "마음이 환기될 만한 곳으로 함께 나가주세요",
+    ("take_me_out", "SF"): "좋아하는 음식을 먹으며 기분을 풀어주세요",
+    ("give_me_space", "NT"): "생각이 정리될 때까지 혼자 둘 시간을 주세요",
+    ("give_me_space", "ST"): "스스로 추스를 때까지 평소처럼 기다려주세요",
+    ("give_me_space", "NF"): "마음을 꺼낼 준비가 될 때까지 기다려주세요",
+    ("give_me_space", "SF"): "연락할 때까지 부담 없이 기다려주세요",
+    ("solve_together", "NT"): "막힌 이유부터 함께 정리해주세요",
+    ("solve_together", "ST"): "지금 할 일부터 함께 처리해주세요",
+    ("solve_together", "NF"): "마음부터 확인하고 해결책을 찾아주세요",
+    ("solve_together", "SF"): "당장 필요한 것부터 함께 챙겨주세요",
+    ("make_me_laugh", "NT"): "엉뚱한 이야기로 복잡한 생각을 돌려주세요",
+    ("make_me_laugh", "ST"): "바로 웃을 만한 걸 하나 보내주세요",
+    ("make_me_laugh", "NF"): "취향에 맞는 웃음으로 마음을 환기해주세요",
+    ("make_me_laugh", "SF"): "같이 웃으며 무거운 분위기를 바꿔주세요",
+}
+
+
+RELATIONSHIP_DISTANCE_COPY: dict[str, str] = {
+    "close": "별일 없어도 자주 안부를 묻고 곁에 있어주세요",
+    "independent": "연락이 뜸해도 각자의 시간을 믿어주세요",
+}
+
+
+CONFLICT_SUPPORT_COPY: dict[str, str] = {
+    "hint_and_wait": "표정이 달라지면 지나치지 말고 먼저 물어봐주세요",
+    "resolve_immediately": "서운한 일은 피하지 말고 바로 이야기해주세요",
+}
+
+
+AFFECTION_RECOGNITION_COPY: dict[str, str] = {
+    "express_with_words": "말과 리액션에 담긴 애정을 알아봐주세요",
+    "express_with_actions": "말없이 챙기는 행동을 애정으로 알아봐주세요",
 }
 
 

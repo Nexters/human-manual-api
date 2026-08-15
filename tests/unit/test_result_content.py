@@ -1,16 +1,20 @@
 from pakit.domain.assessment import MbtiType
 from pakit.services.result_content import (
+    AFFECTION_RECOGNITION_COPY,
     CHARACTER_STORY_COPY,
     COMBINATION_COPY,
+    CONFLICT_SUPPORT_COPY,
     EMOTIONAL_PROCESSING_COPY,
-    MBTI_MOTIVATION_GROUP,
+    MBTI_MIDDLE_GROUP,
     MBTI_STRENGTH_COPY,
     MOTIVATION_COPY,
     MOTIVATION_DESCRIPTION,
     OPENING_TOOL_COPY,
     PACKAGING_COPY,
+    RELATIONSHIP_DISTANCE_COPY,
     RELATIONSHIP_ROLE_COPY,
     RESULT_CONTENT_VERSION,
+    SUPPORT_PREFERENCE_COPY,
 )
 
 
@@ -114,10 +118,31 @@ def test_defines_motivation_copy_and_grouped_descriptions_for_every_allowed_inpu
         "last_chance",
         "fun",
     }
-    assert set(MBTI_MOTIVATION_GROUP) == set(MbtiType)
-    assert set(MBTI_MOTIVATION_GROUP.values()) == {"NT", "ST", "NF", "SF"}
+    assert set(MBTI_MIDDLE_GROUP) == set(MbtiType)
+    assert set(MBTI_MIDDLE_GROUP.values()) == {"NT", "ST", "NF", "SF"}
     assert set(MOTIVATION_DESCRIPTION) == {
         (answer, group) for answer in MOTIVATION_COPY for group in {"NT", "ST", "NF", "SF"}
+    }
+
+
+def test_defines_every_handling_guide_copy() -> None:
+    support_preferences = {
+        "listen_to_me",
+        "take_me_out",
+        "give_me_space",
+        "solve_together",
+        "make_me_laugh",
+    }
+    assert set(SUPPORT_PREFERENCE_COPY) == {
+        (preference, group)
+        for preference in support_preferences
+        for group in {"NT", "ST", "NF", "SF"}
+    }
+    assert set(RELATIONSHIP_DISTANCE_COPY) == {"close", "independent"}
+    assert set(CONFLICT_SUPPORT_COPY) == {"hint_and_wait", "resolve_immediately"}
+    assert set(AFFECTION_RECOGNITION_COPY) == {
+        "express_with_words",
+        "express_with_actions",
     }
 
 
@@ -161,4 +186,4 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-15.1"
+    assert RESULT_CONTENT_VERSION == "2026-08-15.2"

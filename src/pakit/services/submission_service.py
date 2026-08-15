@@ -22,6 +22,7 @@ from pakit.services.assessment_classifier import (
     classify_submission,
 )
 from pakit.services.emotional_processing_service import build_emotional_processing_feature
+from pakit.services.handling_guide_service import build_handling_guide
 from pakit.services.motivation_service import build_motivation_feature
 from pakit.services.result_content import (
     CHARACTER_STORY_COPY,
@@ -115,6 +116,13 @@ def _build_result(
         classification.axis_scores.egen,
     )
     character_story = CHARACTER_STORY_COPY[submission.mbti]
+    handling_guide = build_handling_guide(
+        support_preference=answers["step1.q12"],
+        mbti=submission.mbti,
+        attachment_score=classification.axis_scores.attachment,
+        conflict_style=answers["step2.q02"],
+        affection_style=answers["step2.q08"],
+    )
 
     return SubmissionResultData(
         result_code=result_code,
@@ -147,12 +155,7 @@ def _build_result(
             title=character_story.title,
             description=character_story.description,
         ),
-        can_do=(
-            "같이 놀아주세요",
-            "새로운 제안을 던져주세요",
-            "리액션을 아끼지 말아주세요",
-            "자유롭게 맡겨주세요",
-        ),
+        can_do=handling_guide,
         warnings=(
             "똑같은 일만 반복시켜요",
             "선택을 지나치게 제한해요",
@@ -199,6 +202,7 @@ _DEFAULT_DEMO_SUBMISSION = AssessmentSubmission(
         SubmittedAnswer("step1.q01", "decision"),
         SubmittedAnswer("step1.q02", "set_direction"),
         SubmittedAnswer("step1.q11", "curiosity"),
+        SubmittedAnswer("step1.q12", "listen_to_me"),
         SubmittedAnswer("step2.q01", "inspect_profile"),
         SubmittedAnswer("step2.q02", "hint_and_wait"),
         SubmittedAnswer("step2.q03", "rehearse_with_ai"),
