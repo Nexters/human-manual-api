@@ -32,9 +32,10 @@ cp .env.example .env
 docker compose up --build -d
 ```
 
-PostgreSQL은 외부 포트를 열지 않고 Compose 내부 네트워크에서만 접근할 수 있습니다. 데이터는
-`postgres_data` 볼륨에 저장되므로 일반적인 컨테이너 재시작과 재배포 후에도 유지됩니다.
-`docker compose down -v`는 데이터 볼륨까지 삭제하므로 운영 서버에서 실행하지 않습니다.
+PostgreSQL은 외부 포트를 열지 않고 Docker 내부 네트워크에서만 접근할 수 있습니다. 데이터는
+`postgres_data` 볼륨에 저장되므로 일반적인 컨테이너 재시작과 재배포 후에도 유지됩니다. API
+컨테이너는 시작 전에 `alembic upgrade head`를 자동 실행합니다. `docker compose down -v`는
+데이터 볼륨까지 삭제하므로 운영 서버에서 실행하지 않습니다.
 
 ## 자주 쓰는 명령
 
@@ -63,8 +64,9 @@ src/pakit/
 있습니다. 성향 점수·형용사·MBTI별 캐릭터 명사·언박싱 아이템과 언박싱 소개 문구는 룰로
 결정합니다. 핵심 특징 아래의 장난감 이야기도 MBTI별 16종 고정 카피로 반환하며, `이렇게
 다뤄주세요`와 `이렇게 하면 고장나요`의 네 문구도 테스트 답변·성향 점수·MBTI를 조합해
-반환합니다. 충전 영역은 현재 목업값입니다. 현재 GET API는
-`demo-result-code`만 지원하며 최근 제출 결과를 프로세스 메모리에 보관합니다.
+반환합니다. 충전 영역은 현재 목업값입니다. 제출 결과는 URL-safe 8자리 `result_code`와 함께
+PostgreSQL에 닉네임을 포함한 결과 스냅샷으로 저장되며, 이후 카피가 바뀌어도 생성 당시 결과
+그대로 조회됩니다. 원본 답변은 보존 정책이 확정되지 않아 현재 저장하지 않습니다.
 
 친구 궁합은
 `GET /api/compatibility?mine=demo-result-code&friend=demo-friend-code`로 확인할 수 있습니다.

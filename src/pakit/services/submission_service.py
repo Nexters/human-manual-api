@@ -1,4 +1,5 @@
-from pakit.domain.assessment import MbtiType
+from secrets import token_urlsafe
+
 from pakit.domain.assessment_contract import (
     ASSESSMENT_VERSION,
     QUESTION_CONTRACTS,
@@ -11,8 +12,8 @@ from pakit.domain.assessment_submission import (
     ChargingData,
     FeatureData,
     OverviewData,
+    ResultParticipantData,
     SubmissionResultData,
-    SubmittedAnswer,
     UnboxingItemData,
     UnboxingKitData,
 )
@@ -31,9 +32,11 @@ from pakit.services.result_content import (
     OPENING_TOOL_COPY,
     PACKAGING_COPY,
     RELATIONSHIP_ROLE_COPY,
+    RESULT_CONTENT_VERSION,
     FeatureCopy,
     UnboxingItemCopy,
 )
+from pakit.services.result_repository import ResultCodeConflictError, ResultRepository
 from pakit.services.warning_service import build_warnings
 
 
@@ -49,7 +52,11 @@ class ResultNotFoundError(LookupError):
     pass
 
 
-DEMO_RESULT_CODE = "demo-result-code"
+class ResultCodeGenerationError(RuntimeError):
+    pass
+
+
+RESULT_CODE_GENERATION_ATTEMPTS = 5
 
 
 def _validate_answers(submission: AssessmentSubmission) -> None:
@@ -132,6 +139,7 @@ def _build_result(
 
     return SubmissionResultData(
         result_code=result_code,
+        participant=ResultParticipantData(nickname=submission.nickname),
         overview=OverviewData(
             rarity="상위 4%",
             adjective=adjective,
@@ -175,56 +183,31 @@ def _build_result(
     )
 
 
-def submit_assessment(submission: AssessmentSubmission) -> SubmissionResultData:
+async def submit_assessment(
+    submission: AssessmentSubmission,
+    repository: ResultRepository,
+) -> SubmissionResultData:
     if submission.assessment_version != ASSESSMENT_VERSION:
         raise UnsupportedAssessmentVersionError
 
     _validate_answers(submission)
-    result = _build_result(
-        submission,
-        DEMO_RESULT_CODE,
-        classify_submission(submission),
-    )
-    _DEMO_RESULTS[DEMO_RESULT_CODE] = result
+    classification = classify_submission(submission)
+    for _ in range(RESULT_CODE_GENERATION_ATTEMPTS):
+        result = _build_result(submission, token_urlsafe(6), classification)
+        try:
+            await repository.save(
+                result,
+                assessment_version=submission.assessment_version,
+                content_version=RESULT_CONTENT_VERSION,
+            )
+        except ResultCodeConflictError:
+            continue
+        return result
+    raise ResultCodeGenerationError
+
+
+async def get_result(result_code: str, repository: ResultRepository) -> SubmissionResultData:
+    result = await repository.get(result_code)
+    if result is None:
+        raise ResultNotFoundError
     return result
-
-
-def get_result(result_code: str) -> SubmissionResultData:
-    try:
-        return _DEMO_RESULTS[result_code]
-    except KeyError:
-        raise ResultNotFoundError from None
-
-
-_DEFAULT_DEMO_SUBMISSION = AssessmentSubmission(
-    assessment_version=ASSESSMENT_VERSION,
-    nickname="송송",
-    answers=(
-        SubmittedAnswer("step1.q01", "decision"),
-        SubmittedAnswer("step1.q02", "set_direction"),
-        SubmittedAnswer("step1.q05", "after_waking"),
-        SubmittedAnswer("step1.q06", "rush"),
-        SubmittedAnswer("step1.q11", "curiosity"),
-        SubmittedAnswer("step1.q12", "listen_to_me"),
-        SubmittedAnswer("step2.q01", "inspect_profile"),
-        SubmittedAnswer("step2.q02", "hint_and_wait"),
-        SubmittedAnswer("step2.q03", "rehearse_with_ai"),
-        SubmittedAnswer("step2.q04", 50),
-        SubmittedAnswer("step2.q05", "share_everything"),
-        SubmittedAnswer("step2.q06", 247),
-        SubmittedAnswer("step2.q07", "decorate_for_mood"),
-        SubmittedAnswer("step2.q08", "express_with_words"),
-        SubmittedAnswer("step2.q09", "ruminate"),
-        SubmittedAnswer("step2.q10", "order_familiar_menu"),
-        SubmittedAnswer("step2.q11", "order_familiar_stores"),
-        SubmittedAnswer("step2.q12", "press"),
-    ),
-    mbti=MbtiType.ENTP,
-)
-_DEMO_RESULTS: dict[str, SubmissionResultData] = {
-    DEMO_RESULT_CODE: _build_result(
-        _DEFAULT_DEMO_SUBMISSION,
-        DEMO_RESULT_CODE,
-        classify_submission(_DEFAULT_DEMO_SUBMISSION),
-    )
-}

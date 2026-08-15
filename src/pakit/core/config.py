@@ -1,6 +1,8 @@
 from functools import lru_cache
 from typing import Literal
+from urllib.parse import quote_plus
 
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 ALLOWED_CORS_ORIGINS = (
@@ -21,6 +23,20 @@ class Settings(BaseSettings):
     environment: Literal["local", "test", "staging", "production"] = "local"
     debug: bool = False
     api_prefix: str = "/api"
+    database_host: str = "localhost"
+    database_port: int = 5432
+    database_name: str = "pakit"
+    database_user: str = "pakit"
+    database_password: SecretStr = SecretStr("")
+
+    @property
+    def database_url(self) -> str:
+        password = quote_plus(self.database_password.get_secret_value())
+        user = quote_plus(self.database_user)
+        return (
+            f"postgresql+asyncpg://{user}:{password}@{self.database_host}:"
+            f"{self.database_port}/{self.database_name}"
+        )
 
 
 @lru_cache

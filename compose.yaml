@@ -6,6 +6,12 @@ services:
     env_file:
       - path: .env
         required: false
+    environment:
+      PAKIT_DATABASE_HOST: db
+      PAKIT_DATABASE_PORT: 5432
+      PAKIT_DATABASE_NAME: ${POSTGRES_DB:-pakit}
+      PAKIT_DATABASE_USER: ${POSTGRES_USER:-pakit}
+      PAKIT_DATABASE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
     depends_on:
       db:
         condition: service_healthy
@@ -31,15 +37,6 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
-
-  front:
-    build:
-      context: ../frontend-app  # 👈 프론트엔드 소스 폴더 경로 (상황에 맞게 수정)
-    restart: unless-stopped
-    ports:
-      - "3000:80"
-    depends_on:
-      - api
 
 volumes:
   postgres_data:

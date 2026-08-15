@@ -79,8 +79,14 @@ class ChargingData:
 
 
 @dataclass(frozen=True)
+class ResultParticipantData:
+    nickname: str
+
+
+@dataclass(frozen=True)
 class SubmissionResultData:
     result_code: str
+    participant: ResultParticipantData | None
     overview: OverviewData
     unboxing_kit: UnboxingKitData
     features: tuple[FeatureData, ...]

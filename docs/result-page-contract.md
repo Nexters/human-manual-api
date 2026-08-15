@@ -38,7 +38,8 @@
 
 | 영역 | 필드 | 화면에서 사용하는 값 |
 |---|---|---|
-| 결과 조회 | `result_code` | 개인 결과를 다시 조회하는 고유 코드 |
+| 결과 조회 | `result_code` | 무작위로 생성한 URL-safe 8자리 고유 코드 |
+| 참여자 | `participant.nickname` | 결과 화면에 표시하는 이름 또는 닉네임 |
 | 장난감 소개 | `overview` | 희귀도, 형용사, 명사, 최종 결과명, 캐릭터 ID, 태그 |
 | 언박싱 키트 | `unboxing_kit` | 성향 축 4개 점수, 요약, 포장 상자, 개봉 도구 |
 | 핵심 특징 | `features` | 4개의 제목과 한 줄 설명 |
@@ -167,7 +168,8 @@
 
 ```json
 {
-  "result_code": "demo-result-code",
+  "result_code": "aB3dE7_x",
+  "participant": {"nickname": "송송"},
   "overview": {
     "rarity": "상위 4%",
     "adjective": "새벽 2시에도 카톡 폭격하는",

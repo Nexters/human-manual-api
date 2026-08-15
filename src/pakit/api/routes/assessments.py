@@ -1,8 +1,9 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Path
+from fastapi import APIRouter, Body, Depends, Path
 from fastapi.responses import JSONResponse
 
+from pakit.api.dependencies import get_result_repository
 from pakit.api.schemas.assessment_submissions import (
     ASSESSMENT_SUBMISSION_EXAMPLE,
     ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE,
@@ -12,6 +13,7 @@ from pakit.api.schemas.assessment_submissions import (
 )
 from pakit.domain.assessment import AssessmentInput, AssessmentResult
 from pakit.services.result_builder import build_assessment_result
+from pakit.services.result_repository import ResultRepository
 from pakit.services.submission_service import (
     InvalidSubmissionError,
     ResultNotFoundError,
@@ -42,7 +44,8 @@ results_router = APIRouter(prefix="/results", tags=["Test"])
         "- STEP 2 답변으로 성향 점수, 형용사, 포장 상자와 개봉 도구를 결정합니다.\n"
         "- 선택한 MBTI에 맞는 장난감 명사, 캐릭터와 이미지를 결정합니다.\n\n"
         "### 현재 응답 범위\n"
-        "결과 조회용 `result_code`와 결과 페이지에 필요한 `overview`, `unboxing_kit`, "
+        "결과 조회용 `result_code`, 표시 이름인 `participant`와 결과 페이지에 필요한 "
+        "`overview`, `unboxing_kit`, "
         "`features`, `character_story`, `can_do`, "
         "`warnings`, `charging`을 반환합니다. 형용사·장난감·캐릭터·이미지·성향 점수·"
         "조합 소개·포장 상자·개봉 도구·핵심 특징·장난감 이야기는 제출값으로 결정됩니다. "
@@ -81,10 +84,11 @@ async def create_assessment_submission(
             }
         ),
     ],
+    repository: Annotated[ResultRepository, Depends(get_result_repository)],
 ) -> AssessmentSubmissionOutput | JSONResponse:
     """완료한 테스트 답변을 검증하고 규칙 기반 결과를 반환합니다."""
     try:
-        result = submit_assessment(data.to_domain())
+        result = await submit_assessment(data.to_domain(), repository)
     except UnsupportedAssessmentVersionError:
         return JSONResponse(
             status_code=409,
@@ -114,8 +118,7 @@ async def create_assessment_submission(
     summary="테스트 결과 조회",
     description=(
         "테스트 제출 API에서 받은 `result_code`로 결과를 조회합니다. "
-        "현재 목업에서는 `demo-result-code`만 사용할 수 있으며 "
-        "최근 제출 결과를 메모리에 보관합니다."
+        "결과는 생성 당시의 내용 그대로 데이터베이스에 저장됩니다."
     ),
     response_description="result_code에 해당하는 테스트 결과",
     responses={
@@ -135,10 +138,11 @@ async def get_assessment_result(
         str,
         Path(description="테스트 제출 응답에서 받은 결과 조회 코드"),
     ],
+    repository: Annotated[ResultRepository, Depends(get_result_repository)],
 ) -> AssessmentSubmissionOutput | JSONResponse:
-    """고정 목업 코드로 데모 테스트 결과를 조회합니다."""
+    """고유 결과 코드로 저장된 테스트 결과를 조회합니다."""
     try:
-        result = get_result(result_code)
+        result = await get_result(result_code, repository)
     except ResultNotFoundError:
         return JSONResponse(
             status_code=404,

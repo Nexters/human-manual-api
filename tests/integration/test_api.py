@@ -1,14 +1,38 @@
+import re
+
 import pytest
 from fastapi.testclient import TestClient
 
+from pakit.api.dependencies import get_result_repository
 from pakit.api.schemas.assessment_submissions import (
     ASSESSMENT_SUBMISSION_EXAMPLE,
     ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE,
 )
 from pakit.api.schemas.compatibility import COMPATIBILITY_RESPONSE_EXAMPLE
 from pakit.domain.assessment_contract import ASSESSMENT_VERSION, QUESTION_CONTRACTS, AnswerKind
+from pakit.domain.assessment_submission import SubmissionResultData
 from pakit.main import app
 
+
+class InMemoryResultRepository:
+    def __init__(self) -> None:
+        self.results: dict[str, SubmissionResultData] = {}
+
+    async def save(
+        self,
+        result: SubmissionResultData,
+        *,
+        assessment_version: str,
+        content_version: str,
+    ) -> None:
+        self.results[result.result_code] = result
+
+    async def get(self, result_code: str) -> SubmissionResultData | None:
+        return self.results.get(result_code)
+
+
+result_repository = InMemoryResultRepository()
+app.dependency_overrides[get_result_repository] = lambda: result_repository
 client = TestClient(app)
 
 
@@ -96,7 +120,7 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
     assert response_example == ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE
     get_operation = document["paths"]["/api/results/{result_code}"]["get"]
     assert get_operation["summary"] == "테스트 결과 조회"
-    assert "demo-result-code" in get_operation["description"]
+    assert "데이터베이스" in get_operation["description"]
     compatibility_operation = document["paths"]["/api/compatibility"]["get"]
     assert compatibility_operation["tags"] == ["Compatibility"]
     assert compatibility_operation["summary"] == "친구 궁합 조회"
@@ -122,6 +146,7 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
     result_schema = document["components"]["schemas"]["AssessmentSubmissionOutput"]
     assert set(result_schema["properties"]) == {
         "result_code",
+        "participant",
         "overview",
         "unboxing_kit",
         "features",
@@ -130,6 +155,10 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
         "warnings",
         "charging",
     }
+    result_code_schema = result_schema["properties"]["result_code"]
+    assert result_code_schema["minLength"] == 8
+    assert result_code_schema["maxLength"] == 8
+    assert result_code_schema["pattern"] == "^[A-Za-z0-9_-]{8}$"
     compatibility_schema = document["components"]["schemas"]["CompatibilityOutput"]
     assert set(compatibility_schema["properties"]) == {
         "mine",
@@ -152,6 +181,8 @@ def test_swagger_submission_example_is_accepted() -> None:
     body = response.json()
     expected = ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE | {"result_code": body["result_code"]}
     assert body == expected
+    assert len(body["result_code"]) == 8
+    assert re.fullmatch(r"[A-Za-z0-9_-]{8}", body["result_code"])
 
 
 def test_gets_submitted_result_by_result_code() -> None:
@@ -165,7 +196,15 @@ def test_gets_submitted_result_by_result_code() -> None:
     response = client.get(f"/api/results/{submitted_body['result_code']}")
 
     assert response.status_code == 200
-    assert response.json() == submitted_body == ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE
+    assert response.json() == submitted_body
+
+
+def test_creates_a_distinct_result_code_for_each_submission() -> None:
+    first = client.post("/api/tests/submissions", json=ASSESSMENT_SUBMISSION_EXAMPLE)
+    second = client.post("/api/tests/submissions", json=ASSESSMENT_SUBMISSION_EXAMPLE)
+
+    assert first.status_code == second.status_code == 200
+    assert first.json()["result_code"] != second.json()["result_code"]
 
 
 def test_returns_404_for_unknown_result_code() -> None:
@@ -254,6 +293,7 @@ def test_submits_complete_assessment_and_returns_mixed_result() -> None:
     body = response.json()
     assert set(body) == {
         "result_code",
+        "participant",
         "overview",
         "unboxing_kit",
         "features",
@@ -262,6 +302,7 @@ def test_submits_complete_assessment_and_returns_mixed_result() -> None:
         "warnings",
         "charging",
     }
+    assert body["participant"] == {"nickname": "송송"}
     assert body["overview"]["noun"] == "망원경"
     assert body["overview"]["character_id"] == "telescope"
     assert body["overview"]["image_url"] == "/assets/characters/telescope.png"

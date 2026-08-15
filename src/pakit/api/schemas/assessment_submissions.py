@@ -43,7 +43,8 @@ ASSESSMENT_SUBMISSION_EXAMPLE: dict[str, object] = {
 }
 
 ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
-    "result_code": "demo-result-code",
+    "result_code": "aB3dE7_x",
+    "participant": {"nickname": "송송"},
     "overview": {
         "rarity": "상위 4%",
         "adjective": "옷 예쁘게 입고 플러팅 했다고 하는",
@@ -284,7 +285,15 @@ class AssessmentSubmissionOutput(BaseModel):
 
     model_config = ConfigDict(json_schema_extra={"example": ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE})
 
-    result_code: str = Field(description="결과를 다시 조회할 때 사용하는 고유 코드")
+    result_code: str = Field(
+        min_length=8,
+        max_length=8,
+        pattern=r"^[A-Za-z0-9_-]{8}$",
+        description="결과를 다시 조회할 때 사용하는 URL-safe 8자리 고유 코드",
+    )
+    participant: ParticipantInput | None = Field(
+        description="결과 화면에 표시할 이름 또는 닉네임. 이전 결과에는 없을 수 있음"
+    )
     overview: OverviewOutput = Field(description="장난감 소개")
     unboxing_kit: UnboxingKitOutput = Field(description="언박싱 키트")
     features: list[FeatureOutput] = Field(
