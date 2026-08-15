@@ -18,6 +18,10 @@ uv run uvicorn pakit.main:app --reload
 - 상태 확인: <http://localhost:8000/health>
 - API 상태 확인: <http://localhost:8000/api/health>
 
+브라우저 요청은 로컬 프론트엔드와 운영 프론트엔드 `https://pakit.kr`에서 허용됩니다.
+추가 origin은 `.env`의 `PAKIT_CORS_ORIGINS` JSON 배열에 등록합니다. API 주소나 경로가 아닌
+origin만 입력해야 합니다.
+
 ## Docker Compose로 실행하기
 
 FastAPI와 PostgreSQL을 한 서버에서 함께 실행할 수 있습니다. 먼저 `.env.example`을 복사하고

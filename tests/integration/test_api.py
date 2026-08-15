@@ -39,6 +39,20 @@ def test_health() -> None:
     assert response.json() == {"status": "ok"}
 
 
+def test_allows_cors_from_production_frontend() -> None:
+    response = client.options(
+        "/api/tests/submissions",
+        headers={
+            "Origin": "https://pakit.kr",
+            "Access-Control-Request-Method": "POST",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "https://pakit.kr"
+    assert response.headers["access-control-allow-credentials"] == "true"
+
+
 def test_serves_manual_assessment_test_page() -> None:
     response = client.get("/test/")
 
