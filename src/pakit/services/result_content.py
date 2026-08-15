@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-15.2"
+RESULT_CONTENT_VERSION = "2026-08-15.8"
 
 
 @dataclass(frozen=True)
@@ -117,6 +117,36 @@ CONFLICT_SUPPORT_COPY: dict[str, str] = {
 AFFECTION_RECOGNITION_COPY: dict[str, str] = {
     "express_with_words": "말과 리액션에 담긴 애정을 알아봐주세요",
     "express_with_actions": "말없이 챙기는 행동을 애정으로 알아봐주세요",
+}
+
+
+PROTECTED_TIME_WARNING_COPY: dict[str, str] = {
+    "after_waking": "잠이 덜 깨면 첫 반응이 무뚝뚝해요",
+    "during_meal": "밥 먹는 흐름이 끊기면 바로 예민해져요",
+    "after_work": "퇴근 직후 할 일이 쏟아지면 바로 방전돼요",
+    "late_night": "새벽 감성을 끊으면 괜히 더 예민해져요",
+}
+
+
+ANGER_TRIGGER_WARNING_COPY: dict[str, str] = {
+    "rush": "재촉받으면 하려던 마음도 사라져요",
+    "interrupt": "말을 끊으면 남은 이야기도 삼켜버려요",
+    "take_food": "음식을 허락 없이 가져가면 한입보다 큰 서운함이 남아요",
+    "arrive_late": "늦고도 태연하면 기다린 만큼 신뢰가 깎여요",
+    "nag": "잔소리가 반복되면 귀부터 닫아요",
+    "change_plan": "계획이 갑자기 바뀌면 기분부터 틀어져요",
+}
+
+
+SOCIAL_ENERGY_WARNING_COPY: dict[str, str] = {
+    "E": "내 얘기에 반응이 없으면 신나서 하던 이야기도 금세 재미없어져요",
+    "I": "혼자 정리할 틈이 없으면 대답이 점점 짧아져요",
+}
+
+
+COMMUNICATION_WARNING_COPY: dict[str, str] = {
+    "T": "해결하려고 꺼낸 말에 차갑다는 반응이 돌아오면 억울해져요",
+    "F": "진심을 꺼냈는데 예민하다는 말이 돌아오면 오래 마음에 남아요",
 }
 
 

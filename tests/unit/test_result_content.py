@@ -1,8 +1,10 @@
 from pakit.domain.assessment import MbtiType
 from pakit.services.result_content import (
     AFFECTION_RECOGNITION_COPY,
+    ANGER_TRIGGER_WARNING_COPY,
     CHARACTER_STORY_COPY,
     COMBINATION_COPY,
+    COMMUNICATION_WARNING_COPY,
     CONFLICT_SUPPORT_COPY,
     EMOTIONAL_PROCESSING_COPY,
     MBTI_MIDDLE_GROUP,
@@ -11,9 +13,11 @@ from pakit.services.result_content import (
     MOTIVATION_DESCRIPTION,
     OPENING_TOOL_COPY,
     PACKAGING_COPY,
+    PROTECTED_TIME_WARNING_COPY,
     RELATIONSHIP_DISTANCE_COPY,
     RELATIONSHIP_ROLE_COPY,
     RESULT_CONTENT_VERSION,
+    SOCIAL_ENERGY_WARNING_COPY,
     SUPPORT_PREFERENCE_COPY,
 )
 
@@ -186,4 +190,23 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-15.2"
+    assert RESULT_CONTENT_VERSION == "2026-08-15.8"
+
+
+def test_defines_all_warning_copy_variants() -> None:
+    assert set(PROTECTED_TIME_WARNING_COPY) == {
+        "after_waking",
+        "during_meal",
+        "after_work",
+        "late_night",
+    }
+    assert set(ANGER_TRIGGER_WARNING_COPY) == {
+        "rush",
+        "interrupt",
+        "take_food",
+        "arrive_late",
+        "nag",
+        "change_plan",
+    }
+    assert set(SOCIAL_ENERGY_WARNING_COPY) == {"E", "I"}
+    assert set(COMMUNICATION_WARNING_COPY) == {"T", "F"}

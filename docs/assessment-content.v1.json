@@ -77,7 +77,18 @@
       ],
       "status": "implemented"
     },
-    "warnings": {"question_ids": ["step1.q05", "step1.q06"]},
+    "warnings": {
+      "question_ids": ["step1.q05", "step1.q06"],
+      "additional_input": "mbti",
+      "mbti_axes": ["E/I", "T/F"],
+      "slot_order": [
+        "communication_landmine",
+        "social_energy_boundary",
+        "anger_trigger",
+        "protected_time"
+      ],
+      "status": "implemented"
+    },
     "charging": {"question_ids": ["step1.q07", "step1.q08"]},
     "friend_compatibility": {
       "compatible_question_id": "step1.q09",
@@ -92,7 +103,6 @@
     "classification_boundary": {"operator": ">=", "threshold": 50, "side": "score_100"},
     "unresolved_fields": [
       "features MBTI 16종 대표 특징의 최종 콘텐츠 검수",
-      "warnings 결과 재료를 실제 문구로 조합하는 규칙",
       "charging 결과 재료를 실제 문구로 조합하는 규칙"
     ],
     "known_axes": [
@@ -201,7 +211,12 @@
         {"value": "after_work", "label": "퇴근 직후"},
         {"value": "late_night", "label": "새벽 감성 타임"}
       ],
-      "calculation": {"status": "mapped", "role": "result_material", "result_section": "warnings"}
+      "calculation": {
+        "status": "mapped",
+        "role": "result_material",
+        "result_section": "warnings",
+        "result_slot": "protected_time"
+      }
     },
     {
       "question_id": "step1.q06",
@@ -217,7 +232,12 @@
         {"value": "nag", "label": "잔소리"},
         {"value": "change_plan", "label": "내 계획 바꾸기"}
       ],
-      "calculation": {"status": "mapped", "role": "result_material", "result_section": "warnings"}
+      "calculation": {
+        "status": "mapped",
+        "role": "result_material",
+        "result_section": "warnings",
+        "result_slot": "anger_trigger"
+      }
     },
     {
       "question_id": "step1.q07",

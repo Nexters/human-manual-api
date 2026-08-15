@@ -73,6 +73,8 @@
     </div>
     <h3 class="section-title">이렇게 다뤄주세요</h3>
     <div id="can-do" class="copy-card"></div>
+    <h3 class="section-title">이렇게 하면 고장나요</h3>
+    <div id="warnings" class="copy-card"></div>
     <details>
       <summary>원본 JSON 보기</summary>
       <pre id="json"></pre>
@@ -177,6 +179,12 @@
         canDo.replaceChildren(...data.can_do.map((instruction) => {
           const item = document.createElement("p");
           item.textContent = `✓ ${instruction}`;
+          return item;
+        }));
+        const warnings = document.querySelector("#warnings");
+        warnings.replaceChildren(...data.warnings.map((warning) => {
+          const item = document.createElement("p");
+          item.textContent = `✕ ${warning}`;
           return item;
         }));
         document.querySelector("#json").textContent = JSON.stringify(data, null, 2);

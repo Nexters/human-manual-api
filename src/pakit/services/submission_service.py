@@ -34,6 +34,7 @@ from pakit.services.result_content import (
     FeatureCopy,
     UnboxingItemCopy,
 )
+from pakit.services.warning_service import build_warnings
 
 
 class UnsupportedAssessmentVersionError(ValueError):
@@ -123,6 +124,11 @@ def _build_result(
         conflict_style=answers["step2.q02"],
         affection_style=answers["step2.q08"],
     )
+    warnings = build_warnings(
+        protected_time=answers["step1.q05"],
+        anger_trigger=answers["step1.q06"],
+        mbti=submission.mbti,
+    )
 
     return SubmissionResultData(
         result_code=result_code,
@@ -156,12 +162,7 @@ def _build_result(
             description=character_story.description,
         ),
         can_do=handling_guide,
-        warnings=(
-            "똑같은 일만 반복시켜요",
-            "선택을 지나치게 제한해요",
-            "재미없는 분위기를 오래 끌어요",
-            "아이디어를 시작부터 막아버려요",
-        ),
+        warnings=warnings,
         charging=ChargingData(
             score=90,
             description="친구들과 놀 때 가장 빠르게 충전돼요",
@@ -201,6 +202,8 @@ _DEFAULT_DEMO_SUBMISSION = AssessmentSubmission(
     answers=(
         SubmittedAnswer("step1.q01", "decision"),
         SubmittedAnswer("step1.q02", "set_direction"),
+        SubmittedAnswer("step1.q05", "after_waking"),
+        SubmittedAnswer("step1.q06", "rush"),
         SubmittedAnswer("step1.q11", "curiosity"),
         SubmittedAnswer("step1.q12", "listen_to_me"),
         SubmittedAnswer("step2.q01", "inspect_profile"),

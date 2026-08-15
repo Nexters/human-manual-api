@@ -69,6 +69,8 @@ def test_serves_manual_assessment_test_page() -> None:
     assert "data.character_story.title" in response.text
     assert 'id="can-do"' in response.text
     assert "data.can_do.map" in response.text
+    assert 'id="warnings"' in response.text
+    assert "data.warnings.map" in response.text
     assert 'choices("step1.q11"' in response.text
     assert 'choices("step1.q12"' in response.text
 
@@ -357,6 +359,12 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
         "서운한 일은 피하지 말고 바로 이야기해주세요",
         "말없이 챙기는 행동을 애정으로 알아봐주세요",
     ]
+    assert body["warnings"] == [
+        "해결하려고 꺼낸 말에 차갑다는 반응이 돌아오면 억울해져요",
+        "혼자 정리할 틈이 없으면 대답이 점점 짧아져요",
+        "재촉받으면 하려던 마음도 사라져요",
+        "잠이 덜 깨면 첫 반응이 무뚝뚝해요",
+    ]
 
 
 def test_submission_uses_q11_for_the_motivation_feature_only() -> None:
@@ -407,6 +415,67 @@ def test_uses_every_q12_support_preference(value: str, expected: str) -> None:
 
     assert response.status_code == 200
     assert response.json()["can_do"][0] == expected
+
+
+@pytest.mark.parametrize(
+    ("question_id", "value", "slot", "expected"),
+    [
+        (
+            "step1.q05",
+            "during_meal",
+            3,
+            "밥 먹는 흐름이 끊기면 바로 예민해져요",
+        ),
+        (
+            "step1.q05",
+            "after_work",
+            3,
+            "퇴근 직후 할 일이 쏟아지면 바로 방전돼요",
+        ),
+        (
+            "step1.q05",
+            "late_night",
+            3,
+            "새벽 감성을 끊으면 괜히 더 예민해져요",
+        ),
+        (
+            "step1.q06",
+            "interrupt",
+            2,
+            "말을 끊으면 남은 이야기도 삼켜버려요",
+        ),
+        (
+            "step1.q06",
+            "take_food",
+            2,
+            "음식을 허락 없이 가져가면 한입보다 큰 서운함이 남아요",
+        ),
+        ("step1.q06", "nag", 2, "잔소리가 반복되면 귀부터 닫아요"),
+        (
+            "step1.q06",
+            "change_plan",
+            2,
+            "계획이 갑자기 바뀌면 기분부터 틀어져요",
+        ),
+    ],
+)
+def test_uses_warning_answers(
+    question_id: str,
+    value: str,
+    slot: int,
+    expected: str,
+) -> None:
+    payload = _valid_submission()
+    answers = payload["answers"]
+    assert isinstance(answers, list)
+    for answer in answers:
+        if answer["question_id"] == question_id:
+            answer["value"] = value
+
+    response = client.post("/api/tests/submissions", json=payload)
+
+    assert response.status_code == 200
+    assert response.json()["warnings"][slot] == expected
 
 
 def test_submission_uses_q01_and_q02_for_the_relationship_role_only() -> None:
