@@ -38,5 +38,14 @@ services:
       timeout: 3s
       retries: 10
 
+  front:
+    build:
+      context: ../frontend-app  # 👈 프론트엔드 소스 폴더 경로 (상황에 맞게 수정)
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+
 volumes:
   postgres_data:
