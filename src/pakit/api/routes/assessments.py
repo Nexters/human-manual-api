@@ -43,9 +43,10 @@ results_router = APIRouter(prefix="/results", tags=["Test"])
         "- 선택한 MBTI에 맞는 장난감 명사, 캐릭터와 이미지를 결정합니다.\n\n"
         "### 현재 응답 범위\n"
         "결과 조회용 `result_code`와 결과 페이지에 필요한 `overview`, `unboxing_kit`, "
-        "`features`, `can_do`, "
+        "`features`, `character_story`, `can_do`, "
         "`warnings`, `charging`을 반환합니다. 형용사·장난감·캐릭터·이미지·성향 점수·"
-        "조합 소개·포장 상자·개봉 도구·핵심 특징은 제출값으로 결정됩니다. 희귀도·상단 태그·"
+        "조합 소개·포장 상자·개봉 도구·핵심 특징·장난감 이야기는 제출값으로 결정됩니다. "
+        "희귀도·상단 태그·"
         "사용 방법·주의사항·충전 영역은 아직 프론트엔드 연동용 목업 데이터입니다."
     ),
     response_description="규칙 기반 분류와 목업 콘텐츠를 조합한 테스트 결과",

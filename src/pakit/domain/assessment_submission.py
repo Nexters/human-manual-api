@@ -60,6 +60,12 @@ class FeatureData:
 
 
 @dataclass(frozen=True)
+class CharacterStoryData:
+    title: str
+    description: str
+
+
+@dataclass(frozen=True)
 class ChargingActivityData:
     type: str
     label: str
@@ -78,6 +84,7 @@ class SubmissionResultData:
     overview: OverviewData
     unboxing_kit: UnboxingKitData
     features: tuple[FeatureData, ...]
+    character_story: CharacterStoryData
     can_do: tuple[str, ...]
     warnings: tuple[str, ...]
     charging: ChargingData

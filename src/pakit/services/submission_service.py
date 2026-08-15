@@ -6,6 +6,7 @@ from pakit.domain.assessment_contract import (
 )
 from pakit.domain.assessment_submission import (
     AssessmentSubmission,
+    CharacterStoryData,
     ChargingActivityData,
     ChargingData,
     FeatureData,
@@ -23,6 +24,7 @@ from pakit.services.assessment_classifier import (
 from pakit.services.emotional_processing_service import build_emotional_processing_feature
 from pakit.services.motivation_service import build_motivation_feature
 from pakit.services.result_content import (
+    CHARACTER_STORY_COPY,
     COMBINATION_COPY,
     MBTI_STRENGTH_COPY,
     OPENING_TOOL_COPY,
@@ -112,6 +114,7 @@ def _build_result(
         classification.axis_scores.expression,
         classification.axis_scores.egen,
     )
+    character_story = CHARACTER_STORY_COPY[submission.mbti]
 
     return SubmissionResultData(
         result_code=result_code,
@@ -139,6 +142,10 @@ def _build_result(
                 emotional_processing_feature,
                 mbti_strength,
             )
+        ),
+        character_story=CharacterStoryData(
+            title=character_story.title,
+            description=character_story.description,
         ),
         can_do=(
             "같이 놀아주세요",

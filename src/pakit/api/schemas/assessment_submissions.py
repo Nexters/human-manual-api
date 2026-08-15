@@ -121,6 +121,14 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
             "description": "모두가 당연하다고 넘긴 곳에서 다른 가능성을 발견해요.",
         },
     ],
+    "character_story": {
+        "title": "한번 돌기 시작하면 새로운 판을 만드는 팽이",
+        "description": (
+            "팽이는 얌전히 세워두는 순간보다 힘껏 돌기 시작할 때 진짜 재미가 보여요. 정해진 "
+            "자리만 맴돌지 않고 이쪽저쪽 부딪치며, 예상하지 못한 방향에서도 자기 균형을 찾아내죠. "
+            "당연한 답에 멈추지 않고 새로운 가능성을 시험하는 모습이 닮아 팽이가 도착했습니다."
+        ),
+    },
     "can_do": [
         "같이 놀아주세요",
         "새로운 제안을 던져주세요",
@@ -245,6 +253,13 @@ class FeatureOutput(BaseModel):
     description: str = Field(description="특징 보조 설명")
 
 
+class CharacterStoryOutput(BaseModel):
+    """핵심 특징과 메인 장난감을 연결하는 이야기입니다."""
+
+    title: str = Field(description="장난감의 특징을 담은 이야기 제목")
+    description: str = Field(description="장난감과 사용자의 대표 성향을 연결한 설명")
+
+
 class ChargingActivityOutput(BaseModel):
     """에너지를 충전하는 활동 한 개입니다."""
 
@@ -276,6 +291,9 @@ class AssessmentSubmissionOutput(BaseModel):
         min_length=4,
         max_length=4,
         description="핵심 특징 4개",
+    )
+    character_story: CharacterStoryOutput = Field(
+        description="핵심 특징과 메인 장난감을 연결한 이야기"
     )
     can_do: list[str] = Field(min_length=4, max_length=4, description="사용 방법 4개")
     warnings: list[str] = Field(min_length=4, max_length=4, description="주의사항 4개")

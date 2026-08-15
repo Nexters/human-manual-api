@@ -65,6 +65,8 @@ def test_serves_manual_assessment_test_page() -> None:
     assert "/api/tests/submissions" in response.text
     assert 'id="features"' in response.text
     assert "data.features.map" in response.text
+    assert 'id="character-story-title"' in response.text
+    assert "data.character_story.title" in response.text
     assert 'choices("step1.q11"' in response.text
     assert 'choices("step1.q12"' in response.text
 
@@ -119,6 +121,7 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
         "overview",
         "unboxing_kit",
         "features",
+        "character_story",
         "can_do",
         "warnings",
         "charging",
@@ -250,6 +253,7 @@ def test_submits_complete_assessment_and_returns_mixed_result() -> None:
         "overview",
         "unboxing_kit",
         "features",
+        "character_story",
         "can_do",
         "warnings",
         "charging",
@@ -261,6 +265,8 @@ def test_submits_complete_assessment_and_returns_mixed_result() -> None:
     assert len(body["overview"]["tags"]) == 3
     assert all(0 <= score <= 100 for score in body["unboxing_kit"]["axis_scores"].values())
     assert len(body["features"]) == 4
+    assert body["character_story"]["title"]
+    assert body["overview"]["noun"] in body["character_story"]["description"]
     assert len(body["can_do"]) == 4
     assert len(body["warnings"]) == 4
     assert len(body["charging"]["activities"]) == 3
@@ -335,6 +341,14 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
             "description": "당연해 보이는 것도 작동 원리를 알 때까지 파고들어요.",
         },
     ]
+    assert body["character_story"] == {
+        "title": "남들이 지나친 먼 곳까지 들여다보는 망원경",
+        "description": (
+            "망원경은 눈앞에 보이는 것만으로 관찰을 끝내지 않아요. 초점을 몇 번이고 조절하며 "
+            "멀리 있는 작은 단서까지 당겨 보고, 그 뒤에 숨은 원리를 찾아내죠. 당연한 것도 "
+            "궁금해하고 끝까지 파고드는 모습이 닮아 망원경이 도착했습니다."
+        ),
+    }
 
 
 def test_submission_uses_q11_for_the_motivation_feature_only() -> None:

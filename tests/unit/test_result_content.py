@@ -1,5 +1,6 @@
 from pakit.domain.assessment import MbtiType
 from pakit.services.result_content import (
+    CHARACTER_STORY_COPY,
     COMBINATION_COPY,
     EMOTIONAL_PROCESSING_COPY,
     MBTI_MOTIVATION_GROUP,
@@ -11,6 +12,13 @@ from pakit.services.result_content import (
     RELATIONSHIP_ROLE_COPY,
     RESULT_CONTENT_VERSION,
 )
+
+
+def test_defines_one_distinct_character_story_for_every_mbti() -> None:
+    assert set(CHARACTER_STORY_COPY) == set(MbtiType)
+    assert len({copy.title for copy in CHARACTER_STORY_COPY.values()}) == len(MbtiType)
+    assert len({copy.description for copy in CHARACTER_STORY_COPY.values()}) == len(MbtiType)
+    assert all(copy.title and copy.description for copy in CHARACTER_STORY_COPY.values())
 
 
 def test_defines_copy_for_all_unboxing_combinations() -> None:
@@ -153,4 +161,4 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-14.10"
+    assert RESULT_CONTENT_VERSION == "2026-08-15.1"

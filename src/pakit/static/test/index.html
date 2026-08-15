@@ -67,6 +67,10 @@
     </div>
     <h3 class="section-title">핵심 특징</h3>
     <div id="features" class="feature-grid"></div>
+    <div class="copy-card">
+      <h3 id="character-story-title"></h3>
+      <p id="character-story-description"></p>
+    </div>
     <details>
       <summary>원본 JSON 보기</summary>
       <pre id="json"></pre>
@@ -165,6 +169,8 @@
           card.append(title, description);
           return card;
         }));
+        document.querySelector("#character-story-title").textContent = data.character_story.title;
+        document.querySelector("#character-story-description").textContent = data.character_story.description;
         document.querySelector("#json").textContent = JSON.stringify(data, null, 2);
         document.querySelector("#result").style.display = "block";
         document.querySelector("#result").scrollIntoView({ behavior:"smooth" });
