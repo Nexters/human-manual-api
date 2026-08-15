@@ -1,3 +1,6 @@
+import os
+os.environ["DATABASE_URL"] = ":memory:"
+
 import pytest
 from fastapi.testclient import TestClient
 

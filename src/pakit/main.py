@@ -8,6 +8,7 @@ from pakit import __version__
 from pakit.api.router import api_router
 from pakit.api.routes.health import HealthResponse
 from pakit.core.config import get_settings
+from pakit.core.database import create_db_and_tables
 
 
 def create_app() -> FastAPI:
@@ -51,6 +52,10 @@ def create_app() -> FastAPI:
         name="test-page",
     )
     application.include_router(api_router, prefix=settings.api_prefix)
+
+    @application.on_event("startup")
+    def on_startup():
+        create_db_and_tables()
 
     @application.get("/health", response_model=HealthResponse, tags=["system"])
     async def root_health() -> HealthResponse:

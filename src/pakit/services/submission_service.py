@@ -31,6 +31,8 @@ from pakit.services.result_content import (
     FeatureCopy,
     UnboxingItemCopy,
 )
+from sqlmodel import Session
+from pakit.domain.database_models import AssessmentResult
 
 
 class UnsupportedAssessmentVersionError(ValueError):
@@ -164,7 +166,7 @@ def _build_result(
     )
 
 
-def submit_assessment(submission: AssessmentSubmission) -> SubmissionResultData:
+def submit_assessment(session: Session, submission: AssessmentSubmission) -> SubmissionResultData:
     if submission.assessment_version != ASSESSMENT_VERSION:
         raise UnsupportedAssessmentVersionError
 
@@ -174,43 +176,19 @@ def submit_assessment(submission: AssessmentSubmission) -> SubmissionResultData:
         DEMO_RESULT_CODE,
         classify_submission(submission),
     )
-    _DEMO_RESULTS[DEMO_RESULT_CODE] = result
+    
+    # Save to DB
+    db_result = AssessmentResult(result_code=DEMO_RESULT_CODE, data=result.__dict__)
+    session.add(db_result)
+    session.commit()
+    session.refresh(db_result)
+    
     return result
 
 
-def get_result(result_code: str) -> SubmissionResultData:
-    try:
-        return _DEMO_RESULTS[result_code]
-    except KeyError:
-        raise ResultNotFoundError from None
-
-
-_DEFAULT_DEMO_SUBMISSION = AssessmentSubmission(
-    assessment_version=ASSESSMENT_VERSION,
-    nickname="송송",
-    answers=(
-        SubmittedAnswer("step1.q01", "decision"),
-        SubmittedAnswer("step1.q02", "set_direction"),
-        SubmittedAnswer("step1.q11", "curiosity"),
-        SubmittedAnswer("step2.q01", "inspect_profile"),
-        SubmittedAnswer("step2.q02", "hint_and_wait"),
-        SubmittedAnswer("step2.q03", "rehearse_with_ai"),
-        SubmittedAnswer("step2.q04", 50),
-        SubmittedAnswer("step2.q05", "share_everything"),
-        SubmittedAnswer("step2.q06", 247),
-        SubmittedAnswer("step2.q07", "decorate_for_mood"),
-        SubmittedAnswer("step2.q08", "express_with_words"),
-        SubmittedAnswer("step2.q09", "ruminate"),
-        SubmittedAnswer("step2.q10", "order_familiar_menu"),
-        SubmittedAnswer("step2.q11", "order_familiar_stores"),
-        SubmittedAnswer("step2.q12", "press"),
-    ),
-    mbti=MbtiType.ENTP,
-)
-_DEMO_RESULTS: dict[str, SubmissionResultData] = {
-    DEMO_RESULT_CODE: _build_result(
-        _DEFAULT_DEMO_SUBMISSION,
-        DEMO_RESULT_CODE,
-        classify_submission(_DEFAULT_DEMO_SUBMISSION),
-    )
-}
+def get_result(session: Session, result_code: str) -> SubmissionResultData:
+    db_result = session.get(AssessmentResult, result_code)
+    if not db_result:
+        raise ResultNotFoundError
+        
+    return SubmissionResultData(**db_result.data)

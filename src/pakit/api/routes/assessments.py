@@ -1,7 +1,9 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Path
+from fastapi import APIRouter, Body, Path, Depends
 from fastapi.responses import JSONResponse
+from sqlmodel import Session
+from pakit.core.database import get_session
 
 from pakit.api.schemas.assessment_submissions import (
     ASSESSMENT_SUBMISSION_EXAMPLE,
@@ -79,10 +81,11 @@ async def create_assessment_submission(
             }
         ),
     ],
+    session: Session = Depends(get_session),
 ) -> AssessmentSubmissionOutput | JSONResponse:
     """완료한 테스트 답변을 검증하고 규칙 기반 결과를 반환합니다."""
     try:
-        result = submit_assessment(data.to_domain())
+        result = submit_assessment(session, data.to_domain())
     except UnsupportedAssessmentVersionError:
         return JSONResponse(
             status_code=409,
@@ -133,10 +136,11 @@ async def get_assessment_result(
         str,
         Path(description="테스트 제출 응답에서 받은 결과 조회 코드"),
     ],
+    session: Session = Depends(get_session),
 ) -> AssessmentSubmissionOutput | JSONResponse:
     """고정 목업 코드로 데모 테스트 결과를 조회합니다."""
     try:
-        result = get_result(result_code)
+        result = get_result(session, result_code)
     except ResultNotFoundError:
         return JSONResponse(
             status_code=404,

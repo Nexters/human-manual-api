@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     debug: bool = False
     api_prefix: str = "/api"
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
+    database_url: str = Field(
+        default="postgresql://pakit:pakit@localhost:5432/pakit"
+    )
 
 
 @lru_cache
