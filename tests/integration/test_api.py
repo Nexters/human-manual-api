@@ -48,6 +48,7 @@ def test_serves_manual_assessment_test_page() -> None:
     assert 'id="features"' in response.text
     assert "data.features.map" in response.text
     assert 'choices("step1.q11"' in response.text
+    assert 'choices("step1.q12"' in response.text
 
 
 def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
@@ -59,7 +60,7 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
     assert operation["tags"] == ["Test"]
     assert operation["summary"] == "테스트 결과 제출"
     assert "요청 데이터" in operation["description"]
-    assert "23개 문항" in operation["description"]
+    assert "24개 문항" in operation["description"]
     assert "서버에서 확인하는 항목" in operation["description"]
     assert "현재 응답 범위" in operation["description"]
     swagger_example = operation["requestBody"]["content"]["application/json"]["examples"][
@@ -342,6 +343,29 @@ def test_submission_uses_q11_for_the_motivation_feature_only() -> None:
     assert curiosity_features[0]["title"] == "궁금하면 직진"
     assert fun_features[0]["title"] == "재미 못 참아"
     assert curiosity_features[1:] == fun_features[1:]
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        "listen_to_me",
+        "take_me_out",
+        "give_me_space",
+        "solve_together",
+        "make_me_laugh",
+    ],
+)
+def test_accepts_every_q12_support_preference(value: str) -> None:
+    payload = _valid_submission()
+    answers = payload["answers"]
+    assert isinstance(answers, list)
+    for answer in answers:
+        if answer["question_id"] == "step1.q12":
+            answer["value"] = value
+
+    response = client.post("/api/tests/submissions", json=payload)
+
+    assert response.status_code == 200
 
 
 def test_submission_uses_q01_and_q02_for_the_relationship_role_only() -> None:

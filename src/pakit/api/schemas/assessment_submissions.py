@@ -11,7 +11,7 @@ from pakit.domain.assessment_submission import (
 )
 
 ASSESSMENT_SUBMISSION_EXAMPLE: dict[str, object] = {
-    "assessment_version": "2026-08-14.2",
+    "assessment_version": "2026-08-14.3",
     "participant": {"nickname": "송송"},
     "answers": [
         {"question_id": "step1.q01", "value": "decision"},
@@ -25,6 +25,7 @@ ASSESSMENT_SUBMISSION_EXAMPLE: dict[str, object] = {
         {"question_id": "step1.q09", "value": "tsundere"},
         {"question_id": "step1.q10", "value": "morning_person"},
         {"question_id": "step1.q11", "value": "curiosity"},
+        {"question_id": "step1.q12", "value": "listen_to_me"},
         {"question_id": "step2.q01", "value": "inspect_profile"},
         {"question_id": "step2.q02", "value": "hint_and_wait"},
         {"question_id": "step2.q03", "value": "rehearse_with_ai"},
@@ -168,8 +169,8 @@ class AssessmentSubmissionInput(BaseModel):
     participant: ParticipantInput = Field(description="테스트 참여자 정보")
     answers: list[AnswerInput] = Field(
         min_length=1,
-        max_length=23,
-        description="23개 고정 문항의 답변 목록",
+        max_length=24,
+        description="24개 고정 문항의 답변 목록",
     )
     mbti: MbtiType = Field(description="화면에서 선택한 네 글자 MBTI 유형")
 

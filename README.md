@@ -53,7 +53,7 @@ src/pakit/
 └── services/     # 유스케이스와 룰 기반 결과 조립
 ```
 
-프론트엔드는 완료된 23개 답변과 선택한 MBTI 유형을
+프론트엔드는 완료된 24개 답변과 선택한 MBTI 유형을
 `POST /api/tests/submissions`로 제출할 수 있습니다. 응답은 결과 페이지의 6개 영역으로
 구성되며, 응답의 `result_code`를 사용해 `GET /api/results/{result_code}`로 다시 조회할 수
 있습니다. 성향 점수·형용사·MBTI별 캐릭터 명사·언박싱 아이템과 언박싱 소개 문구는 룰로
@@ -65,7 +65,7 @@ src/pakit/
 현재 궁합 점수와 문구는 프론트엔드 연동용 고정 목업값입니다.
 
 상세 결정 사항과 다음 구현 순서는 [`docs/architecture.md`](./docs/architecture.md)를 참고하세요.
-23개 문항의 기계 판독 가능한 ID 목록은
+24개 문항의 기계 판독 가능한 ID 목록은
 [`docs/assessment-identifiers.v1.json`](./docs/assessment-identifiers.v1.json)에 있습니다.
 실행 가능한 요청·응답 명세와 예시는 서버 실행 후 `/docs`의 Swagger에서 확인할 수 있습니다.
 결과 페이지 와이어프레임 기반의 응답 계약은

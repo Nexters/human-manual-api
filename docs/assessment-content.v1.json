@@ -1,11 +1,11 @@
 {
-  "assessment_version": "2026-08-14.2",
+  "assessment_version": "2026-08-14.3",
   "content_status": "baseline_with_product_mapping",
   "locale": "ko-KR",
   "source": {
     "type": "user_provided_test_screen_images",
     "received_on": "2026-08-13",
-    "scope": "STEP 1 11문항, STEP 2 12문항, MBTI 선택 화면"
+    "scope": "STEP 1 12문항, STEP 2 12문항, MBTI 선택 화면"
   },
   "identifier_contract": "docs/assessment-identifiers.v1.json",
   "result_material_contract": {
@@ -66,7 +66,7 @@
       },
       "product_plan": "docs/key-feature-product-plan.md"
     },
-    "can_do": {"question_ids": ["step1.q03", "step1.q04"]},
+    "can_do": {"question_ids": ["step1.q03", "step1.q04", "step1.q12"]},
     "warnings": {"question_ids": ["step1.q05", "step1.q06"]},
     "charging": {"question_ids": ["step1.q07", "step1.q08"]},
     "friend_compatibility": {
@@ -290,6 +290,27 @@
         "result_section": "features",
         "feature_slot": "motivation",
         "additional_input": "mbti"
+      }
+    },
+    {
+      "question_id": "step1.q12",
+      "step": 1,
+      "order": 12,
+      "prompt": "기분 안 좋은 티가 났는지 친구에게서 연락이 왔다. 다음 중 가장 반가운 메시지는?",
+      "answer_kind": "choice",
+      "options": [
+        {"value": "listen_to_me", "label": "“무슨 일인지 천천히 들어줄게.”"},
+        {"value": "take_me_out", "label": "“일단 나와. 맛있는 거 먹자.”"},
+        {"value": "give_me_space", "label": "“혼자 정리되면 연락해. 기다릴게.”"},
+        {"value": "solve_together", "label": "“내가 같이 해결해볼까?”"},
+        {"value": "make_me_laugh", "label": "“이거 보고 일단 웃어ㅋㅋ”"}
+      ],
+      "calculation": {
+        "status": "input_collection_implemented_result_mapping_pending",
+        "role": "result_material",
+        "result_section": "can_do",
+        "additional_input": "mbti",
+        "mbti_role": "copy_modifier"
       }
     },
     {

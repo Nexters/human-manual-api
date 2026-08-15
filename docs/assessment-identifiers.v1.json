@@ -1,5 +1,5 @@
 {
-  "assessment_version": "2026-08-14.2",
+  "assessment_version": "2026-08-14.3",
   "identifier_status": "published",
   "id_policy": {
     "question_id": "step{number}.q{two_digit_order}",
@@ -103,6 +103,17 @@
         "responsibility",
         "last_chance",
         "fun"
+      ]
+    },
+    {
+      "question_id": "step1.q12",
+      "answer_kind": "choice",
+      "values": [
+        "listen_to_me",
+        "take_me_out",
+        "give_me_space",
+        "solve_together",
+        "make_me_laugh"
       ]
     },
     {
