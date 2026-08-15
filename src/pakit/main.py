@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -8,6 +9,15 @@ from pakit import __version__
 from pakit.api.router import api_router
 from pakit.api.routes.health import HealthResponse
 from pakit.core.config import ALLOWED_CORS_ORIGINS, get_settings
+from pakit.core.database import init_db
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Initialize database tables
+    await init_db()
+    yield
+    # Shutdown: Clean up resources if necessary
 
 
 def create_app() -> FastAPI:
@@ -17,6 +27,7 @@ def create_app() -> FastAPI:
         title=settings.app_name,
         version=__version__,
         debug=settings.debug,
+        lifespan=lifespan,
         openapi_tags=[
             {
                 "name": "Test",

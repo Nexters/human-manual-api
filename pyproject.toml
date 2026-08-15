@@ -5,8 +5,11 @@ description = "나 사용 설명서(Pakit) FastAPI backend"
 readme = "README.md"
 requires-python = ">=3.12,<3.14"
 dependencies = [
+  "aiosqlite>=0.22.1",
+  "asyncpg>=0.31.0",
   "fastapi>=0.116",
   "pydantic-settings>=2.10",
+  "sqlalchemy[asyncio]>=2.0.52",
   "uvicorn[standard]>=0.35",
 ]
 
