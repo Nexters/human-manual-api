@@ -1,8 +1,8 @@
-name: Deploy FastAPI to Gabia
+name: Deploy FastAPI (uv + Docker) to Gabia
 
 on:
   push:
-    branches: [ main ] # main 브랜치에 push될 때 자동 실행
+    branches: [ main ]
 
 jobs:
   deploy:
@@ -17,17 +17,15 @@ jobs:
           host: ${{ secrets.GAIA_HOST }}
           username: ${{ secrets.GAIA_USERNAME }}
           key: ${{ secrets.GAIA_SSH_KEY }}
+          request_pty: true
           script: |
-            # 1. 서버 내부 최상단 프로젝트 폴더로 이동
+            # 1. 서버 내부 프로젝트 폴더로 이동
             cd /home/ubuntu/my-fastapi
             
             # 2. 깃허브 최신 코드로 강제 동기화 (충돌 방지)
             git fetch origin main
             git reset --hard origin/main
             
-            # 3. 가상환경 활성화 및 최신 패키지 설치
-            source venv/bin/activate
-            pip install -r requirements.txt
-            
-            # 4. FastAPI 시스템 서비스 재시작 (방금 설정한 systemd 서비스)
-            sudo systemctl restart fastapi
+            # 3. uv 기반 Docker 이미지 빌드 및 컨테이너 재실행 (DB 포함)
+            docker compose down
+            docker compose up --build -d
