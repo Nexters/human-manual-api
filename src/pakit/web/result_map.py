@@ -249,6 +249,10 @@ def _build_sections() -> list[tuple[str, str, str, str, str, str]]:
         f'<tbody>{"".join(adj_body)}</tbody></table></div>'
     )
     noun_table = table(["MBTI", "명사(캐릭터)"], [[code_chip(m.value), esc(noun(m))] for m in MBTI])
+    rarity_table = table(
+        ["MBTI", "희귀도"],
+        [[code_chip(m.value), esc(rc.MBTI_RARITY_COPY[m])] for m in MBTI],
+    )
     overview_body = f"""
 <p class="lead">결과 이름 = <b>형용사 + 명사</b>. 형용사는 A·B 코드(4축)에서, 명사는 MBTI에서
 나와요. 이론상 16 형용사 × 16 명사 = 256가지 이름.</p>
@@ -256,14 +260,11 @@ def _build_sections() -> list[tuple[str, str, str, str, str, str]]:
 {adj_matrix}
 <div class="two-col">
   <div><h4>명사 16 · MBTI별</h4>{noun_table}</div>
-  <div class="fixed-note">
-    <h4>고정/미정 값</h4>
-    <ul>
-      <li><b>희귀도</b> MBTI별 확정 비율 — 예: ENTP <span class="val">상위 3.2%</span></li>
-      <li><b>상단 태그</b> 도파민 MAX · 장난꾸러기 · 혼자서도 잘 놀아요 — 하드코딩</li>
-      <li>희귀도는 결과 생성 시 MBTI별 고정 매핑으로 결정</li>
-    </ul>
-  </div>
+  <div><h4>희귀도 16 · MBTI별</h4>{rarity_table}</div>
+</div>
+<div class="fixed-note">
+  <h4>아직 목업인 값</h4>
+  <ul><li><b>상단 태그</b> 도파민 MAX · 장난꾸러기 · 혼자서도 잘 놀아요 — 전원 동일</li></ul>
 </div>"""
     sections.append(
         (
@@ -271,7 +272,7 @@ def _build_sections() -> list[tuple[str, str, str, str, str, str]]:
             "결과 · overview",
             "제품 이름",
             f"{axchip('expr')}{axchip('att')}{axchip('egen')}{axchip('rout')}{mbtichip()}",
-            "형용사 16 · 명사 16",
+            "형용사 16 · 명사 16 · 희귀도 16",
             overview_body,
         )
     )
@@ -297,8 +298,9 @@ def _build_sections() -> list[tuple[str, str, str, str, str, str]]:
         return f'<div class="ub-grid">{"".join(cards)}</div>'
 
     unboxing_body = f"""
-<p class="lead">조합 제목·설명은 A×B 16조합, 포장/개봉 설명은 각각 A·B 코드별 4종.</p>
-<h4>조합 제목 + 설명 · 16</h4>
+<p class="lead">API 응답은 포장·개봉 설명을 각각 A·B 코드별 4종에서 골라 반환해요.
+A×B 조합 제목·설명은 기존 결과 스냅샷 복원용 내부 데이터이며 새 API 응답에는 포함되지 않아요.</p>
+<h4>조합 제목 + 설명 · 16 (API 미반환)</h4>
 {combo_table}
 <h4>포장 상자 설명 · 4 (A코드)</h4>
 {unboxing_cards(rc.PACKAGING_COPY, list(A_CODES))}
@@ -485,7 +487,8 @@ Q05·Q06은 사용자가 고른 걸 그대로, MBTI는 축 하나씩만 써요.<
     kw3 = table(["step1.q12", "키워드"], [[val(k), esc(v)] for k, v in ch.SUPPORT_CHARGING_KEYWORD.items()])
     charge_body = f"""
 <p class="lead">메인 문장 = <b>[Q07 앞부분] + [Q11 뒷부분]</b> → 6 × 6 = 36가지.
-키워드 3개는 Q07·Q08·Q12에서 각각. 충전 점수는 <span class="val">90</span> 고정, MBTI 미사용.</p>
+키워드 3개는 Q07·Q08·Q12에서 각각 만들어요. 충전 점수는 API에서 반환하지 않고 MBTI도
+사용하지 않아요.</p>
 <div class="two-col"><div>{clause_table}</div><div>{trigger_table}</div></div>
 <h4>키워드 3개 · Q07(평소회복) / Q08(환기) / Q12(감정회복)</h4>
 <div class="three-col">{kw1}{kw2}{kw3}</div>"""
