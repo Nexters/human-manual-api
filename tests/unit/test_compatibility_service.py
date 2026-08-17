@@ -156,6 +156,30 @@ def test_compatibility_score_is_symmetric_and_keeps_each_person_target() -> None
     assert forward.tips[1].image_url == friend.overview.image_url
 
 
+def test_distance_tip_names_the_person_whose_contact_may_slow_down() -> None:
+    mine = _result(
+        code="mine0001",
+        nickname="지은",
+        mbti="ENTP",
+        scores=AxisScoresData(0, 50, 50, 50),
+    )
+    friend = _result(
+        code="frnd0001",
+        nickname="선우",
+        mbti="ENTP",
+        scores=AxisScoresData(100, 50, 50, 50),
+    )
+
+    result = build_compatibility(mine, friend)
+
+    assert result.tips[0].description == (
+        "혼자만의 시간이 필요해도 선우님에게 짧게 안부를 남기면 관계를 더 편하게 믿을 수 있어요."
+    )
+    assert result.tips[1].description == (
+        "지은님이 연락이 뜸한 순간을 마음이 멀어진 신호로 단정하지 않으면 훨씬 편해져요."
+    )
+
+
 def test_rejects_a_legacy_result_without_a_compatibility_profile() -> None:
     axes = AxisScoresData(50, 50, 50, 50)
     mine = _result(code="mine0001", nickname="나", mbti="ENTP", scores=axes)

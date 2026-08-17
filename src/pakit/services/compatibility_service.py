@@ -365,9 +365,16 @@ def _mbti_tag(left: str, right: str) -> str:
 def _distance_tip(target: SubmissionResultData, other: SubmissionResultData) -> str:
     target_attachment = target.unboxing_kit.axis_scores.attachment
     other_attachment = other.unboxing_kit.axis_scores.attachment
+    assert other.participant is not None
     if target_attachment > other_attachment:
-        return "연락이 뜸한 순간을 마음이 멀어진 신호로 단정하지 않으면 훨씬 편해져요."
-    return "혼자만의 시간이 필요해도 짧게 안부를 남기면 상대가 관계를 더 편하게 믿어요."
+        return (
+            f"{other.participant.nickname}님이 연락이 뜸한 순간을 마음이 멀어진 신호로 "
+            "단정하지 않으면 훨씬 편해져요."
+        )
+    return (
+        f"혼자만의 시간이 필요해도 {other.participant.nickname}님에게 짧게 안부를 남기면 "
+        "관계를 더 편하게 믿을 수 있어요."
+    )
 
 
 def _conflict_tip(target: SubmissionResultData, other: SubmissionResultData) -> str:
