@@ -89,7 +89,11 @@
       ],
       "status": "implemented"
     },
-    "charging": {"question_ids": ["step1.q07", "step1.q08"]},
+    "charging": {
+      "question_ids": ["step1.q07", "step1.q08", "step1.q11", "step1.q12"],
+      "additional_input": null,
+      "rule": "base_recovery_and_motivation_sentence_with_three_charging_keywords"
+    },
     "friend_compatibility": {
       "compatible_question_id": "step1.q09",
       "incompatible_question_id": "step1.q10",
@@ -316,8 +320,9 @@
       "calculation": {
         "status": "mapped",
         "role": "result_material",
-        "result_section": "features",
+        "result_sections": ["features", "charging"],
         "feature_slot": "motivation",
+        "charging_role": "restart_trigger",
         "additional_input": "mbti"
       }
     },
@@ -337,8 +342,9 @@
       "calculation": {
         "status": "mapped",
         "role": "result_material",
-        "result_section": "can_do",
+        "result_sections": ["can_do", "charging"],
         "result_slot": "support_preference",
+        "charging_role": "emotional_recovery_keyword",
         "additional_input": "mbti",
         "mbti_role": "copy_modifier"
       }

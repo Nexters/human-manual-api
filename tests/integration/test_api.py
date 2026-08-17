@@ -215,6 +215,9 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
     assert result_code_schema["pattern"] == "^[A-Za-z0-9_-]{8}$"
     charging_schema = document["components"]["schemas"]["ChargingOutput"]
     assert set(charging_schema["properties"]) == {"description", "activities"}
+    assert charging_schema["properties"]["description"]["maxLength"] == 55
+    charging_activity_schema = document["components"]["schemas"]["ChargingActivityOutput"]
+    assert charging_activity_schema["properties"]["label"]["maxLength"] == 10
     unboxing_schema = document["components"]["schemas"]["UnboxingKitOutput"]
     assert set(unboxing_schema["properties"]) == {
         "axis_scores",

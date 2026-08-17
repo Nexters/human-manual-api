@@ -132,16 +132,12 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
     ],
     "charging": {
         "description": (
-            "일정이 비면 아쉬워하기보다 잠부터 보충해요. 누구의 속도에도 맞추지 않고 "
-            "충분히 자야 배터리가 제대로 차는 타입이에요."
+            "알람 없이 늦잠을 자며 먼저 푹 쉬고, 새로운 구경거리가 생기면 다시 기운이 올라와요."
         ),
         "activities": [
-            {"type": "sleep_until_noon", "label": "늦잠으로 밀린 잠 갚기"},
-            {"type": "go_to_bed", "label": "비어버린 약속만큼 푹 쉬기"},
-            {
-                "type": "sleep_until_noon_go_to_bed",
-                "label": "휴대폰을 멀리 두고 알람 없이 푹 자기",
-            },
+            {"type": "sleep_until_noon", "label": "알람 없는 늦잠"},
+            {"type": "go_to_bed", "label": "바로 더 쉬기"},
+            {"type": "listen_to_me", "label": "속마음 털어놓기"},
         ],
     },
     "compatible_friends": [
@@ -276,17 +272,17 @@ class ChargingActivityOutput(BaseModel):
     """에너지를 충전하는 활동 한 개입니다."""
 
     type: str = Field(description="충전 활동 고정 ID")
-    label: str = Field(description="화면 표시 문구")
+    label: str = Field(max_length=10, description="10자 이하의 충전 키워드")
 
 
 class ChargingOutput(BaseModel):
     """충전 방법 설명과 활동입니다."""
 
-    description: str = Field(description="충전 방법 설명")
+    description: str = Field(max_length=55, description="55자 이하의 충전 패턴 한 문장")
     activities: list[ChargingActivityOutput] = Field(
         min_length=3,
         max_length=3,
-        description="충전 활동 3개",
+        description="평소 회복·일정 변경 시 환기·감정 회복 키워드 3개",
     )
 
 
