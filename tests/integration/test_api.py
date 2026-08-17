@@ -186,10 +186,7 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
     test_tag = next(tag for tag in document["tags"] if tag["name"] == "Test")
     assert "답변 제출" in test_tag["description"]
     assert "/api/v1/tests/submissions" not in document["paths"]
-    assert "/api/v1/tests/evaluate" not in document["paths"]
     assert "/api/assessments/submissions" not in document["paths"]
-    assert "/api/assessments/evaluate" not in document["paths"]
-    assert "/api/tests/evaluate" not in document["paths"]
 
     submission_schema = document["components"]["schemas"]["AssessmentSubmissionInput"]
     assert submission_schema["properties"]["mbti"]["description"] == (
@@ -384,39 +381,6 @@ def test_old_versioned_test_path_is_not_available() -> None:
     )
 
     assert response.status_code == 404
-
-
-def test_evaluate_assessment() -> None:
-    response = client.post(
-        "/api/tests/evaluate",
-        json={
-            "mbti": "ENTP",
-            "axes": {
-                "expression": 90,
-                "attachment": 20,
-                "manner": 80,
-                "novelty": 90,
-            },
-        },
-    )
-
-    assert response.status_code == 200
-    body = response.json()
-    assert body["classification"]["packaging_code"] == "A1"
-    assert body["classification"]["opening_tool_code"] == "B4"
-    assert body["product_name"].endswith("팽이")
-
-
-def test_rejects_out_of_range_score() -> None:
-    response = client.post(
-        "/api/tests/evaluate",
-        json={
-            "mbti": "ENTP",
-            "axes": {"expression": 101, "attachment": 0, "manner": 0, "novelty": 0},
-        },
-    )
-
-    assert response.status_code == 422
 
 
 def test_submits_complete_assessment_and_returns_mixed_result() -> None:

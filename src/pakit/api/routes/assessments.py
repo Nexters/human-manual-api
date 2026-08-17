@@ -11,8 +11,6 @@ from pakit.api.schemas.assessment_submissions import (
     AssessmentSubmissionOutput,
     ErrorResponse,
 )
-from pakit.domain.assessment import AssessmentInput, AssessmentResult
-from pakit.services.result_builder import build_assessment_result
 from pakit.services.result_repository import ResultRepository
 from pakit.services.submission_service import (
     InvalidSubmissionError,
@@ -162,19 +160,3 @@ async def get_assessment_result(
         result,
         public_base_url=str(request.base_url),
     )
-
-
-@router.post(
-    "/evaluate",
-    include_in_schema=False,
-    response_model=AssessmentResult,
-    summary="테스트 분류 규칙 확인",
-    description=(
-        "백엔드 분류 규칙 확인용 API입니다. MBTI 유형과 네 가지 성향 축 점수를 받아 "
-        "포장 유형, 개봉 도구, 캐릭터 명사와 임시 형용사를 계산합니다."
-    ),
-    response_description="분류 규칙을 적용한 결과",
-)
-async def evaluate_assessment(data: AssessmentInput) -> AssessmentResult:
-    """현재 PRD의 분류 규칙으로 테스트 결과를 계산합니다."""
-    return build_assessment_result(data)
