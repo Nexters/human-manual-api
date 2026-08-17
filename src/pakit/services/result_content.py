@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-18.3"
+RESULT_CONTENT_VERSION = "2026-08-18.5"
 
 
 @dataclass(frozen=True)
@@ -104,13 +104,13 @@ SUPPORT_PREFERENCE_COPY: dict[tuple[str, str], str] = {
     ("listen_to_me", "NF"): "해결책보다 지금 느끼는 마음부터 들어주세요",
     ("listen_to_me", "SF"): "말이 정리되지 않아도 중간에 판단하지 말고 끝까지 들어주세요",
     ("take_me_out", "NT"): "생각이 막히면 새로운 장소로 데려가주세요",
-    ("take_me_out", "ST"): "기분이 가라앉으면 맛있는 걸 먹으러 불러내주세요",
+    ("take_me_out", "ST"): "왜 그러냐고 묻는 대신, 늘 가던 곳에 같이 가서 시간 보내주세요",
     ("take_me_out", "NF"): "마음이 답답해 보이면 내가 좋아할 만한 곳으로 함께 바람 쐬러 가주세요",
     ("take_me_out", "SF"): "무슨 일인지 캐묻기보다 좋아하는 걸 먹으러 슬쩍 불러내주세요",
-    ("give_me_space", "NT"): "생각이 정리될 때까지 혼자 둘 시간을 주세요",
-    ("give_me_space", "ST"): "괜찮냐고 계속 묻기보다 혼자 정리할 시간을 주세요",
-    ("give_me_space", "NF"): "마음을 꺼낼 준비가 될 때까지 기다려주세요",
-    ("give_me_space", "SF"): "연락할 때까지 부담 없이 기다려주세요",
+    ("give_me_space", "NT"): "생각이 정리될 때까지 혼자 생각할 시간을 주세요",
+    ("give_me_space", "ST"): "괜찮냐고 계속 묻기보다 평소처럼 지내주세요",
+    ("give_me_space", "NF"): "내가 마음을 꺼낼 준비가 됐을 때 알아봐주세요",
+    ("give_me_space", "SF"): "말은 안 걸어도 좋으니, 곁에 있다는 표시만 남겨주세요",
     ("solve_together", "NT"): "막힌 이유부터 함께 정리해주세요",
     ("solve_together", "ST"): "지금 할 일부터 함께 처리해주세요",
     ("solve_together", "NF"): "마음부터 확인하고 해결책을 찾아주세요",

@@ -195,6 +195,24 @@ def test_defines_every_handling_guide_copy() -> None:
     }
 
 
+def test_uses_confirmed_give_me_space_copy_for_every_mbti_middle_group() -> None:
+    assert {
+        group: SUPPORT_PREFERENCE_COPY[("give_me_space", group)]
+        for group in ("NT", "ST", "NF", "SF")
+    } == {
+        "NT": "생각이 정리될 때까지 혼자 생각할 시간을 주세요",
+        "ST": "괜찮냐고 계속 묻기보다 평소처럼 지내주세요",
+        "NF": "내가 마음을 꺼낼 준비가 됐을 때 알아봐주세요",
+        "SF": "말은 안 걸어도 좋으니, 곁에 있다는 표시만 남겨주세요",
+    }
+
+
+def test_uses_confirmed_take_me_out_copy_for_st_group() -> None:
+    assert SUPPORT_PREFERENCE_COPY[("take_me_out", "ST")] == (
+        "왜 그러냐고 묻는 대신, 늘 가던 곳에 같이 가서 시간 보내주세요"
+    )
+
+
 def test_feature_titles_are_at_most_seven_characters() -> None:
     relationship_roles = list(RELATIONSHIP_ROLE_COPY.values())
     emotional_processing = list(EMOTIONAL_PROCESSING_COPY.values())
@@ -237,7 +255,7 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-18.3"
+    assert RESULT_CONTENT_VERSION == "2026-08-18.5"
 
 
 def test_defines_all_warning_copy_variants() -> None:

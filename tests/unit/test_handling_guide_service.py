@@ -77,7 +77,7 @@ def test_refines_support_preference_with_middle_mbti_group(mbti: MbtiType, expec
         (
             "give_me_space",
             MbtiType.ESTP,
-            "괜찮냐고 계속 묻기보다 혼자 정리할 시간을 주세요",
+            "괜찮냐고 계속 묻기보다 평소처럼 지내주세요",
         ),
         (
             "make_me_laugh",

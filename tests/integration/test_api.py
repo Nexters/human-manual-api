@@ -540,7 +540,7 @@ def test_submission_uses_q11_for_the_motivation_feature_only() -> None:
     [
         ("listen_to_me", "내 말의 표면만 보지 말고, 왜 이런 말을 하는지까지 이해해주세요"),
         ("take_me_out", "생각이 막히면 새로운 장소로 데려가주세요"),
-        ("give_me_space", "생각이 정리될 때까지 혼자 둘 시간을 주세요"),
+        ("give_me_space", "생각이 정리될 때까지 혼자 생각할 시간을 주세요"),
         ("solve_together", "막힌 이유부터 함께 정리해주세요"),
         ("make_me_laugh", "복잡한 생각에서 잠깐 빠져나오게 엉뚱한 이야기를 던져주세요"),
     ],
