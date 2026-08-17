@@ -51,6 +51,11 @@ src = ["src", "tests"]
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
 
+[tool.ruff.lint.per-file-ignores]
+# 결과 조합 지도는 사실상 HTML/CSS/JS 마크업 문자열 모듈이라
+# 긴 마크업 줄(E501)과 표시용 특수문자(RUF001: × – ↔ 등)를 그대로 둔다.
+"src/pakit/web/result_map.py" = ["E501", "RUF001"]
+
 [tool.ruff.lint.isort]
 known-first-party = ["pakit"]
 

@@ -2,12 +2,14 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
 from pakit import __version__
 from pakit.api.router import api_router
 from pakit.api.routes.health import HealthResponse
 from pakit.core.config import ALLOWED_CORS_ORIGINS, get_settings
+from pakit.web.result_map import render_result_map
 
 
 def create_app() -> FastAPI:
@@ -63,6 +65,11 @@ def create_app() -> FastAPI:
     @application.get("/health", response_model=HealthResponse, tags=["system"])
     async def root_health() -> HealthResponse:
         return HealthResponse()
+
+    @application.get("/result-map", response_class=HTMLResponse, include_in_schema=False)
+    async def result_map_page() -> HTMLResponse:
+        """결과 문구 검토용 조합 지도 페이지 (내부용)."""
+        return HTMLResponse(render_result_map())
 
     return application
 
