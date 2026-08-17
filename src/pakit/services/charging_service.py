@@ -31,7 +31,7 @@ MOTIVATION_TRIGGER_DESCRIPTION: dict[str, str] = {
 
 
 BASE_CHARGING_KEYWORD: dict[str, str] = {
-    "sleep_until_noon": "알람 없는 늦잠",
+    "sleep_until_noon": "방해 없는 늦잠",
     "morning_run": "아침 러닝",
     "brunch_cafe": "느긋한 브런치",
     "stay_in_bed": "이불 속 휴식",
@@ -41,7 +41,7 @@ BASE_CHARGING_KEYWORD: dict[str, str] = {
 
 
 EMERGENCY_CHARGING_KEYWORD: dict[str, str] = {
-    "go_to_bed": "바로 더 쉬기",
+    "go_to_bed": "혼자만의 시간",
     "contact_others": "친구 만나기",
     "eat_alone": "혼자 맛있는 한 끼",
     "go_for_drive": "즉흥 드라이브",

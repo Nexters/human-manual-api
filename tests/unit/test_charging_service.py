@@ -43,7 +43,7 @@ def test_explains_resting_baseline_and_curiosity_trigger_together() -> None:
     )
     assert [activity.label for activity in result.activities] == [
         "이불 속 휴식",
-        "바로 더 쉬기",
+        "혼자만의 시간",
         "맛있는 거 먹기",
     ]
 
@@ -51,6 +51,11 @@ def test_explains_resting_baseline_and_curiosity_trigger_together() -> None:
 def test_defines_matching_base_description_and_keyword_inputs() -> None:
     assert set(BASE_CHARGING_CLAUSE) == set(BASE_CHARGING_KEYWORD)
     assert set(BASE_CHARGING_CLAUSE) == set(BASE_CHARGING_MECHANISM)
+
+
+def test_uses_confirmed_charging_keyword_labels() -> None:
+    assert BASE_CHARGING_KEYWORD["sleep_until_noon"] == "방해 없는 늦잠"
+    assert EMERGENCY_CHARGING_KEYWORD["go_to_bed"] == "혼자만의 시간"
 
 
 def test_defines_confirmed_q07_charging_mechanisms_and_descriptions() -> None:
