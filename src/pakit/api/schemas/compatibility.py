@@ -13,39 +13,37 @@ COMPATIBILITY_RESPONSE_EXAMPLE: dict[str, Any] = {
         "noun": "곰인형",
         "character_id": "teddy_bear",
     },
-    "headline": "찰떡궁합 환상의 장난감",
-    "description": "서로의 아이디어를 키워주는 신나는 조합이에요",
+    "headline": "다른 맛이 잘 섞이는 장난감",
+    "description": "닮은 부분은 편안하고 다른 부분은 서로의 빈틈을 채워줘요.",
     "synergy": {
         "score": 80,
-        "title": "낼 수 있는 시너지때",
-        "description": (
-            "새로운 일을 시작하면 이 친구는 색다른 시선을 더해줘요. "
-            "둘이 대화할수록 아이디어가 선명해져요."
-        ),
-        "tags": ["즉흥적인 케미", "아이디어 시너지"],
+        "title": "함께 굴러가는 힘",
+        "description": ("계획을 세우고 움직이는 속도가 맞아 함께할 때 일이 자연스럽게 이어져요."),
+        "tags": ["함께 잘 움직여요", "아이디어가 통해요"],
     },
     "tips": [
         {
             "target": "mine",
             "character_id": "spinning_top",
             "title": "지은님에게",
-            "description": "갑작스러운 변화는 미리 알려주고 직설적인 말은 부드럽게 다듬어주세요.",
+            "description": (
+                "갑작스러운 제안은 짧게라도 미리 알려주면 상대도 마음 편히 함께 움직여요."
+            ),
         },
         {
             "target": "friend",
-            "character_id": "cube",
+            "character_id": "teddy_bear",
             "title": "선우님에게",
             "description": (
-                "즉흥적인 행동을 무책임함으로 단정하지 말고, 불편한 점은 솔직하게 알려주세요."
+                "계획 밖의 제안을 무책임함으로 단정하지 않고 작은 여지를 남겨두면 더 즐거워져요."
             ),
         },
     ],
     "relationship_tip": {
         "title": "더 오래 잘 지내려면",
         "description": (
-            "서로의 속도를 바꾸려 하기보다 차이를 이해해 주세요. "
-            "팽이는 갑작스러운 계획을 미리 알려주고, 비밀상자는 "
-            "불편한 마음을 참지 않고 표현하면 돼요."
+            "지은님과 선우님은 함께 움직이는 속도의 신호만 서로 확인해도 "
+            "훨씬 편하고 오래 가는 사이가 될 수 있어요."
         ),
     },
 }
@@ -85,7 +83,7 @@ class RelationshipTipOutput(BaseModel):
 
 
 class CompatibilityOutput(BaseModel):
-    """친구와의 궁합 화면에 필요한 목업 결과입니다."""
+    """저장된 두 테스트 결과로 계산한 친구 궁합입니다."""
 
     model_config = ConfigDict(json_schema_extra={"example": COMPATIBILITY_RESPONSE_EXAMPLE})
 

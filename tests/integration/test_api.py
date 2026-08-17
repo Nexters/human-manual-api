@@ -1,4 +1,5 @@
 import re
+from dataclasses import replace
 
 import pytest
 from fastapi.testclient import TestClient
@@ -99,6 +100,8 @@ def test_serves_manual_assessment_test_page() -> None:
     assert 'id="charging-description"' in response.text
     assert 'id="charging-activities"' in response.text
     assert "data.charging.activities.map" in response.text
+    assert 'id="compatible-friends"' in response.text
+    assert "data.compatible_friends.map" in response.text
     assert 'choices("step1.q11"' in response.text
     assert 'choices("step1.q12"' in response.text
 
@@ -158,6 +161,7 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
         "can_do",
         "warnings",
         "charging",
+        "compatible_friends",
     }
     result_code_schema = result_schema["properties"]["result_code"]
     assert result_code_schema["minLength"] == 8
@@ -223,20 +227,43 @@ def test_returns_404_for_unknown_result_code() -> None:
     }
 
 
-def test_gets_mock_friend_compatibility() -> None:
+def test_calculates_friend_compatibility_from_two_saved_results() -> None:
+    mine = client.post("/api/tests/submissions", json=ASSESSMENT_SUBMISSION_EXAMPLE)
+    friend_payload = _valid_submission()
+    friend_payload["participant"] = {"nickname": "선우"}
+    friend_payload["mbti"] = "ISFJ"
+    friend = client.post("/api/tests/submissions", json=friend_payload)
+    assert mine.status_code == friend.status_code == 200
+
     response = client.get(
         "/api/compatibility",
-        params={"mine": "demo-result-code", "friend": "demo-friend-code"},
+        params={
+            "mine": mine.json()["result_code"],
+            "friend": friend.json()["result_code"],
+        },
     )
 
     assert response.status_code == 200
-    assert response.json() == COMPATIBILITY_RESPONSE_EXAMPLE
+    body = response.json()
+    assert body["mine"] == {
+        "nickname": mine.json()["participant"]["nickname"],
+        "noun": mine.json()["overview"]["noun"],
+        "character_id": mine.json()["overview"]["character_id"],
+    }
+    assert body["friend"] == {
+        "nickname": "선우",
+        "noun": friend.json()["overview"]["noun"],
+        "character_id": friend.json()["overview"]["character_id"],
+    }
+    assert 0 <= body["synergy"]["score"] <= 100
+    assert len(body["synergy"]["tags"]) == 2
+    assert [tip["target"] for tip in body["tips"]] == ["mine", "friend"]
 
 
 def test_returns_404_for_unknown_compatibility_codes() -> None:
     response = client.get(
         "/api/compatibility",
-        params={"mine": "unknown", "friend": "demo-friend-code"},
+        params={"mine": "unknown1", "friend": "unknown2"},
     )
 
     assert response.status_code == 404
@@ -244,6 +271,30 @@ def test_returns_404_for_unknown_compatibility_codes() -> None:
         "error": {
             "code": "COMPATIBILITY_NOT_FOUND",
             "message": "친구 궁합 결과를 찾을 수 없습니다.",
+        }
+    }
+
+
+def test_returns_409_for_a_result_created_before_compatibility_profiles() -> None:
+    current = client.post("/api/tests/submissions", json=ASSESSMENT_SUBMISSION_EXAMPLE)
+    legacy = client.post("/api/tests/submissions", json=_valid_submission())
+    assert current.status_code == legacy.status_code == 200
+    legacy_code = legacy.json()["result_code"]
+    result_repository.results[legacy_code] = replace(
+        result_repository.results[legacy_code],
+        compatibility_profile=None,
+    )
+
+    response = client.get(
+        "/api/compatibility",
+        params={"mine": current.json()["result_code"], "friend": legacy_code},
+    )
+
+    assert response.status_code == 409
+    assert response.json() == {
+        "error": {
+            "code": "COMPATIBILITY_PROFILE_UNAVAILABLE",
+            "message": "이 결과는 궁합 기능 추가 전에 생성되어 궁합을 계산할 수 없습니다.",
         }
     }
 
@@ -305,6 +356,7 @@ def test_submits_complete_assessment_and_returns_mixed_result() -> None:
         "can_do",
         "warnings",
         "charging",
+        "compatible_friends",
     }
     assert body["participant"] == {"nickname": "송송"}
     assert body["overview"]["noun"] == "망원경"
@@ -319,6 +371,8 @@ def test_submits_complete_assessment_and_returns_mixed_result() -> None:
     assert len(body["can_do"]) == 4
     assert len(body["warnings"]) == 4
     assert len(body["charging"]["activities"]) == 3
+    assert len(body["compatible_friends"]) == 2
+    assert all(friend["badge"] == "환상의 장난감" for friend in body["compatible_friends"])
 
 
 def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> None:

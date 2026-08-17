@@ -157,6 +157,24 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
             },
         ],
     },
+    "compatible_friends": [
+        {
+            "badge": "환상의 장난감",
+            "noun": "비밀상자",
+            "character_id": "secret_box",
+            "image_url": "/assets/characters/secret_box.png",
+            "description": (
+                "당신이 꺼낸 아이디어를 깊이 이해하고, 생각의 다음 방향을 함께 찾아줘요."
+            ),
+        },
+        {
+            "badge": "환상의 장난감",
+            "noun": "테디베어",
+            "character_id": "teddy_bear",
+            "image_url": "/assets/characters/teddy_bear.png",
+            "description": ("꾸준히 관계를 챙기는 당신에게, 다른 리듬과 새로운 재미를 더해줘요."),
+        },
+    ],
 }
 
 
@@ -286,6 +304,16 @@ class ChargingOutput(BaseModel):
     )
 
 
+class CompatibleFriendOutput(BaseModel):
+    """개인 결과 화면에 미리 보여주는 잘 맞는 친구 장난감입니다."""
+
+    badge: str = Field(description="카드 상단 궁합 배지")
+    noun: str = Field(description="추천 친구의 장난감 명사")
+    character_id: str = Field(description="추천 친구 캐릭터의 고정 ID")
+    image_url: str = Field(description="추천 친구 캐릭터 이미지 경로")
+    description: str = Field(description="사용자와 이 장난감이 잘 맞는 이유")
+
+
 class AssessmentSubmissionOutput(BaseModel):
     """테스트 제출을 검증한 후 반환하는 결과입니다."""
 
@@ -313,6 +341,10 @@ class AssessmentSubmissionOutput(BaseModel):
     can_do: list[str] = Field(min_length=4, max_length=4, description="사용 방법 4개")
     warnings: list[str] = Field(min_length=4, max_length=4, description="주의사항 4개")
     charging: ChargingOutput = Field(description="충전 방법")
+    compatible_friends: list[CompatibleFriendOutput] = Field(
+        max_length=2,
+        description="개인 결과 화면의 친구 궁합 미리보기. 새 결과는 2개, 기존 결과는 비어 있음",
+    )
 
     @classmethod
     def from_domain(cls, result: SubmissionResultData) -> "AssessmentSubmissionOutput":

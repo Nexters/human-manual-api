@@ -12,6 +12,8 @@ from pakit.domain.assessment_submission import (
     CharacterStoryData,
     ChargingActivityData,
     ChargingData,
+    CompatibilityProfileData,
+    CompatibleFriendData,
     FeatureData,
     OverviewData,
     ResultParticipantData,
@@ -53,6 +55,24 @@ def _result() -> SubmissionResultData:
             description="충전 설명",
             activities=(ChargingActivityData("rest", "쉬기"),) * 3,
         ),
+        compatible_friends=(
+            CompatibleFriendData(
+                "환상의 장난감",
+                "비밀상자",
+                "secret_box",
+                "/assets/characters/secret_box.png",
+                "설명",
+            ),
+        ),
+        compatibility_profile=CompatibilityProfileData(
+            version="compatibility-v1",
+            mbti="ENTP",
+            relationship_role="organizer",
+            motivation="fun",
+            support_preference="make_me_laugh",
+            conflict_style="resolve_immediately",
+            affection_style="express_with_actions",
+        ),
     )
 
 
@@ -84,6 +104,7 @@ def test_persists_and_restores_an_immutable_result_snapshot() -> None:
         assert record.assessment_version == "assessment-v1"
         assert record.content_version == "content-v1"
         assert record.result_snapshot["participant"] == {"nickname": "송송"}
+        assert record.result_snapshot["compatibility_profile"]["mbti"] == "ENTP"
 
     asyncio.run(run())
 
@@ -134,6 +155,8 @@ def test_restores_a_legacy_snapshot_without_a_participant() -> None:
 
         snapshot = asdict(_result())
         snapshot.pop("participant")
+        snapshot.pop("compatibility_profile")
+        snapshot.pop("compatible_friends")
         snapshot["result_code"] = "legacy01"
         sessions = async_sessionmaker(engine, expire_on_commit=False)
         async with sessions() as session:
@@ -153,5 +176,7 @@ def test_restores_a_legacy_snapshot_without_a_participant() -> None:
         await engine.dispose()
         assert restored is not None
         assert restored.participant is None
+        assert restored.compatibility_profile is None
+        assert restored.compatible_friends == ()
 
     asyncio.run(run())

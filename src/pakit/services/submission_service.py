@@ -21,6 +21,10 @@ from pakit.services.assessment_classifier import (
     classify_submission,
 )
 from pakit.services.charging_service import build_charging
+from pakit.services.compatibility_service import (
+    build_compatibility_profile,
+    build_compatible_friends,
+)
 from pakit.services.emotional_processing_service import build_emotional_processing_feature
 from pakit.services.handling_guide_service import build_handling_guide
 from pakit.services.motivation_service import build_motivation_feature
@@ -175,6 +179,19 @@ def _build_result(
         can_do=handling_guide,
         warnings=warnings,
         charging=charging,
+        compatible_friends=build_compatible_friends(
+            submission.mbti,
+            classification.axis_scores,
+        ),
+        compatibility_profile=build_compatibility_profile(
+            mbti=submission.mbti,
+            relationship_moment=answers["step1.q01"],
+            relationship_strength=answers["step1.q02"],
+            motivation=answers["step1.q11"],
+            support_preference=answers["step1.q12"],
+            conflict_style=answers["step2.q02"],
+            affection_style=answers["step2.q08"],
+        ),
     )
 
 

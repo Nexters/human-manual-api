@@ -84,6 +84,26 @@ class ResultParticipantData:
 
 
 @dataclass(frozen=True)
+class CompatibilityProfileData:
+    version: str
+    mbti: str
+    relationship_role: str
+    motivation: str
+    support_preference: str
+    conflict_style: str
+    affection_style: str
+
+
+@dataclass(frozen=True)
+class CompatibleFriendData:
+    badge: str
+    noun: str
+    character_id: str
+    image_url: str
+    description: str
+
+
+@dataclass(frozen=True)
 class SubmissionResultData:
     result_code: str
     participant: ResultParticipantData | None
@@ -94,3 +114,5 @@ class SubmissionResultData:
     can_do: tuple[str, ...]
     warnings: tuple[str, ...]
     charging: ChargingData
+    compatible_friends: tuple[CompatibleFriendData, ...]
+    compatibility_profile: CompatibilityProfileData | None

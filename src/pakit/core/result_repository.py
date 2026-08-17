@@ -11,6 +11,8 @@ from pakit.domain.assessment_submission import (
     CharacterStoryData,
     ChargingActivityData,
     ChargingData,
+    CompatibilityProfileData,
+    CompatibleFriendData,
     FeatureData,
     OverviewData,
     ResultParticipantData,
@@ -37,6 +39,7 @@ def _result_from_snapshot(snapshot: dict[str, Any]) -> SubmissionResultData:
     story = snapshot["character_story"]
     charging = snapshot["charging"]
     participant = snapshot.get("participant")
+    compatibility_profile = snapshot.get("compatibility_profile")
 
     return SubmissionResultData(
         result_code=snapshot["result_code"],
@@ -83,6 +86,29 @@ def _result_from_snapshot(snapshot: dict[str, Any]) -> SubmissionResultData:
                 ChargingActivityData(type=activity["type"], label=activity["label"])
                 for activity in charging["activities"]
             ),
+        ),
+        compatible_friends=tuple(
+            CompatibleFriendData(
+                badge=friend["badge"],
+                noun=friend["noun"],
+                character_id=friend["character_id"],
+                image_url=friend["image_url"],
+                description=friend["description"],
+            )
+            for friend in snapshot.get("compatible_friends", ())
+        ),
+        compatibility_profile=(
+            CompatibilityProfileData(
+                version=compatibility_profile["version"],
+                mbti=compatibility_profile["mbti"],
+                relationship_role=compatibility_profile["relationship_role"],
+                motivation=compatibility_profile["motivation"],
+                support_preference=compatibility_profile["support_preference"],
+                conflict_style=compatibility_profile["conflict_style"],
+                affection_style=compatibility_profile["affection_style"],
+            )
+            if compatibility_profile is not None
+            else None
         ),
     )
 

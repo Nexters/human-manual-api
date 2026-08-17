@@ -27,7 +27,13 @@
     .feature-card { padding: 16px; border-radius: 10px; background: white; }
     .feature-card h4 { margin: 0 0 6px; font-size: 17px; }
     .feature-card p { margin: 0; color: #666; line-height: 1.5; }
-    @media (max-width: 600px) { .feature-grid { grid-template-columns: 1fr; } }
+    .friend-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .friend-card { padding: 18px; border-radius: 12px; background: white; text-align: center; }
+    .friend-card img { width: 160px; height: 160px; object-fit: contain; }
+    .friend-card h4 { margin: 8px 0; font-size: 20px; }
+    .friend-card p { margin: 8px 0 0; color: #666; line-height: 1.5; }
+    .friend-badge { display: inline-block; padding: 6px 12px; border-radius: 999px; background: #2141f5; color: white; }
+    @media (max-width: 600px) { .feature-grid, .friend-grid { grid-template-columns: 1fr; } }
     pre { overflow: auto; padding: 16px; background: #1d1f21; color: #eee; border-radius: 10px; }
     details { margin-top: 20px; }
   </style>
@@ -81,6 +87,8 @@
       <p id="charging-description"></p>
       <div id="charging-activities"></div>
     </div>
+    <h3 class="section-title">나와 잘 맞는 친구 장난감</h3>
+    <div id="compatible-friends" class="friend-grid"></div>
     <details>
       <summary>원본 JSON 보기</summary>
       <pre id="json"></pre>
@@ -200,6 +208,23 @@
           const item = document.createElement("p");
           item.textContent = `🔋 ${activity.label}`;
           return item;
+        }));
+        const compatibleFriends = document.querySelector("#compatible-friends");
+        compatibleFriends.replaceChildren(...data.compatible_friends.map((friend) => {
+          const card = document.createElement("article");
+          card.className = "friend-card";
+          const badge = document.createElement("span");
+          badge.className = "friend-badge";
+          badge.textContent = friend.badge;
+          const image = document.createElement("img");
+          image.src = friend.image_url;
+          image.alt = friend.noun;
+          const noun = document.createElement("h4");
+          noun.textContent = friend.noun;
+          const description = document.createElement("p");
+          description.textContent = friend.description;
+          card.append(badge, image, noun, description);
+          return card;
         }));
         document.querySelector("#json").textContent = JSON.stringify(data, null, 2);
         document.querySelector("#result").style.display = "block";
