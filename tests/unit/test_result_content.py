@@ -177,6 +177,7 @@ def test_defines_copy_for_all_packaging_types() -> None:
         "A4": "locked_box",
     }
     assert all(len(copy.tags) == 2 and copy.reason for copy in PACKAGING_COPY.values())
+    assert all(len(copy.reason) <= 220 for copy in PACKAGING_COPY.values())
 
 
 def test_defines_copy_for_all_opening_tools() -> None:
@@ -187,10 +188,11 @@ def test_defines_copy_for_all_opening_tools() -> None:
         "B4": "chainsaw",
     }
     assert all(len(copy.tags) == 2 and copy.reason for copy in OPENING_TOOL_COPY.values())
+    assert all(len(copy.reason) <= 180 for copy in OPENING_TOOL_COPY.values())
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-17.2"
+    assert RESULT_CONTENT_VERSION == "2026-08-17.3"
 
 
 def test_defines_all_warning_copy_variants() -> None:
