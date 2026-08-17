@@ -200,11 +200,24 @@ DIMENSION_COPY = {
     ),
 }
 
-WEAKNESS_LABEL = {
-    "distance": "서로 필요한 거리",
-    "conflict": "대화를 푸는 속도",
-    "care": "서로 원하는 챙김",
-    "pace": "함께 움직이는 속도",
+RELATIONSHIP_STRENGTH_COPY = {
+    "distance": "서로 편한 간격을 알아보는 감각이 좋아요.",
+    "conflict": "서운한 일이 생겨도 대화를 다시 이어가는 힘이 있어요.",
+    "care": "필요한 순간에 서로의 마음을 챙기는 감각이 잘 통해요.",
+    "pace": "함께 무언가를 시작하고 이어가는 호흡이 좋아요.",
+}
+
+RELATIONSHIP_HABIT_COPY = {
+    "distance": (
+        "연락이 뜸해질 때 쓸 짧은 신호 하나를 정해두면 각자의 시간도 더 편하게 믿을 수 있어요."
+    ),
+    "conflict": (
+        "서운한 날에는 바로 말할지 시간을 둘지만 먼저 알려주면 좋은 호흡을 오래 지킬 수 있어요."
+    ),
+    "care": ("힘든 날 원하는 위로를 한마디로 알려주는 습관을 만들면 서로의 마음을 놓치지 않아요."),
+    "pace": (
+        "약속을 잡을 때 즉흥 제안인지 미리 정할 계획인지만 맞추면 함께하는 일이 더 즐거워져요."
+    ),
 }
 
 SUPPORT_TIPS = {
@@ -637,6 +650,27 @@ def _person(result: SubmissionResultData) -> CompatibilityPersonData:
     )
 
 
+def _relationship_tip_description(
+    mine: CompatibilityPersonData,
+    friend: CompatibilityPersonData,
+    strongest: str,
+    weakest: str,
+    dimensions: dict[str, int],
+) -> str:
+    names = f"{mine.nickname}님과 {friend.nickname}님은"
+    if strongest == weakest:
+        if dimensions[strongest] >= 74:
+            return (
+                f"{names} 네 가지 관계 리듬이 고르게 잘 맞는 편이에요. 서로 필요한 거리와 "
+                "위로가 달라지는 순간만 가끔 확인해보세요."
+            )
+        return (
+            f"{names} 한 가지보다 여러 관계 리듬을 천천히 알아가는 것이 중요한 사이예요. "
+            "연락·대화·위로 중 그날 가장 필요한 것부터 한마디로 알려주세요."
+        )
+    return f"{names} {RELATIONSHIP_STRENGTH_COPY[strongest]} {RELATIONSHIP_HABIT_COPY[weakest]}"
+
+
 def build_compatibility(
     mine: SubmissionResultData,
     friend: SubmissionResultData,
@@ -690,10 +724,12 @@ def build_compatibility(
         ),
         relationship_tip=RelationshipTipData(
             title="더 오래 잘 지내려면",
-            description=(
-                f"{mine_person.nickname}님과 {friend_person.nickname}님은 "
-                f"{WEAKNESS_LABEL[weakest]}만 서로 확인해도 "
-                "훨씬 편하고 오래 가는 사이가 될 수 있어요."
+            description=_relationship_tip_description(
+                mine_person,
+                friend_person,
+                strongest,
+                weakest,
+                dimensions,
             ),
         ),
     )

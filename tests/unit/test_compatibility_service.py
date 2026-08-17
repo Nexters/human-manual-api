@@ -178,6 +178,10 @@ def test_distance_tip_names_the_person_whose_contact_may_slow_down() -> None:
     assert result.tips[1].description == (
         "지은님이 연락이 뜸한 순간을 마음이 멀어진 신호로 단정하지 않으면 훨씬 편해져요."
     )
+    assert result.relationship_tip.description == (
+        "지은님과 선우님은 서운한 일이 생겨도 대화를 다시 이어가는 힘이 있어요. "
+        "연락이 뜸해질 때 쓸 짧은 신호 하나를 정해두면 각자의 시간도 더 편하게 믿을 수 있어요."
+    )
 
 
 def test_returns_four_detailed_conversation_topics() -> None:
