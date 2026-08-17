@@ -1,5 +1,7 @@
 import re
+from copy import deepcopy
 from dataclasses import replace
+from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
@@ -35,6 +37,24 @@ class InMemoryResultRepository:
 result_repository = InMemoryResultRepository()
 app.dependency_overrides[get_result_repository] = lambda: result_repository
 client = TestClient(app)
+
+
+def _testserver_response_example() -> dict[str, Any]:
+    expected = deepcopy(ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE)
+    expected["overview"]["image_url"] = "http://testserver/assets/characters/spinning_top.png"
+    expected["unboxing_kit"]["packaging"]["image_url"] = (
+        "http://testserver/assets/packaging_boxes/matryoshka_box.png"
+    )
+    expected["unboxing_kit"]["opening_tool"]["image_url"] = (
+        "http://testserver/assets/opening_tools/glove.png"
+    )
+    expected["compatible_friends"][0]["image_url"] = (
+        "http://testserver/assets/characters/secret_box.png"
+    )
+    expected["compatible_friends"][1]["image_url"] = (
+        "http://testserver/assets/characters/teddy_bear.png"
+    )
+    return expected
 
 
 def _valid_submission() -> dict[str, object]:
@@ -100,6 +120,10 @@ def test_serves_manual_assessment_test_page() -> None:
     assert 'id="charging-description"' in response.text
     assert 'id="charging-activities"' in response.text
     assert "data.charging.activities.map" in response.text
+    assert 'id="packaging-image"' in response.text
+    assert "data.unboxing_kit.packaging.image_url" in response.text
+    assert 'id="tool-image"' in response.text
+    assert "data.unboxing_kit.opening_tool.image_url" in response.text
     assert 'id="compatible-friends"' in response.text
     assert "data.compatible_friends.map" in response.text
     assert 'choices("step1.q11"' in response.text
@@ -187,7 +211,7 @@ def test_swagger_submission_example_is_accepted() -> None:
 
     assert response.status_code == 200
     body = response.json()
-    expected = ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE | {"result_code": body["result_code"]}
+    expected = _testserver_response_example() | {"result_code": body["result_code"]}
     assert body == expected
     assert len(body["result_code"]) == 8
     assert re.fullmatch(r"[A-Za-z0-9_-]{8}", body["result_code"])
@@ -361,7 +385,7 @@ def test_submits_complete_assessment_and_returns_mixed_result() -> None:
     assert body["participant"] == {"nickname": "송송"}
     assert body["overview"]["noun"] == "망원경"
     assert body["overview"]["character_id"] == "telescope"
-    assert body["overview"]["image_url"] == "/assets/characters/telescope.png"
+    assert body["overview"]["image_url"] == "http://testserver/assets/characters/telescope.png"
     assert body["overview"]["result_name"].endswith("망원경")
     assert len(body["overview"]["tags"]) == 3
     assert all(0 <= score <= 100 for score in body["unboxing_kit"]["axis_scores"].values())
@@ -410,7 +434,7 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
         "noun": "망원경",
         "result_name": '"어디야" 물을 때마다 다른 나라 가 있는 망원경',
         "character_id": "telescope",
-        "image_url": "/assets/characters/telescope.png",
+        "image_url": "http://testserver/assets/characters/telescope.png",
         "tags": [],
     }
     assert body["unboxing_kit"]["axis_scores"] == {
@@ -609,14 +633,21 @@ def test_submission_uses_q01_and_q02_for_the_relationship_role_only() -> None:
     assert decision_features[2:] == worries_features[2:]
 
 
-def test_serves_character_image_from_result_url() -> None:
+def test_serves_all_images_from_absolute_result_urls() -> None:
     submitted = client.post("/api/tests/submissions", json=_valid_submission())
-    image_url = submitted.json()["overview"]["image_url"]
+    body = submitted.json()
+    image_urls = [
+        body["overview"]["image_url"],
+        body["unboxing_kit"]["packaging"]["image_url"],
+        body["unboxing_kit"]["opening_tool"]["image_url"],
+        *(friend["image_url"] for friend in body["compatible_friends"]),
+    ]
 
-    response = client.get(image_url)
-
-    assert response.status_code == 200
-    assert response.headers["content-type"] == "image/png"
+    assert all(image_url.startswith("http://testserver/assets/") for image_url in image_urls)
+    for image_url in image_urls:
+        response = client.get(image_url)
+        assert response.status_code == 200
+        assert response.headers["content-type"] == "image/png"
 
 
 def test_rejects_unsupported_assessment_version() -> None:

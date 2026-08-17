@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Depends, Path
+from fastapi import APIRouter, Body, Depends, Path, Request
 from fastapi.responses import JSONResponse
 
 from pakit.api.dependencies import get_result_repository
@@ -68,6 +68,7 @@ results_router = APIRouter(prefix="/results", tags=["Test"])
     },
 )
 async def create_assessment_submission(
+    request: Request,
     data: Annotated[
         AssessmentSubmissionInput,
         Body(
@@ -109,7 +110,10 @@ async def create_assessment_submission(
                 }
             },
         )
-    return AssessmentSubmissionOutput.from_domain(result)
+    return AssessmentSubmissionOutput.from_domain(
+        result,
+        public_base_url=str(request.base_url),
+    )
 
 
 @results_router.get(
@@ -134,6 +138,7 @@ async def create_assessment_submission(
     },
 )
 async def get_assessment_result(
+    request: Request,
     result_code: Annotated[
         str,
         Path(description="테스트 제출 응답에서 받은 결과 조회 코드"),
@@ -153,7 +158,10 @@ async def get_assessment_result(
                 }
             },
         )
-    return AssessmentSubmissionOutput.from_domain(result)
+    return AssessmentSubmissionOutput.from_domain(
+        result,
+        public_base_url=str(request.base_url),
+    )
 
 
 @router.post(

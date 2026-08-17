@@ -95,10 +95,11 @@ def _validate_answers(submission: AssessmentSubmission) -> None:
             )
 
 
-def _unboxing_item(item: UnboxingItemCopy) -> UnboxingItemData:
+def _unboxing_item(item: UnboxingItemCopy, asset_directory: str) -> UnboxingItemData:
     return UnboxingItemData(
         type=item.type,
         name=item.name,
+        image_url=f"/assets/{asset_directory}/{item.type}.png",
         tags=item.tags,
         reason=item.reason,
     )
@@ -160,8 +161,14 @@ def _build_result(
             axis_scores=classification.axis_scores,
             title=combination_copy.title,
             description=combination_copy.description,
-            packaging=_unboxing_item(PACKAGING_COPY[classification.packaging_code]),
-            opening_tool=_unboxing_item(OPENING_TOOL_COPY[classification.opening_tool_code]),
+            packaging=_unboxing_item(
+                PACKAGING_COPY[classification.packaging_code],
+                "packaging_boxes",
+            ),
+            opening_tool=_unboxing_item(
+                OPENING_TOOL_COPY[classification.opening_tool_code],
+                "opening_tools",
+            ),
         ),
         features=tuple(
             _feature(item)

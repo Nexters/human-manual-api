@@ -23,10 +23,14 @@ from pakit.domain.assessment_submission import (
 from pakit.services.result_repository import ResultCodeConflictError
 
 
-def _unboxing_item(snapshot: dict[str, Any]) -> UnboxingItemData:
+def _unboxing_item(snapshot: dict[str, Any], asset_directory: str) -> UnboxingItemData:
     return UnboxingItemData(
         type=snapshot["type"],
         name=snapshot["name"],
+        image_url=snapshot.get(
+            "image_url",
+            f"/assets/{asset_directory}/{snapshot['type']}.png",
+        ),
         tags=tuple(snapshot["tags"]),
         reason=snapshot["reason"],
     )
@@ -66,8 +70,8 @@ def _result_from_snapshot(snapshot: dict[str, Any]) -> SubmissionResultData:
             ),
             title=unboxing["title"],
             description=unboxing["description"],
-            packaging=_unboxing_item(unboxing["packaging"]),
-            opening_tool=_unboxing_item(unboxing["opening_tool"]),
+            packaging=_unboxing_item(unboxing["packaging"], "packaging_boxes"),
+            opening_tool=_unboxing_item(unboxing["opening_tool"], "opening_tools"),
         ),
         features=tuple(
             FeatureData(title=feature["title"], description=feature["description"])

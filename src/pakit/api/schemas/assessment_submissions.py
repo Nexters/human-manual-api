@@ -51,7 +51,7 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
         "noun": "팽이",
         "result_name": "옷 예쁘게 입고 플러팅 했다고 하는 팽이",
         "character_id": "spinning_top",
-        "image_url": "/assets/characters/spinning_top.png",
+        "image_url": "https://api.pakit.kr/assets/characters/spinning_top.png",
         "tags": ["도파민 MAX", "장난꾸러기", "혼자서도 잘 놀아요"],
     },
     "unboxing_kit": {
@@ -70,6 +70,7 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
         "packaging": {
             "type": "matryoshka_box",
             "name": "마트료시카 상자",
+            "image_url": "https://api.pakit.kr/assets/packaging_boxes/matryoshka_box.png",
             "tags": ["탐색형", "밀착형"],
             "reason": (
                 "좋아하는 마음을 바로 보여주는 법이 없어요. 티 안 나게 챙기고, 안부는 돌려서 묻고, "
@@ -86,6 +87,7 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
         "opening_tool": {
             "type": "glove",
             "name": "장갑",
+            "image_url": "https://api.pakit.kr/assets/opening_tools/glove.png",
             "tags": ["루틴형", "에겐형"],
             "reason": (
                 "새로운 방법이 넘쳐나도, 좋은 건 늘 하던 방식으로 하는 사람이에요. 인사는 "
@@ -162,7 +164,7 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
             "badge": "환상의 장난감",
             "noun": "비밀상자",
             "character_id": "secret_box",
-            "image_url": "/assets/characters/secret_box.png",
+            "image_url": "https://api.pakit.kr/assets/characters/secret_box.png",
             "description": (
                 "당신이 꺼낸 아이디어를 깊이 이해하고, 생각의 다음 방향을 함께 찾아줘요."
             ),
@@ -171,7 +173,7 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
             "badge": "환상의 장난감",
             "noun": "테디베어",
             "character_id": "teddy_bear",
-            "image_url": "/assets/characters/teddy_bear.png",
+            "image_url": "https://api.pakit.kr/assets/characters/teddy_bear.png",
             "description": ("꾸준히 관계를 챙기는 당신에게, 다른 리듬과 새로운 재미를 더해줘요."),
         },
     ],
@@ -226,7 +228,7 @@ class OverviewOutput(BaseModel):
     noun: str = Field(description="MBTI에 따라 결정된 장난감 명사")
     result_name: str = Field(description="형용사와 명사를 합친 최종 결과명")
     character_id: str = Field(description="캐릭터 이미지 매핑용 고정 ID")
-    image_url: str = Field(description="서버가 제공하는 캐릭터 이미지 경로")
+    image_url: str = Field(description="서버가 제공하는 캐릭터 이미지 절대 URL")
     tags: list[str] = Field(min_length=3, max_length=3, description="말풍선 태그 3개")
 
 
@@ -246,6 +248,7 @@ class PackagingOutput(BaseModel):
         description="포장 상자 고정 ID"
     )
     name: str = Field(description="결과 페이지에 표시할 한글 이름")
+    image_url: str = Field(description="서버가 제공하는 포장 상자 이미지 절대 URL")
     tags: list[str] = Field(min_length=2, max_length=2, description="관련 성향 태그 2개")
     reason: str = Field(description="이 상자가 선택된 이유")
 
@@ -257,6 +260,7 @@ class OpeningToolOutput(BaseModel):
         description="개봉 도구 고정 ID"
     )
     name: str = Field(description="결과 페이지에 표시할 한글 이름")
+    image_url: str = Field(description="서버가 제공하는 개봉 도구 이미지 절대 URL")
     tags: list[str] = Field(min_length=2, max_length=2, description="관련 성향 태그 2개")
     reason: str = Field(description="이 도구가 선택된 이유")
 
@@ -310,7 +314,7 @@ class CompatibleFriendOutput(BaseModel):
     badge: str = Field(description="카드 상단 궁합 배지")
     noun: str = Field(description="추천 친구의 장난감 명사")
     character_id: str = Field(description="추천 친구 캐릭터의 고정 ID")
-    image_url: str = Field(description="추천 친구 캐릭터 이미지 경로")
+    image_url: str = Field(description="추천 친구 캐릭터 이미지 절대 URL")
     description: str = Field(description="사용자와 이 장난감이 잘 맞는 이유")
 
 
@@ -347,8 +351,29 @@ class AssessmentSubmissionOutput(BaseModel):
     )
 
     @classmethod
-    def from_domain(cls, result: SubmissionResultData) -> "AssessmentSubmissionOutput":
-        return cls.model_validate(asdict(result))
+    def from_domain(
+        cls,
+        result: SubmissionResultData,
+        *,
+        public_base_url: str,
+    ) -> "AssessmentSubmissionOutput":
+        payload = asdict(result)
+
+        def absolute_url(path: str) -> str:
+            if path.startswith(("http://", "https://")):
+                return path
+            return f"{public_base_url.rstrip('/')}/{path.lstrip('/')}"
+
+        payload["overview"]["image_url"] = absolute_url(payload["overview"]["image_url"])
+        payload["unboxing_kit"]["packaging"]["image_url"] = absolute_url(
+            payload["unboxing_kit"]["packaging"]["image_url"]
+        )
+        payload["unboxing_kit"]["opening_tool"]["image_url"] = absolute_url(
+            payload["unboxing_kit"]["opening_tool"]["image_url"]
+        )
+        for friend in payload["compatible_friends"]:
+            friend["image_url"] = absolute_url(friend["image_url"])
+        return cls.model_validate(payload)
 
 
 class ErrorDetail(BaseModel):

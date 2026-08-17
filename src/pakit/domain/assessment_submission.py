@@ -40,6 +40,7 @@ class AxisScoresData:
 class UnboxingItemData:
     type: str
     name: str
+    image_url: str
     tags: tuple[str, ...]
     reason: str
 

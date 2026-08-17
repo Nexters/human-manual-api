@@ -42,9 +42,19 @@ def _result() -> SubmissionResultData:
             title="테스트 제목",
             description="테스트 설명",
             packaging=UnboxingItemData(
-                "minimal_box", "미니멀 상자", ("직진형", "거리조절형"), "이유"
+                "minimal_box",
+                "미니멀 상자",
+                "/assets/packaging_boxes/minimal_box.png",
+                ("직진형", "거리조절형"),
+                "이유",
             ),
-            opening_tool=UnboxingItemData("chainsaw", "전기톱", ("탐험형", "테토형"), "이유"),
+            opening_tool=UnboxingItemData(
+                "chainsaw",
+                "전기톱",
+                "/assets/opening_tools/chainsaw.png",
+                ("탐험형", "테토형"),
+                "이유",
+            ),
         ),
         features=(FeatureData("특징", "설명"),) * 4,
         character_story=CharacterStoryData("이야기", "설명"),
@@ -157,6 +167,8 @@ def test_restores_a_legacy_snapshot_without_a_participant() -> None:
         snapshot.pop("participant")
         snapshot.pop("compatibility_profile")
         snapshot.pop("compatible_friends")
+        snapshot["unboxing_kit"]["packaging"].pop("image_url")
+        snapshot["unboxing_kit"]["opening_tool"].pop("image_url")
         snapshot["result_code"] = "legacy01"
         sessions = async_sessionmaker(engine, expire_on_commit=False)
         async with sessions() as session:
@@ -178,5 +190,11 @@ def test_restores_a_legacy_snapshot_without_a_participant() -> None:
         assert restored.participant is None
         assert restored.compatibility_profile is None
         assert restored.compatible_friends == ()
+        assert restored.unboxing_kit.packaging.image_url == (
+            "/assets/packaging_boxes/minimal_box.png"
+        )
+        assert restored.unboxing_kit.opening_tool.image_url == (
+            "/assets/opening_tools/chainsaw.png"
+        )
 
     asyncio.run(run())
