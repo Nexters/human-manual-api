@@ -46,7 +46,7 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
     "result_code": "aB3dE7_x",
     "participant": {"nickname": "송송"},
     "overview": {
-        "rarity": "상위 4%",
+        "rarity": "상위 3.2%",
         "adjective": "옷 예쁘게 입고 플러팅 했다고 하는",
         "noun": "팽이",
         "result_name": "옷 예쁘게 입고 플러팅 했다고 하는 팽이",

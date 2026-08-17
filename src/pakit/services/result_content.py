@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-17.7"
+RESULT_CONTENT_VERSION = "2026-08-18.1"
 
 
 @dataclass(frozen=True)
@@ -75,6 +75,26 @@ MBTI_MIDDLE_GROUP: dict[MbtiType, str] = {
     MbtiType.ESFJ: "SF",
     MbtiType.ISFP: "SF",
     MbtiType.ESFP: "SF",
+}
+
+
+MBTI_RARITY_COPY: dict[MbtiType, str] = {
+    MbtiType.INFJ: "상위 1.5%",
+    MbtiType.ENTJ: "상위 1.8%",
+    MbtiType.INTJ: "상위 2.1%",
+    MbtiType.ENFJ: "상위 2.5%",
+    MbtiType.ENTP: "상위 3.2%",
+    MbtiType.INTP: "상위 3.3%",
+    MbtiType.ESTP: "상위 4.3%",
+    MbtiType.INFP: "상위 4.4%",
+    MbtiType.ISTP: "상위 5.4%",
+    MbtiType.ENFP: "상위 8.1%",
+    MbtiType.ESFP: "상위 8.5%",
+    MbtiType.ESTJ: "상위 8.7%",
+    MbtiType.ISFP: "상위 8.8%",
+    MbtiType.ISTJ: "상위 11.6%",
+    MbtiType.ESFJ: "상위 12.3%",
+    MbtiType.ISFJ: "상위 13.5%",
 }
 
 

@@ -259,9 +259,9 @@ def _build_sections() -> list[tuple[str, str, str, str, str, str]]:
   <div class="fixed-note">
     <h4>고정/미정 값</h4>
     <ul>
-      <li><b>희귀도</b> <span class="val">상위 4%</span> — 하드코딩(전원 동일)</li>
+      <li><b>희귀도</b> MBTI별 확정 비율 — 예: ENTP <span class="val">상위 3.2%</span></li>
       <li><b>상단 태그</b> 도파민 MAX · 장난꾸러기 · 혼자서도 잘 놀아요 — 하드코딩</li>
-      <li>기획상 overview는 통계 기반 예정, 규칙 미정</li>
+      <li>희귀도는 결과 생성 시 MBTI별 고정 매핑으로 결정</li>
     </ul>
   </div>
 </div>"""

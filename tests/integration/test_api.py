@@ -448,7 +448,7 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
     assert response.status_code == 200
     body = response.json()
     assert body["overview"] | {"tags": []} == {
-        "rarity": "상위 4%",
+        "rarity": "상위 3.3%",
         "adjective": '"어디야" 물을 때마다 다른 나라 가 있는',
         "noun": "망원경",
         "result_name": '"어디야" 물을 때마다 다른 나라 가 있는 망원경',

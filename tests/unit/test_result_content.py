@@ -8,6 +8,7 @@ from pakit.services.result_content import (
     CONFLICT_SUPPORT_COPY,
     EMOTIONAL_PROCESSING_COPY,
     MBTI_MIDDLE_GROUP,
+    MBTI_RARITY_COPY,
     MBTI_STRENGTH_COPY,
     MOTIVATION_COPY,
     MOTIVATION_DESCRIPTION,
@@ -102,6 +103,28 @@ def test_defines_one_distinct_strength_for_every_mbti() -> None:
     }
 
 
+def test_defines_confirmed_rarity_for_every_mbti() -> None:
+    assert set(MBTI_RARITY_COPY) == set(MbtiType)
+    assert {mbti.value: rarity for mbti, rarity in MBTI_RARITY_COPY.items()} == {
+        "INFJ": "상위 1.5%",
+        "ENTJ": "상위 1.8%",
+        "INTJ": "상위 2.1%",
+        "ENFJ": "상위 2.5%",
+        "ENTP": "상위 3.2%",
+        "INTP": "상위 3.3%",
+        "ESTP": "상위 4.3%",
+        "INFP": "상위 4.4%",
+        "ISTP": "상위 5.4%",
+        "ENFP": "상위 8.1%",
+        "ESFP": "상위 8.5%",
+        "ESTJ": "상위 8.7%",
+        "ISFP": "상위 8.8%",
+        "ISTJ": "상위 11.6%",
+        "ESFJ": "상위 12.3%",
+        "ISFJ": "상위 13.5%",
+    }
+
+
 def test_defines_every_emotional_processing_quadrant() -> None:
     assert set(EMOTIONAL_PROCESSING_COPY) == {
         ("explore", "egen"),
@@ -192,7 +215,7 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-17.7"
+    assert RESULT_CONTENT_VERSION == "2026-08-18.1"
 
 
 def test_defines_all_warning_copy_variants() -> None:

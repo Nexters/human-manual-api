@@ -31,6 +31,7 @@ from pakit.services.motivation_service import build_motivation_feature
 from pakit.services.result_content import (
     CHARACTER_STORY_COPY,
     COMBINATION_COPY,
+    MBTI_RARITY_COPY,
     MBTI_STRENGTH_COPY,
     OPENING_TOOL_COPY,
     PACKAGING_COPY,
@@ -151,7 +152,7 @@ def _build_result(
         result_code=result_code,
         participant=ResultParticipantData(nickname=submission.nickname),
         overview=OverviewData(
-            rarity="상위 4%",
+            rarity=MBTI_RARITY_COPY[submission.mbti],
             adjective=adjective,
             noun=character.noun,
             result_name=f"{adjective} {character.noun}",
