@@ -83,12 +83,22 @@ class RelationshipTipData:
 
 
 @dataclass(frozen=True)
+class CompatibilityDetailData:
+    key: Literal["distance", "conflict", "care", "pace"]
+    score: int
+    title: str
+    label: str
+    description: str
+
+
+@dataclass(frozen=True)
 class CompatibilityData:
     mine: CompatibilityPersonData
     friend: CompatibilityPersonData
     headline: str
     description: str
     synergy: SynergyData
+    details: tuple[CompatibilityDetailData, ...]
     tips: tuple[CompatibilityTipData, ...]
     relationship_tip: RelationshipTipData
 
@@ -203,6 +213,34 @@ SUPPORT_TIPS = {
     "give_me_space": "바로 답을 재촉하지 않고 혼자 정리할 시간을 주면 다시 편하게 돌아와요.",
     "solve_together": "공감만 하고 끝내기보다 지금 할 수 있는 일을 함께 찾으면 든든해해요.",
     "make_me_laugh": "분위기가 무거워질 때 취향 맞는 웃음을 건네면 마음의 문이 빨리 열려요.",
+}
+
+SUPPORT_NEED_COPY = {
+    "listen_to_me": "이야기를 충분히 들어줄 때",
+    "take_me_out": "밖으로 불러내 함께 움직일 때",
+    "give_me_space": "혼자 정리할 시간을 받을 때",
+    "solve_together": "같이 해결책을 찾을 때",
+    "make_me_laugh": "같이 웃으며 분위기를 바꿀 때",
+}
+
+AFFECTION_STYLE_COPY = {
+    "express_with_words": "말과 반응으로 마음을 보여주는 편이에요.",
+    "express_with_actions": "말보다 행동으로 마음을 보여주는 편이에요.",
+}
+
+RELATIONSHIP_ROLE_COPY = {
+    "guide": "방향을 잡는",
+    "connector": "사람과 이야기를 이어주는",
+    "organizer": "말 나온 일을 실제로 만드는",
+    "supporter": "주변 사람을 살피고 챙기는",
+    "energizer": "분위기를 끌어올리는",
+}
+
+MOTIVATION_COPY = {
+    "novelty": "새로운 게 보여야",
+    "fun": "재밌는 일이 생겨야",
+    "people_duty": "필요로 하는 사람이나 지킬 약속이 있어야",
+    "achievement": "끝낼 목표가 보여야",
 }
 
 
@@ -345,7 +383,7 @@ def compatibility_headline(score: int) -> tuple[str, str]:
         )
     return (
         "사용설명서가 필요한 장난감",
-        "잘못된 조합이 아니라 서로의 신호를 번역하는 시간이 필요한 사이예요.",
+        "서로 편한 방식이 달라, 각자의 사용법을 알아갈 시간이 필요한 사이예요.",
     )
 
 
@@ -410,6 +448,184 @@ def _tip_for(
     return SUPPORT_TIPS[other_profile.support_preference]
 
 
+def _detail_label(score: int) -> str:
+    if score >= 88:
+        return "자연스럽게 맞아요"
+    if score >= 74:
+        return "다름이 잘 섞여요"
+    if score >= 60:
+        return "조금 맞춰가면 돼요"
+    return "서로의 설명서가 필요해요"
+
+
+def _distance_detail(
+    mine: SubmissionResultData,
+    friend: SubmissionResultData,
+    score: int,
+) -> CompatibilityDetailData:
+    assert mine.participant is not None and friend.participant is not None
+    mine_name = mine.participant.nickname
+    friend_name = friend.participant.nickname
+    mine_attachment = mine.unboxing_kit.axis_scores.attachment
+    friend_attachment = friend.unboxing_kit.axis_scores.attachment
+    if abs(mine_attachment - friend_attachment) <= 15:
+        if (mine_attachment + friend_attachment) / 2 >= 50:
+            description = (
+                f"{mine_name}님과 {friend_name}님은 모두 자주 안부를 나누고 가까이 있을 때 "
+                "관계가 단단하다고 느껴요."
+            )
+        else:
+            description = (
+                f"{mine_name}님과 {friend_name}님은 연락이 잠시 뜸해도 각자의 시간을 "
+                "편하게 믿을 수 있어요."
+            )
+    else:
+        closer_name, independent_name = (
+            (mine_name, friend_name)
+            if mine_attachment > friend_attachment
+            else (friend_name, mine_name)
+        )
+        description = (
+            f"{closer_name}님은 자주 연결될수록 안심하고, {independent_name}님은 각자의 시간을 "
+            "보장받을수록 편해져요. 애정의 크기보다 편한 간격이 다른 사이예요."
+        )
+    return CompatibilityDetailData(
+        key="distance",
+        score=score,
+        title="우리 사이의 거리감",
+        label=_detail_label(score),
+        description=description,
+    )
+
+
+def _conflict_detail(
+    mine: SubmissionResultData,
+    friend: SubmissionResultData,
+    score: int,
+) -> CompatibilityDetailData:
+    assert mine.participant is not None and friend.participant is not None
+    mine_profile = mine.compatibility_profile
+    friend_profile = friend.compatibility_profile
+    assert mine_profile is not None and friend_profile is not None
+    mine_name = mine.participant.nickname
+    friend_name = friend.participant.nickname
+    if mine_profile.conflict_style == friend_profile.conflict_style:
+        if mine_profile.conflict_style == "resolve_immediately":
+            description = (
+                f"{mine_name}님과 {friend_name}님은 서운한 일을 오래 묵히기보다 바로 확인해야 "
+                "마음이 풀려요. 솔직한 대신 말의 온도만 챙기면 회복이 빠른 조합이에요."
+            )
+        else:
+            description = (
+                f"{mine_name}님과 {friend_name}님은 마음을 먼저 정리한 뒤 이야기하는 편이에요. "
+                "침묵이 길어질 때 다시 대화할 시점만 알려주면 오해가 줄어요."
+            )
+    else:
+        direct_name, pause_name = (
+            (mine_name, friend_name)
+            if mine_profile.conflict_style == "resolve_immediately"
+            else (friend_name, mine_name)
+        )
+        description = (
+            f"{direct_name}님은 바로 확인해야 마음이 놓이고, {pause_name}님은 생각을 정리할 "
+            "시간이 필요해요. 한쪽의 질문은 공격이 아니고, 다른 쪽의 침묵은 회피가 아니에요."
+        )
+    return CompatibilityDetailData(
+        key="conflict",
+        score=score,
+        title="서운함을 푸는 속도",
+        label=_detail_label(score),
+        description=description,
+    )
+
+
+def _care_detail(
+    mine: SubmissionResultData,
+    friend: SubmissionResultData,
+    score: int,
+) -> CompatibilityDetailData:
+    assert mine.participant is not None and friend.participant is not None
+    mine_profile = mine.compatibility_profile
+    friend_profile = friend.compatibility_profile
+    assert mine_profile is not None and friend_profile is not None
+    mine_name = mine.participant.nickname
+    friend_name = friend.participant.nickname
+    same_support = mine_profile.support_preference == friend_profile.support_preference
+    same_affection = mine_profile.affection_style == friend_profile.affection_style
+    if same_support:
+        shared_need = SUPPORT_NEED_COPY[mine_profile.support_preference]
+        if same_affection:
+            description = (
+                f"{mine_name}님과 {friend_name}님은 모두 {shared_need} 마음이 풀려요. 애정을 "
+                f"표현할 때도 둘 다 {AFFECTION_STYLE_COPY[mine_profile.affection_style]} "
+                "서로의 챙김을 비교적 쉽게 알아보는 조합이에요."
+            )
+            label = "위로도 표현도 닮았어요"
+        else:
+            description = (
+                f"{mine_name}님과 {friend_name}님은 모두 {shared_need} 마음이 풀려요. 다만 "
+                f"{mine_name}님은 {AFFECTION_STYLE_COPY[mine_profile.affection_style]} "
+                f"{friend_name}님은 {AFFECTION_STYLE_COPY[friend_profile.affection_style]} "
+                "원하는 위로는 같지만 애정이 보이는 모양은 달라요."
+            )
+            label = "원하는 위로는 같아요"
+    else:
+        description = (
+            f"{mine_name}님은 {SUPPORT_NEED_COPY[mine_profile.support_preference]} 마음이 풀리고, "
+            f"{friend_name}님은 {SUPPORT_NEED_COPY[friend_profile.support_preference]} 마음이 "
+            f"풀려요. {mine_name}님은 {AFFECTION_STYLE_COPY[mine_profile.affection_style]} "
+            f"{friend_name}님은 {AFFECTION_STYLE_COPY[friend_profile.affection_style]} 서로 원하는 "
+            "위로를 미리 말해두면 애정이 엇갈리지 않아요."
+        )
+        label = "서로의 위로법을 알아가요"
+    return CompatibilityDetailData(
+        key="care",
+        score=score,
+        title="마음을 주고받는 방식",
+        label=label,
+        description=description,
+    )
+
+
+def _pace_detail(
+    mine: SubmissionResultData,
+    friend: SubmissionResultData,
+    score: int,
+) -> CompatibilityDetailData:
+    assert mine.participant is not None and friend.participant is not None
+    mine_profile = mine.compatibility_profile
+    friend_profile = friend.compatibility_profile
+    assert mine_profile is not None and friend_profile is not None
+    mine_name = mine.participant.nickname
+    friend_name = friend.participant.nickname
+    description = (
+        f"{mine_name}님은 관계에서 {RELATIONSHIP_ROLE_COPY[mine_profile.relationship_role]} 역할을 "
+        f"맡고, {MOTIVATION_COPY[mine_profile.motivation]} 잘 움직여요. {friend_name}님은 "
+        f"{RELATIONSHIP_ROLE_COPY[friend_profile.relationship_role]} 역할을 맡고, "
+        f"{MOTIVATION_COPY[friend_profile.motivation]} 힘이 나요."
+    )
+    return CompatibilityDetailData(
+        key="pace",
+        score=score,
+        title="약속과 행동의 리듬",
+        label=_detail_label(score),
+        description=description,
+    )
+
+
+def _compatibility_details(
+    mine: SubmissionResultData,
+    friend: SubmissionResultData,
+    scores: CompatibilityScores,
+) -> tuple[CompatibilityDetailData, ...]:
+    return (
+        _distance_detail(mine, friend, scores.distance),
+        _conflict_detail(mine, friend, scores.conflict),
+        _care_detail(mine, friend, scores.care),
+        _pace_detail(mine, friend, scores.pace),
+    )
+
+
 def _person(result: SubmissionResultData) -> CompatibilityPersonData:
     if result.participant is None:
         raise CompatibilityUnavailableError
@@ -455,6 +671,7 @@ def build_compatibility(
             description=synergy_description,
             tags=(synergy_tag, _mbti_tag(mine_profile.mbti, friend_profile.mbti)),
         ),
+        details=_compatibility_details(mine, friend, scores),
         tips=(
             CompatibilityTipData(
                 target="mine",

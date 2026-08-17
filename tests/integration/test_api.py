@@ -145,6 +145,7 @@ def test_serves_manual_compatibility_test_page() -> None:
     assert response.status_code == 200
     assert "친구 궁합 테스트" in response.text
     assert "/api/compatibility?" in response.text
+    assert "data.details.map" in response.text
     assert 'id="mine-image"' in response.text
     assert 'id="friend-image"' in response.text
     assert "data.synergy.score" in response.text
@@ -231,6 +232,7 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
         "headline",
         "description",
         "synergy",
+        "details",
         "tips",
         "relationship_tip",
     }
@@ -316,6 +318,14 @@ def test_calculates_friend_compatibility_from_two_saved_results() -> None:
     }
     assert 0 <= body["synergy"]["score"] <= 100
     assert len(body["synergy"]["tags"]) == 2
+    assert [detail["key"] for detail in body["details"]] == [
+        "distance",
+        "conflict",
+        "care",
+        "pace",
+    ]
+    assert all(body["mine"]["nickname"] in detail["description"] for detail in body["details"])
+    assert all(body["friend"]["nickname"] in detail["description"] for detail in body["details"])
     assert [tip["target"] for tip in body["tips"]] == ["mine", "friend"]
     assert body["tips"][0]["image_url"] == body["mine"]["image_url"]
     assert body["tips"][1]["image_url"] == body["friend"]["image_url"]

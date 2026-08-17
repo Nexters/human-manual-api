@@ -23,6 +23,49 @@ COMPATIBILITY_RESPONSE_EXAMPLE: dict[str, Any] = {
         "description": ("계획을 세우고 움직이는 속도가 맞아 함께할 때 일이 자연스럽게 이어져요."),
         "tags": ["함께 잘 움직여요", "아이디어가 통해요"],
     },
+    "details": [
+        {
+            "key": "distance",
+            "score": 72,
+            "title": "우리 사이의 거리감",
+            "label": "조금 맞춰가면 돼요",
+            "description": (
+                "지은님은 각자의 시간을 보장받을수록 편하고, 선우님은 자주 연결될수록 "
+                "안심해요. 애정의 크기보다 편한 간격이 다른 사이예요."
+            ),
+        },
+        {
+            "key": "conflict",
+            "score": 68,
+            "title": "서운함을 푸는 속도",
+            "label": "조금 맞춰가면 돼요",
+            "description": (
+                "지은님은 바로 확인해야 마음이 놓이고, 선우님은 생각을 정리할 시간이 "
+                "필요해요. 질문은 공격이 아니고 침묵은 회피가 아니에요."
+            ),
+        },
+        {
+            "key": "care",
+            "score": 84,
+            "title": "마음을 주고받는 방식",
+            "label": "서로의 위로법을 알아가요",
+            "description": (
+                "지은님은 같이 웃으며 분위기를 바꿀 때 마음이 풀리고, 선우님은 혼자 정리할 "
+                "시간을 받을 때 마음이 풀려요. 서로 원하는 위로를 미리 말해두면 애정이 "
+                "엇갈리지 않아요."
+            ),
+        },
+        {
+            "key": "pace",
+            "score": 91,
+            "title": "약속과 행동의 리듬",
+            "label": "자연스럽게 맞아요",
+            "description": (
+                "지은님은 분위기를 끌어올리고 재밌는 일이 생기면 움직여요. 선우님은 "
+                "사람을 챙기고 지킬 약속이 있을 때 힘이 나요."
+            ),
+        },
+    ],
     "tips": [
         {
             "target": "mine",
@@ -81,6 +124,18 @@ class CompatibilityTipOutput(BaseModel):
     description: str = Field(description="팁 설명")
 
 
+class CompatibilityDetailOutput(BaseModel):
+    """두 사람의 관계를 한 가지 관점에서 비교한 상세 분석입니다."""
+
+    key: Literal["distance", "conflict", "care", "pace"] = Field(
+        description="상세 분석 영역의 고정 ID"
+    )
+    score: int = Field(ge=0, le=100, description="해당 영역의 궁합 점수")
+    title: str = Field(description="상세 분석 제목")
+    label: str = Field(description="점수 구간을 직관적으로 설명하는 라벨")
+    description: str = Field(description="두 사람의 실제 차이와 관계 장면을 설명하는 문장")
+
+
 class RelationshipTipOutput(BaseModel):
     """관계를 오래 유지하기 위한 공통 팁입니다."""
 
@@ -98,6 +153,11 @@ class CompatibilityOutput(BaseModel):
     headline: str = Field(description="궁합 결과 제목")
     description: str = Field(description="궁합 결과 한 줄 설명")
     synergy: SynergyOutput = Field(description="두 사람이 만드는 시너지")
+    details: list[CompatibilityDetailOutput] = Field(
+        min_length=4,
+        max_length=4,
+        description="거리감·갈등·위로·행동 리듬 상세 분석 4개",
+    )
     tips: list[CompatibilityTipOutput] = Field(
         min_length=2,
         max_length=2,

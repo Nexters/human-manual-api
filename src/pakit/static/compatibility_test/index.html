@@ -32,6 +32,13 @@
     .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
     .tag { padding: 7px 12px; border-radius: 999px; background: #ffe5f6; color: #ed3faf; }
     .section-title { margin: 36px 0 12px; text-align: center; }
+    .analysis { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .analysis-card { margin-top: 0; }
+    .analysis-heading { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
+    .analysis-heading h3 { margin: 0; }
+    .analysis-score { color: #173bff; font-weight: 800; }
+    .analysis-label { margin: 7px 0 12px; color: #ed3faf; font-weight: 700; }
+    .analysis-description { color: #596273; line-height: 1.65; }
     .tips { display: grid; gap: 12px; }
     .tip { display: grid; grid-template-columns: 84px 1fr; align-items: center; gap: 16px; }
     .tip img { width: 76px; height: 76px; object-fit: contain; }
@@ -44,6 +51,7 @@
       form { grid-template-columns: 1fr; }
       .person img { width: 140px; height: 140px; }
       .synergy { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+      .analysis { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -85,6 +93,9 @@
         <div id="synergy-tags" class="tags"></div>
       </div>
     </section>
+
+    <h2 class="section-title">우리 사이를 더 자세히 보면</h2>
+    <section id="analysis" class="analysis"></section>
 
     <h2 class="section-title">함께 있을 때 기억해주세요</h2>
     <section id="tips" class="tips"></section>
@@ -137,6 +148,26 @@
           tag.className = "tag";
           tag.textContent = text;
           return tag;
+        }));
+        document.querySelector("#analysis").replaceChildren(...data.details.map((detail) => {
+          const card = document.createElement("article");
+          card.className = "card analysis-card";
+          const heading = document.createElement("div");
+          heading.className = "analysis-heading";
+          const title = document.createElement("h3");
+          title.textContent = detail.title;
+          const score = document.createElement("span");
+          score.className = "analysis-score";
+          score.textContent = detail.score;
+          heading.append(title, score);
+          const label = document.createElement("p");
+          label.className = "analysis-label";
+          label.textContent = detail.label;
+          const description = document.createElement("p");
+          description.className = "analysis-description";
+          description.textContent = detail.description;
+          card.append(heading, label, description);
+          return card;
         }));
         document.querySelector("#tips").replaceChildren(...data.tips.map((tip) => {
           const card = document.createElement("article");

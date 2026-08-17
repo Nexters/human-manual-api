@@ -180,6 +180,82 @@ def test_distance_tip_names_the_person_whose_contact_may_slow_down() -> None:
     )
 
 
+def test_returns_four_detailed_conversation_topics() -> None:
+    mine = _result(
+        code="mine0001",
+        nickname="지은",
+        mbti="ENTP",
+        scores=AxisScoresData(20, 100, 0, 33),
+        support="make_me_laugh",
+        affection="express_with_words",
+        role="energizer",
+        motivation="fun",
+    )
+    friend = _result(
+        code="frnd0001",
+        nickname="선우",
+        mbti="ISFJ",
+        scores=AxisScoresData(80, 20, 100, 100),
+        support="give_me_space",
+        conflict="hint_and_wait",
+        affection="express_with_actions",
+        role="supporter",
+        motivation="people_duty",
+    )
+
+    details = build_compatibility(mine, friend).details
+
+    assert [detail.key for detail in details] == ["distance", "conflict", "care", "pace"]
+    assert all(0 <= detail.score <= 100 for detail in details)
+    assert all("지은" in detail.description for detail in details)
+    assert all("선우" in detail.description for detail in details)
+    assert "애정의 크기보다 편한 간격" in details[0].description
+    assert "질문은 공격이 아니고" in details[1].description
+    assert details[2].title == "마음을 주고받는 방식"
+    assert "같이 웃으며 분위기를 바꿀 때" in details[2].description
+    assert "재밌는 일이 생겨야" in details[3].description
+
+
+def test_summarizes_a_shared_support_need_without_repeating_each_person() -> None:
+    axes = AxisScoresData(50, 50, 50, 50)
+    mine = _result(
+        code="mine0001",
+        nickname="잉뿌삐",
+        mbti="INFP",
+        scores=axes,
+        support="listen_to_me",
+        affection="express_with_words",
+    )
+    friend = _result(
+        code="frnd0001",
+        nickname="이해선",
+        mbti="ENTP",
+        scores=axes,
+        support="listen_to_me",
+        affection="express_with_actions",
+    )
+
+    care = build_compatibility(mine, friend).details[2]
+
+    assert care.label == "원하는 위로는 같아요"
+    assert care.description == (
+        "잉뿌삐님과 이해선님은 모두 이야기를 충분히 들어줄 때 마음이 풀려요. 다만 "
+        "잉뿌삐님은 말과 반응으로 마음을 보여주는 편이에요. 이해선님은 말보다 행동으로 "
+        "마음을 보여주는 편이에요. 원하는 위로는 같지만 애정이 보이는 모양은 달라요."
+    )
+
+
+def test_recognizes_when_support_and_affection_are_both_shared() -> None:
+    axes = AxisScoresData(50, 50, 50, 50)
+    mine = _result(code="mine0001", nickname="지은", mbti="ENTP", scores=axes)
+    friend = _result(code="frnd0001", nickname="선우", mbti="ENTP", scores=axes)
+
+    care = build_compatibility(mine, friend).details[2]
+
+    assert care.label == "위로도 표현도 닮았어요"
+    assert "서로의 챙김을 비교적 쉽게 알아보는 조합" in care.description
+
+
 def test_rejects_a_legacy_result_without_a_compatibility_profile() -> None:
     axes = AxisScoresData(50, 50, 50, 50)
     mine = _result(code="mine0001", nickname="나", mbti="ENTP", scores=axes)
@@ -205,6 +281,13 @@ def test_rejects_a_legacy_result_without_a_compatibility_profile() -> None:
 )
 def test_compatibility_headline_boundaries(score: int, expected_title: str) -> None:
     assert compatibility_headline(score)[0] == expected_title
+
+
+def test_low_compatibility_headline_explains_the_difference_without_judging_the_pair() -> None:
+    assert compatibility_headline(63) == (
+        "사용설명서가 필요한 장난감",
+        "서로 편한 방식이 달라, 각자의 사용법을 알아갈 시간이 필요한 사이예요.",
+    )
 
 
 @pytest.mark.parametrize("mbti", list(MbtiType))
