@@ -41,7 +41,7 @@ step1.q08`의 24개 조합으로 결정한다. 계산 규칙이 확정되지 않
 | 결과 조회 | `result_code` | 무작위로 생성한 URL-safe 8자리 고유 코드 |
 | 참여자 | `participant.nickname` | 결과 화면에 표시하는 이름 또는 닉네임 |
 | 장난감 소개 | `overview` | 희귀도, 형용사, 명사, 최종 결과명, 캐릭터 ID, 태그 |
-| 언박싱 키트 | `unboxing_kit` | 성향 축 4개 점수, 요약, 포장 상자, 개봉 도구 |
+| 언박싱 키트 | `unboxing_kit` | 성향 축 4개 점수, 포장 상자, 개봉 도구 |
 | 핵심 특징 | `features` | 4개의 제목과 한 줄 설명 |
 | 장난감 이야기 | `character_story` | 특징과 메인 장난감을 연결하는 제목과 줄글 |
 | 사용 방법 | `can_do` | 사용자가 좋아하는 행동 4개 |
@@ -71,8 +71,6 @@ step1.q08`의 24개 조합으로 결정한다. 계산 규칙이 확정되지 않
 | `axis_scores.expression` | integer | 탐색 `0` ↔ 직진 `100` |
 | `axis_scores.routine` | integer | 탐험 `0` ↔ 루틴 `100` |
 | `axis_scores.egen` | integer | 테토 `0` ↔ 에겐 `100` |
-| `title` | string | 유형 요약 제목 |
-| `description` | string | 유형 설명 |
 | `packaging` | object | 포장 상자 정보 |
 | `opening_tool` | object | 개봉 도구 정보 |
 
@@ -195,8 +193,6 @@ MBTI는 사용하지 않는다. 사용자가 실제로 고른 두 행동을 선�
       "routine": 20,
       "egen": 75
     },
-    "title": "밤이 깊어질수록 텐션이 올라가는 장난꾸러기",
-    "description": "해가 지면 비로소 에너지가 충전되는 타입이에요.",
     "packaging": {
       "type": "fragile_box",
       "name": "취급주의 상자",

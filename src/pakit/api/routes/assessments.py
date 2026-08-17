@@ -48,7 +48,7 @@ results_router = APIRouter(prefix="/results", tags=["Test"])
         "`overview`, `unboxing_kit`, "
         "`features`, `character_story`, `can_do`, "
         "`warnings`, `charging`을 반환합니다. 형용사·장난감·캐릭터·이미지·성향 점수·"
-        "조합 소개·포장 상자·개봉 도구·핵심 특징·장난감 이야기는 제출값으로 결정됩니다. "
+        "포장 상자·개봉 도구·핵심 특징·장난감 이야기는 제출값으로 결정됩니다. "
         "희귀도·상단 태그·"
         "사용 방법과 주의사항, 충전 설명과 활동도 제출값으로 결정됩니다. 계산 규칙이 "
         "확정되지 않은 충전 점수는 반환하지 않습니다."

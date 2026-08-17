@@ -61,12 +61,6 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
             "routine": 67,
             "egen": 100,
         },
-        "title": "안 친한 척하면서 안부는 꼬박꼬박 챙기는 사람",
-        "description": (
-            "좋아하는 티는 죽어도 안 내는데, 행동이 이미 다 말하고 있어요. 지나가듯 한 말을 "
-            "기억했다가 슬쩍 내밀고, 익숙해진 옆자리는 조용히 지키죠. 가까워지는 덴 느려도 "
-            "한번 데워지면 안 식는 은은한 온돌 타입이에요."
-        ),
         "packaging": {
             "type": "matryoshka_box",
             "name": "마트료시카 상자",
@@ -260,8 +254,6 @@ class UnboxingKitOutput(BaseModel):
     """성향 점수와 그 점수로 결정된 언박싱 키트입니다."""
 
     axis_scores: AxisScoresOutput = Field(description="성향 축 4개 점수")
-    title: str = Field(description="성향 요약 제목")
-    description: str = Field(description="성향 요약 설명")
     packaging: PackagingOutput = Field(description="포장 상자")
     opening_tool: OpeningToolOutput = Field(description="개봉 도구")
 

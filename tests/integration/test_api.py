@@ -123,6 +123,8 @@ def test_serves_manual_assessment_test_page() -> None:
     assert "data.unboxing_kit.packaging.image_url" in response.text
     assert 'id="tool-image"' in response.text
     assert "data.unboxing_kit.opening_tool.image_url" in response.text
+    assert 'id="summary-title"' not in response.text
+    assert "data.unboxing_kit.title" not in response.text
     assert 'id="compatible-friends"' in response.text
     assert "data.compatible_friends.map" in response.text
     assert 'id="compatibility-link"' in response.text
@@ -213,6 +215,12 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
     assert result_code_schema["pattern"] == "^[A-Za-z0-9_-]{8}$"
     charging_schema = document["components"]["schemas"]["ChargingOutput"]
     assert set(charging_schema["properties"]) == {"description", "activities"}
+    unboxing_schema = document["components"]["schemas"]["UnboxingKitOutput"]
+    assert set(unboxing_schema["properties"]) == {
+        "axis_scores",
+        "packaging",
+        "opening_tool",
+    }
     compatibility_schema = document["components"]["schemas"]["CompatibilityOutput"]
     assert set(compatibility_schema["properties"]) == {
         "mine",
@@ -477,7 +485,7 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
         "routine": 0,
         "egen": 33,
     }
-    assert body["unboxing_kit"]["title"] == "고백도 통보로 하는 사람"
+    assert set(body["unboxing_kit"]) == {"axis_scores", "packaging", "opening_tool"}
     assert body["unboxing_kit"]["packaging"]["type"] == "minimal_box"
     assert body["unboxing_kit"]["opening_tool"]["type"] == "chainsaw"
     assert body["features"] == [

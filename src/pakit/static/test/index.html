@@ -68,10 +68,6 @@
     <h2 id="result-name"></h2>
     <p id="axes"></p>
     <div class="copy-card">
-      <h3 id="summary-title"></h3>
-      <p id="summary-description"></p>
-    </div>
-    <div class="copy-card">
       <img id="packaging-image" class="item-image" alt="포장 상자">
       <h3 id="packaging-name"></h3>
       <p id="packaging-tags"></p>
@@ -209,8 +205,6 @@
         document.querySelector("#character").src = data.overview.image_url;
         document.querySelector("#result-name").textContent = data.overview.result_name;
         document.querySelector("#axes").textContent = Object.entries(data.unboxing_kit.axis_scores).map(([key,value]) => `${key}: ${value}`).join(" · ");
-        document.querySelector("#summary-title").textContent = data.unboxing_kit.title;
-        document.querySelector("#summary-description").textContent = data.unboxing_kit.description;
         document.querySelector("#packaging-image").src = data.unboxing_kit.packaging.image_url;
         document.querySelector("#packaging-name").textContent = `포장: ${data.unboxing_kit.packaging.name}`;
         document.querySelector("#packaging-tags").textContent = data.unboxing_kit.packaging.tags.join(" · ");
