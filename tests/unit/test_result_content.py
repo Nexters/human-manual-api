@@ -30,6 +30,28 @@ def test_defines_one_distinct_character_story_for_every_mbti() -> None:
     assert all(copy.title and copy.description for copy in CHARACTER_STORY_COPY.values())
 
 
+def test_uses_confirmed_estj_helicopter_story() -> None:
+    story = CHARACTER_STORY_COPY[MbtiType.ESTJ]
+
+    assert story.title == "정해진 순서를 건너뛰지 않고 현장을 책임지는 헬리콥터"
+    assert story.description == (
+        "헬리콥터는 급한 상황일수록 점검 순서를 먼저 밟아요. 늘 하던 방식으로 상태를 확인한 뒤 "
+        "필요한 자리에 정확히 내려가, 누가 무엇을 언제 할지 분명하게 정리하죠. 검증된 방식으로 "
+        "현장을 맡아 끝까지 책임지는 모습이 닮아 헬리콥터가 도착했습니다."
+    )
+
+
+def test_uses_confirmed_intp_telescope_story() -> None:
+    story = CHARACTER_STORY_COPY[MbtiType.INTP]
+
+    assert story.title == "원리를 알아야 비로소 초점이 잡히는 망원경"
+    assert story.description == (
+        "망원경은 눈에 대기만 한다고 바로 보이지 않아요. 렌즈가 어떤 원리로 상을 잡는지 "
+        "이해하고 몇 번이고 직접 조절해야 흐릿하던 것이 선명해지죠. 남들이 당연하게 넘긴 것도 "
+        "직접 뜯어보고 원리를 이해해야 넘어가는 모습이 닮아 망원경이 도착했습니다."
+    )
+
+
 def test_defines_copy_for_all_unboxing_combinations() -> None:
     expected_keys = {
         (f"A{packaging}", f"B{tool}") for packaging in range(1, 5) for tool in range(1, 5)
@@ -215,7 +237,7 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-18.1"
+    assert RESULT_CONTENT_VERSION == "2026-08-18.3"
 
 
 def test_defines_all_warning_copy_variants() -> None:

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-18.1"
+RESULT_CONTENT_VERSION = "2026-08-18.3"
 
 
 @dataclass(frozen=True)
@@ -410,11 +410,11 @@ CHARACTER_STORY_COPY: dict[MbtiType, CharacterStoryCopy] = {
         ),
     ),
     MbtiType.ESTJ: CharacterStoryCopy(
-        "엉킨 현장을 위에서 정리하는 헬리콥터",
+        "정해진 순서를 건너뛰지 않고 현장을 책임지는 헬리콥터",
         (
-            "헬리콥터는 복잡한 현장에서도 위에서 전체 상황을 먼저 살펴요. 어디가 막혔는지, 누가 "
-            "어디로 움직여야 하는지 빠르게 파악한 뒤 필요한 자리에 정확히 내려가죠. 역할과 순서를 "
-            "세워 모두가 움직이게 하는 모습이 닮아 헬리콥터가 도착했습니다."
+            "헬리콥터는 급한 상황일수록 점검 순서를 먼저 밟아요. 늘 하던 방식으로 상태를 확인한 뒤 "
+            "필요한 자리에 정확히 내려가, 누가 무엇을 언제 할지 분명하게 정리하죠. 검증된 방식으로 "
+            "현장을 맡아 끝까지 책임지는 모습이 닮아 헬리콥터가 도착했습니다."
         ),
     ),
     MbtiType.INFJ: CharacterStoryCopy(
@@ -482,11 +482,11 @@ CHARACTER_STORY_COPY: dict[MbtiType, CharacterStoryCopy] = {
         ),
     ),
     MbtiType.INTP: CharacterStoryCopy(
-        "남들이 지나친 먼 곳까지 들여다보는 망원경",
+        "원리를 알아야 비로소 초점이 잡히는 망원경",
         (
-            "망원경은 눈앞에 보이는 것만으로 관찰을 끝내지 않아요. 초점을 몇 번이고 조절하며 "
-            "멀리 있는 작은 단서까지 당겨 보고, 그 뒤에 숨은 원리를 찾아내죠. 당연한 것도 "
-            "궁금해하고 끝까지 파고드는 모습이 닮아 망원경이 도착했습니다."
+            "망원경은 눈에 대기만 한다고 바로 보이지 않아요. 렌즈가 어떤 원리로 상을 잡는지 "
+            "이해하고 몇 번이고 직접 조절해야 흐릿하던 것이 선명해지죠. 남들이 당연하게 넘긴 것도 "
+            "직접 뜯어보고 원리를 이해해야 넘어가는 모습이 닮아 망원경이 도착했습니다."
         ),
     ),
     MbtiType.ISTP: CharacterStoryCopy(
