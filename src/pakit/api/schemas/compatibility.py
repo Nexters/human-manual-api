@@ -7,11 +7,13 @@ COMPATIBILITY_RESPONSE_EXAMPLE: dict[str, Any] = {
         "nickname": "지은",
         "noun": "팽이",
         "character_id": "spinning_top",
+        "image_url": "https://api.pakit.kr/assets/characters/spinning_top.png",
     },
     "friend": {
         "nickname": "선우",
         "noun": "곰인형",
         "character_id": "teddy_bear",
+        "image_url": "https://api.pakit.kr/assets/characters/teddy_bear.png",
     },
     "headline": "다른 맛이 잘 섞이는 장난감",
     "description": "닮은 부분은 편안하고 다른 부분은 서로의 빈틈을 채워줘요.",
@@ -25,6 +27,7 @@ COMPATIBILITY_RESPONSE_EXAMPLE: dict[str, Any] = {
         {
             "target": "mine",
             "character_id": "spinning_top",
+            "image_url": "https://api.pakit.kr/assets/characters/spinning_top.png",
             "title": "지은님에게",
             "description": (
                 "갑작스러운 제안은 짧게라도 미리 알려주면 상대도 마음 편히 함께 움직여요."
@@ -33,6 +36,7 @@ COMPATIBILITY_RESPONSE_EXAMPLE: dict[str, Any] = {
         {
             "target": "friend",
             "character_id": "teddy_bear",
+            "image_url": "https://api.pakit.kr/assets/characters/teddy_bear.png",
             "title": "선우님에게",
             "description": (
                 "계획 밖의 제안을 무책임함으로 단정하지 않고 작은 여지를 남겨두면 더 즐거워져요."
@@ -55,6 +59,7 @@ class CompatibilityPersonOutput(BaseModel):
     nickname: str = Field(description="화면에 표시할 닉네임")
     noun: str = Field(description="테스트 결과 장난감 명사")
     character_id: str = Field(description="캐릭터 이미지 매핑용 고정 ID")
+    image_url: str = Field(description="서버가 제공하는 캐릭터 이미지 절대 URL")
 
 
 class SynergyOutput(BaseModel):
@@ -71,6 +76,7 @@ class CompatibilityTipOutput(BaseModel):
 
     target: Literal["mine", "friend"] = Field(description="팁을 전달할 대상")
     character_id: str = Field(description="팁 이미지 매핑용 캐릭터 ID")
+    image_url: str = Field(description="팁에 표시할 캐릭터 이미지 절대 URL")
     title: str = Field(description="팁 제목")
     description: str = Field(description="팁 설명")
 
@@ -98,3 +104,21 @@ class CompatibilityOutput(BaseModel):
         description="각 사람에게 전달할 팁 2개",
     )
     relationship_tip: RelationshipTipOutput = Field(description="오래 지내기 위한 공통 팁")
+
+    @classmethod
+    def from_domain_payload(
+        cls,
+        payload: dict[str, Any],
+        *,
+        public_base_url: str,
+    ) -> "CompatibilityOutput":
+        def absolute_url(path: str) -> str:
+            if path.startswith(("http://", "https://")):
+                return path
+            return f"{public_base_url.rstrip('/')}/{path.lstrip('/')}"
+
+        payload["mine"]["image_url"] = absolute_url(payload["mine"]["image_url"])
+        payload["friend"]["image_url"] = absolute_url(payload["friend"]["image_url"])
+        for tip in payload["tips"]:
+            tip["image_url"] = absolute_url(tip["image_url"])
+        return cls.model_validate(payload)

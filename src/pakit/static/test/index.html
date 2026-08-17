@@ -34,6 +34,7 @@
     .friend-card h4 { margin: 8px 0; font-size: 20px; }
     .friend-card p { margin: 8px 0 0; color: #666; line-height: 1.5; }
     .friend-badge { display: inline-block; padding: 6px 12px; border-radius: 999px; background: #2141f5; color: white; }
+    .page-link { display: inline-block; margin-top: 18px; padding: 12px 18px; border: 1px solid #2141f5; border-radius: 9px; color: #2141f5; text-decoration: none; font-weight: 700; }
     @media (max-width: 600px) { .feature-grid, .friend-grid { grid-template-columns: 1fr; } }
     pre { overflow: auto; padding: 16px; background: #1d1f21; color: #eee; border-radius: 10px; }
     details { margin-top: 20px; }
@@ -92,6 +93,7 @@
     </div>
     <h3 class="section-title">나와 잘 맞는 친구 장난감</h3>
     <div id="compatible-friends" class="friend-grid"></div>
+    <a id="compatibility-link" class="page-link" href="/compatibility-test/">이 결과로 친구 궁합 테스트하기</a>
     <details>
       <summary>원본 JSON 보기</summary>
       <pre id="json"></pre>
@@ -231,6 +233,7 @@
           card.append(badge, image, noun, description);
           return card;
         }));
+        document.querySelector("#compatibility-link").href = `/compatibility-test/?mine=${encodeURIComponent(data.result_code)}`;
         document.querySelector("#json").textContent = JSON.stringify(data, null, 2);
         document.querySelector("#result").style.display = "block";
         document.querySelector("#result").scrollIntoView({ behavior:"smooth" });

@@ -126,8 +126,23 @@ def test_serves_manual_assessment_test_page() -> None:
     assert "data.unboxing_kit.opening_tool.image_url" in response.text
     assert 'id="compatible-friends"' in response.text
     assert "data.compatible_friends.map" in response.text
+    assert 'id="compatibility-link"' in response.text
+    assert "/compatibility-test/?mine=" in response.text
     assert 'choices("step1.q11"' in response.text
     assert 'choices("step1.q12"' in response.text
+
+
+def test_serves_manual_compatibility_test_page() -> None:
+    response = client.get("/compatibility-test/")
+
+    assert response.status_code == 200
+    assert "친구 궁합 테스트" in response.text
+    assert "/api/compatibility?" in response.text
+    assert 'id="mine-image"' in response.text
+    assert 'id="friend-image"' in response.text
+    assert "data.synergy.score" in response.text
+    assert "data.tips.map" in response.text
+    assert "data.relationship_tip.description" in response.text
 
 
 def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
@@ -273,15 +288,26 @@ def test_calculates_friend_compatibility_from_two_saved_results() -> None:
         "nickname": mine.json()["participant"]["nickname"],
         "noun": mine.json()["overview"]["noun"],
         "character_id": mine.json()["overview"]["character_id"],
+        "image_url": mine.json()["overview"]["image_url"],
     }
     assert body["friend"] == {
         "nickname": "선우",
         "noun": friend.json()["overview"]["noun"],
         "character_id": friend.json()["overview"]["character_id"],
+        "image_url": friend.json()["overview"]["image_url"],
     }
     assert 0 <= body["synergy"]["score"] <= 100
     assert len(body["synergy"]["tags"]) == 2
     assert [tip["target"] for tip in body["tips"]] == ["mine", "friend"]
+    assert body["tips"][0]["image_url"] == body["mine"]["image_url"]
+    assert body["tips"][1]["image_url"] == body["friend"]["image_url"]
+    for image_url in (
+        body["mine"]["image_url"],
+        body["friend"]["image_url"],
+        *(tip["image_url"] for tip in body["tips"]),
+    ):
+        assert image_url.startswith("http://testserver/assets/characters/")
+        assert client.get(image_url).status_code == 200
 
 
 def test_returns_404_for_unknown_compatibility_codes() -> None:

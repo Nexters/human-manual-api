@@ -56,6 +56,7 @@ class CompatibilityPersonData:
     nickname: str
     noun: str
     character_id: str
+    image_url: str
 
 
 @dataclass(frozen=True)
@@ -70,6 +71,7 @@ class SynergyData:
 class CompatibilityTipData:
     target: Literal["mine", "friend"]
     character_id: str
+    image_url: str
     title: str
     description: str
 
@@ -408,6 +410,7 @@ def _person(result: SubmissionResultData) -> CompatibilityPersonData:
         nickname=result.participant.nickname,
         noun=result.overview.noun,
         character_id=result.overview.character_id,
+        image_url=result.overview.image_url,
     )
 
 
@@ -449,12 +452,14 @@ def build_compatibility(
             CompatibilityTipData(
                 target="mine",
                 character_id=mine_person.character_id,
+                image_url=mine_person.image_url,
                 title=f"{mine_person.nickname}님에게",
                 description=mine_tip,
             ),
             CompatibilityTipData(
                 target="friend",
                 character_id=friend_person.character_id,
+                image_url=friend_person.image_url,
                 title=f"{friend_person.nickname}님에게",
                 description=friend_tip,
             ),

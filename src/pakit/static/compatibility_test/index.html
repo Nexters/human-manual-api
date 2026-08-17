@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pakit 친구 궁합 테스트</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; }
+    * { box-sizing: border-box; }
+    body { max-width: 760px; margin: 0 auto; padding: 32px 20px 80px; color: #202124; background: #f5f6f8; }
+    h1 { margin-bottom: 6px; }
+    .muted { color: #737b89; }
+    form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin: 24px 0; }
+    input { width: 100%; padding: 12px; border: 1px solid #d9dde5; border-radius: 10px; font-size: 16px; }
+    button { padding: 12px 20px; border: 0; border-radius: 10px; background: #173bff; color: white; font-size: 16px; font-weight: 700; cursor: pointer; }
+    button:disabled { opacity: .5; }
+    #error { color: #b42318; white-space: pre-wrap; }
+    #result { display: none; }
+    .card { margin-top: 16px; padding: 22px; border-radius: 16px; background: white; }
+    .people { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .person { text-align: center; }
+    .person img { width: 190px; height: 190px; object-fit: contain; }
+    .person h2 { margin: 4px 0; }
+    .person p { margin: 0; color: #737b89; }
+    .headline { margin: 34px 0 18px; text-align: center; }
+    .headline h2 { margin-bottom: 8px; }
+    .headline p { margin: 0; color: #667085; }
+    .synergy { display: grid; grid-template-columns: 150px 1fr; align-items: center; gap: 24px; }
+    .score { display: grid; place-items: center; width: 130px; height: 130px; border-radius: 50%; background: conic-gradient(#173bff var(--score), #e6e9ef 0); }
+    .score::before { content: ""; grid-area: 1 / 1; width: 102px; height: 102px; border-radius: 50%; background: white; }
+    .score strong { grid-area: 1 / 1; z-index: 1; color: #173bff; font-size: 36px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .tag { padding: 7px 12px; border-radius: 999px; background: #ffe5f6; color: #ed3faf; }
+    .section-title { margin: 36px 0 12px; text-align: center; }
+    .tips { display: grid; gap: 12px; }
+    .tip { display: grid; grid-template-columns: 84px 1fr; align-items: center; gap: 16px; }
+    .tip img { width: 76px; height: 76px; object-fit: contain; }
+    .tip h3 { margin: 0 0 7px; }
+    .tip p, .relationship p, .synergy p { margin: 0; color: #596273; line-height: 1.65; }
+    .relationship { border-left: 6px solid #ed3faf; }
+    details { margin-top: 22px; }
+    pre { overflow: auto; padding: 16px; border-radius: 10px; background: #1d1f21; color: #eee; }
+    @media (max-width: 620px) {
+      form { grid-template-columns: 1fr; }
+      .person img { width: 140px; height: 140px; }
+      .synergy { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <h1>친구 궁합 테스트</h1>
+  <p class="muted">두 사람이 받은 8자리 결과 코드를 입력하면 실제 궁합 API 응답을 보여줍니다.</p>
+
+  <form id="compatibility-form">
+    <input id="mine" name="mine" minlength="8" maxlength="8" placeholder="내 결과 코드" required>
+    <input id="friend" name="friend" minlength="8" maxlength="8" placeholder="친구 결과 코드" required>
+    <button id="submit" type="submit">궁합 보기</button>
+  </form>
+  <p id="error"></p>
+
+  <main id="result">
+    <section class="card people">
+      <article class="person">
+        <p>나</p>
+        <img id="mine-image" alt="내 장난감">
+        <h2 id="mine-name"></h2>
+      </article>
+      <article class="person">
+        <p>친구</p>
+        <img id="friend-image" alt="친구 장난감">
+        <h2 id="friend-name"></h2>
+      </article>
+    </section>
+
+    <section class="headline">
+      <h2 id="headline"></h2>
+      <p id="description"></p>
+    </section>
+
+    <section class="card synergy">
+      <div id="score" class="score"><strong id="score-value"></strong></div>
+      <div>
+        <h2 id="synergy-title"></h2>
+        <p id="synergy-description"></p>
+        <div id="synergy-tags" class="tags"></div>
+      </div>
+    </section>
+
+    <h2 class="section-title">함께 있을 때 기억해주세요</h2>
+    <section id="tips" class="tips"></section>
+
+    <section class="card relationship">
+      <h2 id="relationship-title"></h2>
+      <p id="relationship-description"></p>
+    </section>
+
+    <details>
+      <summary>원본 JSON 보기</summary>
+      <pre id="json"></pre>
+    </details>
+  </main>
+
+  <script>
+    const form = document.querySelector("#compatibility-form");
+    const mineInput = document.querySelector("#mine");
+    const friendInput = document.querySelector("#friend");
+    const query = new URLSearchParams(window.location.search);
+    mineInput.value = query.get("mine") || "";
+    friendInput.value = query.get("friend") || "";
+
+    const renderPerson = (prefix, person) => {
+      document.querySelector(`#${prefix}-image`).src = person.image_url;
+      document.querySelector(`#${prefix}-name`).textContent = `${person.noun} ${person.nickname}`;
+    };
+
+    const loadCompatibility = async () => {
+      const submit = document.querySelector("#submit");
+      const error = document.querySelector("#error");
+      submit.disabled = true;
+      error.textContent = "";
+      const params = new URLSearchParams({ mine: mineInput.value, friend: friendInput.value });
+      try {
+        const response = await fetch(`/api/compatibility?${params}`);
+        const data = await response.json();
+        if (!response.ok) throw new Error(JSON.stringify(data, null, 2));
+        history.replaceState(null, "", `/compatibility-test/?${params}`);
+        renderPerson("mine", data.mine);
+        renderPerson("friend", data.friend);
+        document.querySelector("#headline").textContent = data.headline;
+        document.querySelector("#description").textContent = data.description;
+        document.querySelector("#score").style.setProperty("--score", `${data.synergy.score}%`);
+        document.querySelector("#score-value").textContent = data.synergy.score;
+        document.querySelector("#synergy-title").textContent = data.synergy.title;
+        document.querySelector("#synergy-description").textContent = data.synergy.description;
+        document.querySelector("#synergy-tags").replaceChildren(...data.synergy.tags.map((text) => {
+          const tag = document.createElement("span");
+          tag.className = "tag";
+          tag.textContent = text;
+          return tag;
+        }));
+        document.querySelector("#tips").replaceChildren(...data.tips.map((tip) => {
+          const card = document.createElement("article");
+          card.className = "card tip";
+          const image = document.createElement("img");
+          image.src = tip.image_url;
+          image.alt = tip.title;
+          const copy = document.createElement("div");
+          const title = document.createElement("h3");
+          title.textContent = tip.title;
+          const description = document.createElement("p");
+          description.textContent = tip.description;
+          copy.append(title, description);
+          card.append(image, copy);
+          return card;
+        }));
+        document.querySelector("#relationship-title").textContent = data.relationship_tip.title;
+        document.querySelector("#relationship-description").textContent = data.relationship_tip.description;
+        document.querySelector("#json").textContent = JSON.stringify(data, null, 2);
+        document.querySelector("#result").style.display = "block";
+      } catch (reason) {
+        document.querySelector("#result").style.display = "none";
+        error.textContent = `궁합 조회 실패\n${reason.message}`;
+      } finally {
+        submit.disabled = false;
+      }
+    };
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      loadCompatibility();
+    });
+
+    if (mineInput.value && friendInput.value) loadCompatibility();
+  </script>
+</body>
+</html>

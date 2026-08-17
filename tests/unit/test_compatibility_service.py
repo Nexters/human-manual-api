@@ -150,8 +150,10 @@ def test_compatibility_score_is_symmetric_and_keeps_each_person_target() -> None
     assert 0 <= forward.synergy.score <= 100
     assert forward.tips[0].target == "mine"
     assert forward.tips[0].title == "지은님에게"
+    assert forward.tips[0].image_url == mine.overview.image_url
     assert forward.tips[1].target == "friend"
     assert forward.tips[1].title == "선우님에게"
+    assert forward.tips[1].image_url == friend.overview.image_url
 
 
 def test_rejects_a_legacy_result_without_a_compatibility_profile() -> None:

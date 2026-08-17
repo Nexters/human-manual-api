@@ -1,7 +1,7 @@
 from dataclasses import asdict
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import JSONResponse
 
 from pakit.api.dependencies import get_result_repository
@@ -45,6 +45,7 @@ router = APIRouter(prefix="/compatibility", tags=["Compatibility"])
     },
 )
 async def get_compatibility(
+    request: Request,
     mine: Annotated[str, Query(description="내 테스트 결과 코드")],
     friend: Annotated[str, Query(description="친구 테스트 결과 코드")],
     repository: Annotated[ResultRepository, Depends(get_result_repository)],
@@ -72,4 +73,7 @@ async def get_compatibility(
                 }
             },
         )
-    return CompatibilityOutput.model_validate(asdict(result))
+    return CompatibilityOutput.from_domain_payload(
+        asdict(result),
+        public_base_url=str(request.base_url),
+    )

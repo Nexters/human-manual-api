@@ -50,6 +50,14 @@ def create_app() -> FastAPI:
         StaticFiles(directory=Path(__file__).parent / "static" / "test", html=True),
         name="test-page",
     )
+    application.mount(
+        "/compatibility-test",
+        StaticFiles(
+            directory=Path(__file__).parent / "static" / "compatibility_test",
+            html=True,
+        ),
+        name="compatibility-test-page",
+    )
     application.include_router(api_router, prefix=settings.api_prefix)
 
     @application.get("/health", response_model=HealthResponse, tags=["system"])
