@@ -255,7 +255,7 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-18.5"
+    assert RESULT_CONTENT_VERSION == "2026-08-18.6"
 
 
 def test_defines_all_warning_copy_variants() -> None:
@@ -274,4 +274,7 @@ def test_defines_all_warning_copy_variants() -> None:
         "change_plan",
     }
     assert set(SOCIAL_ENERGY_WARNING_COPY) == {"E", "I"}
-    assert set(COMMUNICATION_WARNING_COPY) == {"T", "F"}
+    assert COMMUNICATION_WARNING_COPY == {
+        "T": "해결하려고 꺼낸 말에 차갑다는 말이 돌아오면 억울해져요",
+        "F": "속마음을 꺼냈는데 유난이라는 말이 돌아오면 오래 마음에 남아요",
+    }

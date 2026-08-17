@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-18.5"
+RESULT_CONTENT_VERSION = "2026-08-18.6"
 
 
 @dataclass(frozen=True)
@@ -165,8 +165,8 @@ SOCIAL_ENERGY_WARNING_COPY: dict[str, str] = {
 
 
 COMMUNICATION_WARNING_COPY: dict[str, str] = {
-    "T": "해결하려고 꺼낸 말에 차갑다는 반응이 돌아오면 억울해져요",
-    "F": "진심을 꺼냈는데 예민하다는 말이 돌아오면 오래 마음에 남아요",
+    "T": "해결하려고 꺼낸 말에 차갑다는 말이 돌아오면 억울해져요",
+    "F": "속마음을 꺼냈는데 유난이라는 말이 돌아오면 오래 마음에 남아요",
 }
 
 

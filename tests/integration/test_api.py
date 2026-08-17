@@ -502,7 +502,7 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
         "말없이 챙기는 행동을 애정으로 알아봐주세요",
     ]
     assert body["warnings"] == [
-        "해결하려고 꺼낸 말에 차갑다는 반응이 돌아오면 억울해져요",
+        "해결하려고 꺼낸 말에 차갑다는 말이 돌아오면 억울해져요",
         "혼자 정리할 틈이 없으면 대답이 점점 짧아져요",
         "재촉받으면 하려던 마음도 사라져요",
         "잠이 덜 깨면 첫 반응이 무뚝뚝해요",
