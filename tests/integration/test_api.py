@@ -511,7 +511,7 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
         ),
     }
     assert body["can_do"] == [
-        "결론을 재촉하지 말고 생각의 흐름을 들어주세요",
+        "내 말의 표면만 보지 말고, 왜 이런 말을 하는지까지 이해해주세요",
         "연락이 뜸해도 각자의 시간을 믿어주세요",
         "서운한 일은 피하지 말고 바로 이야기해주세요",
         "말없이 챙기는 행동을 애정으로 알아봐주세요",
@@ -553,11 +553,11 @@ def test_submission_uses_q11_for_the_motivation_feature_only() -> None:
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
-        ("listen_to_me", "결론을 재촉하지 말고 생각의 흐름을 들어주세요"),
+        ("listen_to_me", "내 말의 표면만 보지 말고, 왜 이런 말을 하는지까지 이해해주세요"),
         ("take_me_out", "생각이 막히면 새로운 장소로 데려가주세요"),
         ("give_me_space", "생각이 정리될 때까지 혼자 둘 시간을 주세요"),
         ("solve_together", "막힌 이유부터 함께 정리해주세요"),
-        ("make_me_laugh", "엉뚱한 이야기로 복잡한 생각을 돌려주세요"),
+        ("make_me_laugh", "복잡한 생각에서 잠깐 빠져나오게 엉뚱한 이야기를 던져주세요"),
     ],
 )
 def test_uses_every_q12_support_preference(value: str, expected: str) -> None:

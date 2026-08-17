@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-17.3"
+RESULT_CONTENT_VERSION = "2026-08-17.5"
 
 
 @dataclass(frozen=True)
@@ -79,25 +79,25 @@ MBTI_MIDDLE_GROUP: dict[MbtiType, str] = {
 
 
 SUPPORT_PREFERENCE_COPY: dict[tuple[str, str], str] = {
-    ("listen_to_me", "NT"): "결론을 재촉하지 말고 생각의 흐름을 들어주세요",
+    ("listen_to_me", "NT"): "내 말의 표면만 보지 말고, 왜 이런 말을 하는지까지 이해해주세요",
     ("listen_to_me", "ST"): "무슨 일이 있었는지 처음부터 차근차근 들어주세요",
     ("listen_to_me", "NF"): "해결책보다 지금 느끼는 마음부터 들어주세요",
-    ("listen_to_me", "SF"): "편하게 말할 수 있도록 곁에서 들어주세요",
+    ("listen_to_me", "SF"): "말이 정리되지 않아도 중간에 판단하지 말고 끝까지 들어주세요",
     ("take_me_out", "NT"): "생각이 막히면 새로운 장소로 데려가주세요",
     ("take_me_out", "ST"): "기분이 가라앉으면 맛있는 걸 먹으러 불러내주세요",
-    ("take_me_out", "NF"): "마음이 환기될 만한 곳으로 함께 나가주세요",
-    ("take_me_out", "SF"): "좋아하는 음식을 먹으며 기분을 풀어주세요",
+    ("take_me_out", "NF"): "마음이 답답해 보이면 내가 좋아할 만한 곳으로 함께 바람 쐬러 가주세요",
+    ("take_me_out", "SF"): "무슨 일인지 캐묻기보다 좋아하는 걸 먹으러 슬쩍 불러내주세요",
     ("give_me_space", "NT"): "생각이 정리될 때까지 혼자 둘 시간을 주세요",
-    ("give_me_space", "ST"): "스스로 추스를 때까지 평소처럼 기다려주세요",
+    ("give_me_space", "ST"): "괜찮냐고 계속 묻기보다 혼자 정리할 시간을 주세요",
     ("give_me_space", "NF"): "마음을 꺼낼 준비가 될 때까지 기다려주세요",
     ("give_me_space", "SF"): "연락할 때까지 부담 없이 기다려주세요",
     ("solve_together", "NT"): "막힌 이유부터 함께 정리해주세요",
     ("solve_together", "ST"): "지금 할 일부터 함께 처리해주세요",
     ("solve_together", "NF"): "마음부터 확인하고 해결책을 찾아주세요",
     ("solve_together", "SF"): "당장 필요한 것부터 함께 챙겨주세요",
-    ("make_me_laugh", "NT"): "엉뚱한 이야기로 복잡한 생각을 돌려주세요",
-    ("make_me_laugh", "ST"): "바로 웃을 만한 걸 하나 보내주세요",
-    ("make_me_laugh", "NF"): "취향에 맞는 웃음으로 마음을 환기해주세요",
+    ("make_me_laugh", "NT"): "복잡한 생각에서 잠깐 빠져나오게 엉뚱한 이야기를 던져주세요",
+    ("make_me_laugh", "ST"): "길게 위로하기보다 바로 웃을 수 있는 사진이나 영상을 보내주세요",
+    ("make_me_laugh", "NF"): "내가 좋아할 만한 농담으로 무거워진 마음을 살짝 풀어주세요",
     ("make_me_laugh", "SF"): "같이 웃으며 무거운 분위기를 바꿔주세요",
 }
 
@@ -109,7 +109,7 @@ RELATIONSHIP_DISTANCE_COPY: dict[str, str] = {
 
 
 CONFLICT_SUPPORT_COPY: dict[str, str] = {
-    "hint_and_wait": "표정이 달라지면 지나치지 말고 먼저 물어봐주세요",
+    "hint_and_wait": "평소보다 말수가 줄면 모른 척 넘기지 말고 먼저 물어봐주세요",
     "resolve_immediately": "서운한 일은 피하지 말고 바로 이야기해주세요",
 }
 
