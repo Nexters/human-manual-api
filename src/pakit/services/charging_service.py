@@ -1,12 +1,22 @@
 from pakit.domain.assessment_submission import ChargingActivityData, ChargingData
 
 BASE_CHARGING_CLAUSE: dict[str, str] = {
-    "sleep_until_noon": "알람 없이 늦잠을 자며 먼저 푹 쉬고,",
-    "morning_run": "몸에 땀이 날 만큼 움직이며 머리를 비우고,",
-    "brunch_cafe": "느긋하게 맛있는 걸 먹으며 기분을 채우고,",
-    "stay_in_bed": "아무것도 하지 않고 이불 속에서 푹 쉬고,",
-    "watch_streaming": "밀린 콘텐츠를 몰아보며 현실을 잠시 잊고,",
-    "self_development": "미뤄둔 일을 하나 끝내며 개운함을 채우고,",
+    "sleep_until_noon": "잠이 충분히 채워져야 나머지가 돌아가는 사람이에요",
+    "morning_run": "에너지를 써야 오히려 채워지는 사람이에요",
+    "brunch_cafe": "나한테 좋은 걸 제대로 챙겨줘야 채워지는 사람이에요",
+    "stay_in_bed": "혼자 아무것도 안 하는 시간이 있어야 채워지는 사람이에요",
+    "watch_streaming": "뭔가에 푹 빠져서 딴생각이 안 날 때 채워지는 사람이에요",
+    "self_development": "마음의 짐을 덜어야 쉬어지는 사람이에요",
+}
+
+
+BASE_CHARGING_MECHANISM: dict[str, str] = {
+    "sleep_until_noon": "수면 우선",
+    "morning_run": "소모",
+    "brunch_cafe": "감각 만족",
+    "stay_in_bed": "차단",
+    "watch_streaming": "몰입",
+    "self_development": "청산",
 }
 
 
@@ -57,7 +67,7 @@ def build_charging(
     trigger_description = MOTIVATION_TRIGGER_DESCRIPTION[motivation]
     return ChargingData(
         score=90,
-        description=f"{base_description} {trigger_description}",
+        description=f"{base_description}. {trigger_description}",
         activities=(
             ChargingActivityData(
                 type=holiday_choice,

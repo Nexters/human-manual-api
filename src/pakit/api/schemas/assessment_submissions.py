@@ -132,7 +132,8 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
     ],
     "charging": {
         "description": (
-            "알람 없이 늦잠을 자며 먼저 푹 쉬고, 새로운 구경거리가 생기면 다시 기운이 올라와요."
+            "잠이 충분히 채워져야 나머지가 돌아가는 사람이에요. 새로운 구경거리가 생기면 다시 "
+            "기운이 올라와요."
         ),
         "activities": [
             {"type": "sleep_until_noon", "label": "알람 없는 늦잠"},
@@ -278,7 +279,7 @@ class ChargingActivityOutput(BaseModel):
 class ChargingOutput(BaseModel):
     """충전 방법 설명과 활동입니다."""
 
-    description: str = Field(max_length=55, description="55자 이하의 충전 패턴 한 문장")
+    description: str = Field(max_length=61, description="61자 이하의 충전 패턴 설명")
     activities: list[ChargingActivityOutput] = Field(
         min_length=3,
         max_length=3,

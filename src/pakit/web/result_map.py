@@ -473,12 +473,13 @@ Q05·Q06은 사용자가 고른 걸 그대로, MBTI는 축 하나씩만 써요.<
 
     # ── 7. 충전 방법 ─────────────────────────────────────────────────────
     clause_table = table(
-        ["step1.q07", "선택지", "메인문장 앞부분"],
-        [[val(k), esc(CHOICE["step1.q07"][k]), esc(ch.BASE_CHARGING_CLAUSE[k])]
+        ["step1.q07", "선택지", "메커니즘", "첫 문장"],
+        [[val(k), esc(CHOICE["step1.q07"][k]), esc(ch.BASE_CHARGING_MECHANISM[k]),
+          esc(ch.BASE_CHARGING_CLAUSE[k])]
          for k in ch.BASE_CHARGING_CLAUSE],
     )
     trigger_table = table(
-        ["step1.q11", "선택지", "메인문장 뒷부분"],
+        ["step1.q11", "선택지", "두 번째 문장"],
         [[val(k), esc(CHOICE["step1.q11"][k]), esc(ch.MOTIVATION_TRIGGER_DESCRIPTION[k])]
          for k in ch.MOTIVATION_TRIGGER_DESCRIPTION],
     )
@@ -486,7 +487,7 @@ Q05·Q06은 사용자가 고른 걸 그대로, MBTI는 축 하나씩만 써요.<
     kw2 = table(["step1.q08", "키워드"], [[val(k), esc(v)] for k, v in ch.EMERGENCY_CHARGING_KEYWORD.items()])
     kw3 = table(["step1.q12", "키워드"], [[val(k), esc(v)] for k, v in ch.SUPPORT_CHARGING_KEYWORD.items()])
     charge_body = f"""
-<p class="lead">메인 문장 = <b>[Q07 앞부분] + [Q11 뒷부분]</b> → 6 × 6 = 36가지.
+<p class="lead">메인 설명 = <b>[Q07 첫 문장] + [Q11 두 번째 문장]</b> → 6 × 6 = 36가지.
 키워드 3개는 Q07·Q08·Q12에서 각각 만들어요. 충전 점수는 API에서 반환하지 않고 MBTI도
 사용하지 않아요.</p>
 <div class="two-col"><div>{clause_table}</div><div>{trigger_table}</div></div>
