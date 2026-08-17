@@ -144,11 +144,17 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
     ],
     "charging": {
         "score": 90,
-        "description": "친구들과 놀 때 가장 빠르게 충전돼요",
+        "description": (
+            "일정이 비면 아쉬워하기보다 잠부터 보충해요. 누구의 속도에도 맞추지 않고 "
+            "충분히 자야 배터리가 제대로 차는 타입이에요."
+        ),
         "activities": [
-            {"type": "hangout", "label": "친구들과 놀기"},
-            {"type": "beer", "label": "맥주 한 잔"},
-            {"type": "travel", "label": "여행가기"},
+            {"type": "sleep_until_noon", "label": "늦잠으로 밀린 잠 갚기"},
+            {"type": "go_to_bed", "label": "비어버린 약속만큼 푹 쉬기"},
+            {
+                "type": "sleep_until_noon_go_to_bed",
+                "label": "휴대폰을 멀리 두고 알람 없이 푹 자기",
+            },
         ],
     },
 }

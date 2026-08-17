@@ -8,8 +8,6 @@ from pakit.domain.assessment_contract import (
 from pakit.domain.assessment_submission import (
     AssessmentSubmission,
     CharacterStoryData,
-    ChargingActivityData,
-    ChargingData,
     FeatureData,
     OverviewData,
     ResultParticipantData,
@@ -22,6 +20,7 @@ from pakit.services.assessment_classifier import (
     AssessmentClassification,
     classify_submission,
 )
+from pakit.services.charging_service import build_charging
 from pakit.services.emotional_processing_service import build_emotional_processing_feature
 from pakit.services.handling_guide_service import build_handling_guide
 from pakit.services.motivation_service import build_motivation_feature
@@ -136,6 +135,10 @@ def _build_result(
         anger_trigger=answers["step1.q06"],
         mbti=submission.mbti,
     )
+    charging = build_charging(
+        holiday_choice=answers["step1.q07"],
+        cancellation_choice=answers["step1.q08"],
+    )
 
     return SubmissionResultData(
         result_code=result_code,
@@ -171,15 +174,7 @@ def _build_result(
         ),
         can_do=handling_guide,
         warnings=warnings,
-        charging=ChargingData(
-            score=90,
-            description="친구들과 놀 때 가장 빠르게 충전돼요",
-            activities=(
-                ChargingActivityData("hangout", "친구들과 놀기"),
-                ChargingActivityData("beer", "맥주 한 잔"),
-                ChargingActivityData("travel", "여행가기"),
-            ),
-        ),
+        charging=charging,
     )
 
 

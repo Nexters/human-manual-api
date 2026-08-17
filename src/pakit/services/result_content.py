@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-15.8"
+RESULT_CONTENT_VERSION = "2026-08-15.9"
 
 
 @dataclass(frozen=True)
