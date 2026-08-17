@@ -112,5 +112,7 @@ PRD의 "축당 2문항 × 4축" 기술과 현재 24개 고정 테스트 화면�
 - MVP 운영 환경에서는 FastAPI와 PostgreSQL을 한 백엔드 서버의 Docker Compose로 실행한다.
   PostgreSQL은 외부 포트를 공개하지 않고 named volume에 데이터를 저장한다. 별도 DB 서버와
   블록 스토리지는 운영 부하와 복구 요구가 확인된 뒤 도입한다.
+- 로컬 개발에서는 `compose.local.yaml`을 함께 적용해 PostgreSQL만 실행하고, DB 포트는
+  `127.0.0.1:5432`에만 공개한다. FastAPI는 호스트에서 `uvicorn --reload`로 실행한다.
 - Alembic 마이그레이션은 API 컨테이너 시작 전에 실행하며 실패하면 새 API 컨테이너를 시작하지
   않는다. 첫 마이그레이션은 `assessment_results` 테이블을 생성하고 downgrade로 되돌릴 수 있다.

@@ -22,17 +22,40 @@ uv run uvicorn pakit.main:app --reload
 프론트엔드 `https://pakit.kr`에서 허용됩니다. 이 목록은 서버 코드에 고정되어 있으며 `.env`로
 재정의하지 않습니다.
 
-## Docker Compose로 실행하기
+## 로컬에서 실행하기
 
-FastAPI와 PostgreSQL을 한 서버에서 함께 실행할 수 있습니다. 먼저 `.env.example`을 복사하고
-`POSTGRES_PASSWORD`에 로컬 또는 운영 환경의 비밀번호를 설정합니다.
+먼저 `.env.example`을 복사하고 `PAKIT_DATABASE_PASSWORD`와 `POSTGRES_PASSWORD`에 같은
+로컬 DB 비밀번호를 설정합니다.
 
 ```bash
 cp .env.example .env
+```
+
+로컬에서는 PostgreSQL만 Docker로 실행합니다. `compose.local.yaml`은 DB 포트를 로컬
+루프백 주소에만 열며 배포에는 사용하지 않습니다.
+
+```bash
+docker compose -f compose.yaml -f compose.local.yaml up -d db
+uv run alembic upgrade head
+uv run uvicorn pakit.main:app --reload
+```
+
+개발을 마치면 DB 컨테이너만 중지할 수 있습니다. `postgres_data` 볼륨은 그대로 유지됩니다.
+
+```bash
+docker compose -f compose.yaml -f compose.local.yaml stop db
+```
+
+## Docker Compose로 배포하기
+
+배포 서버에서는 기존 `compose.yaml`로 API, PostgreSQL, 프론트엔드를 함께 실행합니다. 이때
+백엔드 저장소의 상위 경로에 `frontend-app`이 있어야 합니다.
+
+```bash
 docker compose up --build -d
 ```
 
-PostgreSQL은 외부 포트를 열지 않고 Docker 내부 네트워크에서만 접근할 수 있습니다. 데이터는
+운영 PostgreSQL은 외부 포트를 열지 않고 Docker 내부 네트워크에서만 접근합니다. 데이터는
 `postgres_data` 볼륨에 저장되므로 일반적인 컨테이너 재시작과 재배포 후에도 유지됩니다. API
 컨테이너는 시작 전에 `alembic upgrade head`를 자동 실행합니다. `docker compose down -v`는
 데이터 볼륨까지 삭제하므로 운영 서버에서 실행하지 않습니다.
