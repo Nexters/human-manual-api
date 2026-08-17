@@ -75,6 +75,12 @@
     <div id="can-do" class="copy-card"></div>
     <h3 class="section-title">이렇게 하면 고장나요</h3>
     <div id="warnings" class="copy-card"></div>
+    <h3 class="section-title">충전 방법</h3>
+    <div class="copy-card">
+      <h3 id="charging-score"></h3>
+      <p id="charging-description"></p>
+      <div id="charging-activities"></div>
+    </div>
     <details>
       <summary>원본 JSON 보기</summary>
       <pre id="json"></pre>
@@ -185,6 +191,14 @@
         warnings.replaceChildren(...data.warnings.map((warning) => {
           const item = document.createElement("p");
           item.textContent = `✕ ${warning}`;
+          return item;
+        }));
+        document.querySelector("#charging-score").textContent = `충전 점수 ${data.charging.score}`;
+        document.querySelector("#charging-description").textContent = data.charging.description;
+        const chargingActivities = document.querySelector("#charging-activities");
+        chargingActivities.replaceChildren(...data.charging.activities.map((activity) => {
+          const item = document.createElement("p");
+          item.textContent = `🔋 ${activity.label}`;
           return item;
         }));
         document.querySelector("#json").textContent = JSON.stringify(data, null, 2);

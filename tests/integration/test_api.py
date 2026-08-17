@@ -95,6 +95,10 @@ def test_serves_manual_assessment_test_page() -> None:
     assert "data.can_do.map" in response.text
     assert 'id="warnings"' in response.text
     assert "data.warnings.map" in response.text
+    assert 'id="charging-score"' in response.text
+    assert 'id="charging-description"' in response.text
+    assert 'id="charging-activities"' in response.text
+    assert "data.charging.activities.map" in response.text
     assert 'choices("step1.q11"' in response.text
     assert 'choices("step1.q12"' in response.text
 
