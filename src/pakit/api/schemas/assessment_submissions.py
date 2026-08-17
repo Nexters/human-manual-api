@@ -138,7 +138,7 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
         "activities": [
             {"type": "sleep_until_noon", "label": "방해 없는 늦잠"},
             {"type": "go_to_bed", "label": "혼자만의 시간"},
-            {"type": "listen_to_me", "label": "속마음 털어놓기"},
+            {"type": "ENTP", "label": "호기심 충족"},
         ],
     },
     "compatible_friends": [

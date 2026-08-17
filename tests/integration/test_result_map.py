@@ -40,12 +40,15 @@ def test_result_map_includes_copy_from_every_section() -> None:
         "수면 우선",  # 충전 방법 · Q07 메커니즘
         "잠이 충분히 채워져야 나머지가 돌아가는 사람이에요",  # 충전 방법 · Q07 첫 문장
         "방해 없는 늦잠",  # 충전 방법 · Q07 키워드
+        "침대와 한몸",  # 충전 방법 · Q07 키워드
         "혼자만의 시간",  # 충전 방법 · Q08 키워드
+        "관심 분야 탐구",  # 충전 방법 · MBTI 키워드(INTJ)
+        "수다 떨기",  # 충전 방법 · MBTI 공통 키워드
         "잠이 덜 깨면 첫 반응",  # 주의사항 · 보호 시간(after_waking)
         "찰떡궁합 환상의 장난감",  # 궁합 헤드라인
     ]
     for phrase in expected:
         assert phrase in body, f"누락된 문구: {phrase}"
 
-    assert "충전 점수는 API에서 반환하지 않고" in body
+    assert "충전 점수는 API에서 반환하지 않아요" in body
     assert '충전 점수는 <span class="val">90</span> 고정' not in body

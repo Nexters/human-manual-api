@@ -485,21 +485,20 @@ Q05·Q06은 사용자가 고른 걸 그대로, MBTI는 축 하나씩만 써요.<
     )
     kw1 = table(["step1.q07", "키워드"], [[val(k), esc(v)] for k, v in ch.BASE_CHARGING_KEYWORD.items()])
     kw2 = table(["step1.q08", "키워드"], [[val(k), esc(v)] for k, v in ch.EMERGENCY_CHARGING_KEYWORD.items()])
-    kw3 = table(["step1.q12", "키워드"], [[val(k), esc(v)] for k, v in ch.SUPPORT_CHARGING_KEYWORD.items()])
+    kw3 = table(["MBTI", "키워드"], [[code_chip(k.value), esc(v)] for k, v in ch.MBTI_CHARGING_KEYWORD.items()])
     charge_body = f"""
 <p class="lead">메인 설명 = <b>[Q07 첫 문장] + [Q11 두 번째 문장]</b> → 6 × 6 = 36가지.
-키워드 3개는 Q07·Q08·Q12에서 각각 만들어요. 충전 점수는 API에서 반환하지 않고 MBTI도
-사용하지 않아요.</p>
+키워드 3개는 Q07·Q08·MBTI에서 각각 만들어요. 충전 점수는 API에서 반환하지 않아요.</p>
 <div class="two-col"><div>{clause_table}</div><div>{trigger_table}</div></div>
-<h4>키워드 3개 · Q07(평소회복) / Q08(환기) / Q12(감정회복)</h4>
+<h4>키워드 3개 · Q07(평소회복) / Q08(환기) / MBTI(유형별 회복)</h4>
 <div class="three-col">{kw1}{kw2}{kw3}</div>"""
     sections.append(
         (
             "charging",
             "결과 · charging",
             "충전 방법",
-            f"{qchip('step1.q07')}{qchip('step1.q11')}{qchip('step1.q08')}{qchip('step1.q12')}",
-            "문장 36 · 키워드 6·4·5",
+            f"{qchip('step1.q07')}{qchip('step1.q11')}{qchip('step1.q08')}{mbtichip()}",
+            "문장 36 · 키워드 6·4·16",
             charge_body,
         )
     )

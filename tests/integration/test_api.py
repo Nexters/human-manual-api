@@ -414,6 +414,10 @@ def test_submits_complete_assessment_and_returns_mixed_result() -> None:
     assert len(body["warnings"]) == 4
     assert set(body["charging"]) == {"description", "activities"}
     assert len(body["charging"]["activities"]) == 3
+    assert body["charging"]["activities"][2] == {
+        "type": "INTP",
+        "label": "외부와 단절",
+    }
     assert len(body["compatible_friends"]) == 2
     assert all(friend["badge"] == "환상의 장난감" for friend in body["compatible_friends"])
 

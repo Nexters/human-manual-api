@@ -1,3 +1,4 @@
+from pakit.domain.assessment import MbtiType
 from pakit.domain.assessment_submission import ChargingActivityData, ChargingData
 
 BASE_CHARGING_CLAUSE: dict[str, str] = {
@@ -34,7 +35,7 @@ BASE_CHARGING_KEYWORD: dict[str, str] = {
     "sleep_until_noon": "방해 없는 늦잠",
     "morning_run": "아침 러닝",
     "brunch_cafe": "느긋한 브런치",
-    "stay_in_bed": "이불 속 휴식",
+    "stay_in_bed": "침대와 한몸",
     "watch_streaming": "콘텐츠 몰아보기",
     "self_development": "작은 성취",
 }
@@ -48,12 +49,23 @@ EMERGENCY_CHARGING_KEYWORD: dict[str, str] = {
 }
 
 
-SUPPORT_CHARGING_KEYWORD: dict[str, str] = {
-    "listen_to_me": "속마음 털어놓기",
-    "take_me_out": "맛있는 거 먹기",
-    "give_me_space": "혼자 생각 정리하기",
-    "solve_together": "같이 답 찾기",
-    "make_me_laugh": "웃으며 털어내기",
+MBTI_CHARGING_KEYWORD: dict[MbtiType, str] = {
+    MbtiType.INTJ: "관심 분야 탐구",
+    MbtiType.ENTJ: "자기계발",
+    MbtiType.INTP: "외부와 단절",
+    MbtiType.ENTP: "호기심 충족",
+    MbtiType.INFJ: "조용한 공간",
+    MbtiType.ENFJ: "깊은 대화",
+    MbtiType.INFP: "감성 충전",
+    MbtiType.ENFP: "수다 떨기",
+    MbtiType.ISTJ: "루틴 지키기",
+    MbtiType.ESTJ: "정리정돈",
+    MbtiType.ISTP: "관심사 몰입",
+    MbtiType.ESTP: "새로운 자극",
+    MbtiType.ISFJ: "익숙한 공간",
+    MbtiType.ESFJ: "수다 떨기",
+    MbtiType.ISFP: "독립된 공간",
+    MbtiType.ESFP: "수다 떨기",
 }
 
 
@@ -61,7 +73,7 @@ def build_charging(
     holiday_choice: str,
     cancellation_choice: str,
     motivation: str,
-    support_preference: str,
+    mbti: MbtiType,
 ) -> ChargingData:
     base_description = BASE_CHARGING_CLAUSE[holiday_choice]
     trigger_description = MOTIVATION_TRIGGER_DESCRIPTION[motivation]
@@ -78,8 +90,8 @@ def build_charging(
                 label=EMERGENCY_CHARGING_KEYWORD[cancellation_choice],
             ),
             ChargingActivityData(
-                type=support_preference,
-                label=SUPPORT_CHARGING_KEYWORD[support_preference],
+                type=mbti.value,
+                label=MBTI_CHARGING_KEYWORD[mbti],
             ),
         ),
     )

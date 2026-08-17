@@ -145,7 +145,7 @@ def _build_result(
         holiday_choice=answers["step1.q07"],
         cancellation_choice=answers["step1.q08"],
         motivation=answers["step1.q11"],
-        support_preference=answers["step1.q12"],
+        mbti=submission.mbti,
     )
 
     return SubmissionResultData(
