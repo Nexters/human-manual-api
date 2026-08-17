@@ -145,7 +145,6 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
         "잠이 덜 깨면 첫 반응이 무뚝뚝해요",
     ],
     "charging": {
-        "score": 90,
         "description": (
             "일정이 비면 아쉬워하기보다 잠부터 보충해요. 누구의 속도에도 맞추지 않고 "
             "충분히 자야 배터리가 제대로 차는 타입이에요."
@@ -297,9 +296,8 @@ class ChargingActivityOutput(BaseModel):
 
 
 class ChargingOutput(BaseModel):
-    """충전 점수와 충전 활동입니다."""
+    """충전 방법 설명과 활동입니다."""
 
-    score: int = Field(ge=0, le=100, description="충전 점수")
     description: str = Field(description="충전 방법 설명")
     activities: list[ChargingActivityOutput] = Field(
         min_length=3,

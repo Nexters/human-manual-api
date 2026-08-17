@@ -15,6 +15,9 @@
     input[type="text"], input[type="number"], select { padding: 9px; font-size: 16px; }
     input[type="range"] { width: min(500px, 80%); vertical-align: middle; }
     button { padding: 12px 20px; border: 0; border-radius: 9px; background: #111; color: white; font-size: 16px; cursor: pointer; }
+    button.secondary { border: 1px solid #111; background: white; color: #111; }
+    .test-toolbar { display: flex; justify-content: flex-end; margin: 12px 0; }
+    .form-actions { display: flex; flex-wrap: wrap; gap: 10px; }
     button:disabled { opacity: .5; }
     #error { color: #b42318; white-space: pre-wrap; }
     #result { display: none; margin-top: 32px; padding: 22px; border-radius: 14px; background: #f5f5f5; }
@@ -45,13 +48,18 @@
   <p class="muted">디자인 없는 효용 검증용 페이지입니다. 제출하면 현재 서버의 룰 기반 결과를 생성합니다.</p>
 
   <form id="assessment-form">
-    <label>닉네임 <input id="nickname" type="text" value="해서니" required></label>
+    <div class="test-toolbar">
+      <button id="fill-defaults" class="secondary" type="button">기본값 채우기</button>
+    </div>
+    <label>닉네임 <input id="nickname" type="text" required></label>
     <div id="questions"></div>
     <fieldset>
       <legend>MBTI</legend>
       <select id="mbti" required></select>
     </fieldset>
-    <button id="submit" type="submit">결과 만들기</button>
+    <div class="form-actions">
+      <button id="submit" type="submit">결과 만들기</button>
+    </div>
     <p id="error"></p>
   </form>
 
@@ -87,7 +95,6 @@
     <div id="warnings" class="copy-card"></div>
     <h3 class="section-title">충전 방법</h3>
     <div class="copy-card">
-      <h3 id="charging-score"></h3>
       <p id="charging-description"></p>
       <div id="charging-activities"></div>
     </div>
@@ -134,21 +141,50 @@
       const fieldset = document.createElement("fieldset");
       fieldset.innerHTML = `<legend>${question.id} · ${question.prompt}</legend>`;
       if (question.kind === "scale") {
-        fieldset.innerHTML += `<span>밀착</span> <input name="${question.id}" type="range" min="0" max="100" step="1" value="${question.defaultValue}"> <output>${question.defaultValue}</output> <span>거리조절</span>`;
-        fieldset.querySelector("input").addEventListener("input", (event) => fieldset.querySelector("output").value = event.target.value);
+        fieldset.innerHTML += `<span>밀착</span> <input name="${question.id}" type="range" min="0" max="100" step="1" value="50"> <output>선택 안 함</output> <span>거리조절</span>`;
+        const input = fieldset.querySelector("input");
+        const selectScaleValue = () => {
+          input.setCustomValidity("");
+          fieldset.querySelector("output").value = input.value;
+        };
+        input.setCustomValidity("값을 선택해주세요.");
+        input.addEventListener("input", selectScaleValue);
+        input.addEventListener("pointerdown", selectScaleValue);
+        input.addEventListener("keydown", selectScaleValue);
       } else if (question.kind === "integer") {
-        fieldset.innerHTML += `<input name="${question.id}" type="number" min="0" max="999" step="1" value="${question.defaultValue}" required>`;
+        fieldset.innerHTML += `<input name="${question.id}" type="number" min="0" max="999" step="1" required>`;
       } else {
         question.options.forEach(([value, label]) => {
-          fieldset.innerHTML += `<label class="option"><input type="radio" name="${question.id}" value="${value}" ${value === question.defaultValue ? "checked" : ""} required> ${label}</label>`;
+          fieldset.innerHTML += `<label class="option"><input type="radio" name="${question.id}" value="${value}" required> ${label}</label>`;
         });
       }
       root.appendChild(fieldset);
     });
 
     const mbti = document.querySelector("#mbti");
+    mbti.add(new Option("MBTI 선택", "", true, true));
+    mbti.options[0].disabled = true;
     ["INTJ","ISTJ","ENTJ","ESTJ","INFJ","ISFJ","ENFJ","ESFJ","INFP","ISFP","ENFP","ESFP","INTP","ISTP","ENTP","ESTP"].forEach((value) => {
-      mbti.add(new Option(value, value, value === "ENTP", value === "ENTP"));
+      mbti.add(new Option(value, value));
+    });
+
+    document.querySelector("#fill-defaults").addEventListener("click", () => {
+      document.querySelector("#nickname").value = "해서니";
+      questions.forEach((question) => {
+        if (question.kind === "scale") {
+          const input = document.querySelector(`[name="${question.id}"]`);
+          input.value = question.defaultValue;
+          input.setCustomValidity("");
+          input.closest("fieldset").querySelector("output").value = question.defaultValue;
+        } else if (question.kind === "integer") {
+          document.querySelector(`[name="${question.id}"]`).value = question.defaultValue;
+        } else {
+          document.querySelector(
+            `[name="${question.id}"][value="${question.defaultValue}"]`
+          ).checked = true;
+        }
+      });
+      mbti.value = "ENTP";
     });
 
     document.querySelector("#assessment-form").addEventListener("submit", async (event) => {
@@ -208,7 +244,6 @@
           item.textContent = `✕ ${warning}`;
           return item;
         }));
-        document.querySelector("#charging-score").textContent = `충전 점수 ${data.charging.score}`;
         document.querySelector("#charging-description").textContent = data.charging.description;
         const chargingActivities = document.querySelector("#charging-activities");
         chargingActivities.replaceChildren(...data.charging.activities.map((activity) => {

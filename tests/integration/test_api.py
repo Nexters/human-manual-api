@@ -116,7 +116,6 @@ def test_serves_manual_assessment_test_page() -> None:
     assert "data.can_do.map" in response.text
     assert 'id="warnings"' in response.text
     assert "data.warnings.map" in response.text
-    assert 'id="charging-score"' in response.text
     assert 'id="charging-description"' in response.text
     assert 'id="charging-activities"' in response.text
     assert "data.charging.activities.map" in response.text
@@ -128,6 +127,12 @@ def test_serves_manual_assessment_test_page() -> None:
     assert "data.compatible_friends.map" in response.text
     assert 'id="compatibility-link"' in response.text
     assert "/compatibility-test/?mine=" in response.text
+    assert 'id="fill-defaults"' in response.text
+    assert 'id="nickname" type="text" required' in response.text
+    assert 'id="nickname" type="text" value=' not in response.text
+    assert 'input.setCustomValidity("값을 선택해주세요.")' in response.text
+    assert 'mbti.add(new Option("MBTI 선택", "", true, true))' in response.text
+    assert 'document.querySelector("#nickname").value = "해서니"' in response.text
     assert 'choices("step1.q11"' in response.text
     assert 'choices("step1.q12"' in response.text
 
@@ -206,6 +211,8 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
     assert result_code_schema["minLength"] == 8
     assert result_code_schema["maxLength"] == 8
     assert result_code_schema["pattern"] == "^[A-Za-z0-9_-]{8}$"
+    charging_schema = document["components"]["schemas"]["ChargingOutput"]
+    assert set(charging_schema["properties"]) == {"description", "activities"}
     compatibility_schema = document["components"]["schemas"]["CompatibilityOutput"]
     assert set(compatibility_schema["properties"]) == {
         "mine",
@@ -420,6 +427,7 @@ def test_submits_complete_assessment_and_returns_mixed_result() -> None:
     assert body["overview"]["noun"] in body["character_story"]["description"]
     assert len(body["can_do"]) == 4
     assert len(body["warnings"]) == 4
+    assert set(body["charging"]) == {"description", "activities"}
     assert len(body["charging"]["activities"]) == 3
     assert len(body["compatible_friends"]) == 2
     assert all(friend["badge"] == "환상의 장난감" for friend in body["compatible_friends"])
