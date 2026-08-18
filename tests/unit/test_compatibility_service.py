@@ -16,6 +16,7 @@ from pakit.domain.assessment_submission import (
 )
 from pakit.services.compatibility_service import (
     COMPATIBILITY_PROFILE_VERSION,
+    RELATIONSHIP_ROLE_BY_ANSWERS,
     CompatibilityUnavailableError,
     build_compatibility,
     build_compatibility_profile,
@@ -73,12 +74,10 @@ def _result(
         (moment, strength)
         for moment in ("decision", "worries", "hangout", "information")
         for strength in (
-            "set_direction",
+            "organize_and_coordinate",
             "lift_mood",
             "make_it_happen",
-            "draw_people_out",
-            "coordinate_opinions",
-            "remember_and_care",
+            "care_for_others",
         )
     ],
 )
@@ -104,6 +103,27 @@ def test_builds_a_relationship_role_for_every_q1_q2_combination(
         "energizer",
     }
     assert profile.version == COMPATIBILITY_PROFILE_VERSION
+
+
+def test_maps_every_q1_q2_combination_to_the_confirmed_compatibility_role() -> None:
+    assert RELATIONSHIP_ROLE_BY_ANSWERS == {
+        ("decision", "organize_and_coordinate"): "guide",
+        ("decision", "lift_mood"): "connector",
+        ("decision", "make_it_happen"): "organizer",
+        ("decision", "care_for_others"): "supporter",
+        ("worries", "organize_and_coordinate"): "guide",
+        ("worries", "lift_mood"): "energizer",
+        ("worries", "make_it_happen"): "guide",
+        ("worries", "care_for_others"): "supporter",
+        ("hangout", "organize_and_coordinate"): "organizer",
+        ("hangout", "lift_mood"): "energizer",
+        ("hangout", "make_it_happen"): "organizer",
+        ("hangout", "care_for_others"): "supporter",
+        ("information", "organize_and_coordinate"): "guide",
+        ("information", "lift_mood"): "connector",
+        ("information", "make_it_happen"): "guide",
+        ("information", "care_for_others"): "supporter",
+    }
 
 
 @pytest.mark.parametrize(

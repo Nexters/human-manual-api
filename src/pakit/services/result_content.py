@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-18.13"
+RESULT_CONTENT_VERSION = "2026-08-19.1"
 
 
 @dataclass(frozen=True)
@@ -221,9 +221,9 @@ MOTIVATION_DESCRIPTION: dict[tuple[str, str], str] = {
 
 
 RELATIONSHIP_ROLE_COPY: dict[tuple[str, str], FeatureCopy] = {
-    ("decision", "set_direction"): FeatureCopy(
-        "결정 대장",
-        "친구들이 아무거나만 반복하면 조건을 딱 정리해 선택지를 좁혀주는 사람이에요.",
+    ("decision", "organize_and_coordinate"): FeatureCopy(
+        "결정 조율자",
+        "친구들 의견이 갈리면 기준과 공통점을 정리해 모두가 납득할 방향을 만드는 사람이에요.",
     ),
     ("decision", "lift_mood"): FeatureCopy(
         "말문 트기왕",
@@ -231,23 +231,15 @@ RELATIONSHIP_ROLE_COPY: dict[tuple[str, str], FeatureCopy] = {
     ),
     ("decision", "make_it_happen"): FeatureCopy(
         "실행 총무",
-        "여기까지 정했으면 끝을 봐야 해서, 누가 언제 할지까지 정해주는 사람이에요.",
+        "아이디어가 나오면 누가 언제 움직일지 정해 결정을 실제 행동으로 옮기는 사람이에요.",
     ),
-    ("decision", "draw_people_out"): FeatureCopy(
-        "의견 소환사",
-        "말 없는 친구에게도 슬쩍 물어봐, 모두의 진짜 의견을 꺼내는 사람이에요.",
+    ("decision", "care_for_others"): FeatureCopy(
+        "의견 챙김왕",
+        "말 없는 친구에게도 원하는 걸 물어보고 누구도 빠지지 않는 선택을 만드는 사람이에요.",
     ),
-    ("decision", "coordinate_opinions"): FeatureCopy(
-        "평화 협상가",
-        "하고 싶은 게 제각각이어도 겹치는 지점을 찾아 결론을 만드는 사람이에요.",
-    ),
-    ("decision", "remember_and_care"): FeatureCopy(
-        "취향 기억왕",
-        "누가 뭘 좋아하고 싫어하는지 기억해 모두가 만족할 답을 고르는 사람이에요.",
-    ),
-    ("worries", "set_direction"): FeatureCopy(
+    ("worries", "organize_and_coordinate"): FeatureCopy(
         "고민 길잡이",
-        "친구의 생각이 엉켜 있으면 지금 할 수 있는 일부터 짚어주는 사람이에요.",
+        "친구의 생각이 엉켜 있으면 상황을 정리하고 지금 할 수 있는 일부터 짚어주는 사람이에요.",
     ),
     ("worries", "lift_mood"): FeatureCopy(
         "기분 환기담당",
@@ -255,23 +247,15 @@ RELATIONSHIP_ROLE_COPY: dict[tuple[str, str], FeatureCopy] = {
     ),
     ("worries", "make_it_happen"): FeatureCopy(
         "현실 해결사",
-        "친구가 고민만 맴돌고 있으면 당장 해볼 수 있는 방법을 함께 정하는 사람이에요.",
+        "친구가 고민만 맴돌면 당장 해볼 수 있는 방법을 찾아 함께 움직이는 사람이에요.",
     ),
-    ("worries", "draw_people_out"): FeatureCopy(
-        "고민 대나무숲",
-        "말하기 힘든 속마음도 어느새 전부 털어놓게 만드는 사람이에요.",
-    ),
-    ("worries", "coordinate_opinions"): FeatureCopy(
-        "관계 통역사",
-        "친구가 사람 때문에 힘들어하면 서로 왜 그랬는지 풀어서 설명해주는 사람이에요.",
-    ),
-    ("worries", "remember_and_care"): FeatureCopy(
+    ("worries", "care_for_others"): FeatureCopy(
         "맞춤 위로왕",
-        "지나가듯 했던 말까지 기억했다가 꼭 필요한 방식으로 위로하는 사람이에요.",
+        "서두르지 않고 이야기를 들어주며 그 친구에게 필요한 방식으로 위로하는 사람이에요.",
     ),
-    ("hangout", "set_direction"): FeatureCopy(
-        "모임 대장",
-        "심심하다는 말이 나오면 어디서 뭘 할지부터 빠르게 정하는 사람이에요.",
+    ("hangout", "organize_and_coordinate"): FeatureCopy(
+        "모임 조율대장",
+        "하고 싶은 게 제각각이어도 모두가 즐기도록 장소와 순서를 정리하는 사람이에요.",
     ),
     ("hangout", "lift_mood"): FeatureCopy(
         "분위기 메이커",
@@ -281,21 +265,13 @@ RELATIONSHIP_ROLE_COPY: dict[tuple[str, str], FeatureCopy] = {
         "약속 추진대장",
         "언제 한번 보자는 말을 진짜 날짜와 장소가 있는 약속으로 만드는 사람이에요.",
     ),
-    ("hangout", "draw_people_out"): FeatureCopy(
-        "리액션 부자",
-        "친구의 이야기를 신나게 받아줘 모두가 한마디씩 끼어들게 만드는 사람이에요.",
+    ("hangout", "care_for_others"): FeatureCopy(
+        "모임 챙김대장",
+        "누구 하나 겉돌지 않게 살피고 모두가 편하게 즐기도록 챙기는 사람이에요.",
     ),
-    ("hangout", "coordinate_opinions"): FeatureCopy(
-        "어색함 해결사",
-        "서로 안 친한 친구들이 섞여도 누구 하나 겉돌지 않게 이어주는 사람이에요.",
-    ),
-    ("hangout", "remember_and_care"): FeatureCopy(
-        "취향 맞춤대장",
-        "오늘 모인 친구들의 취향을 보고 다 같이 즐길 만한 걸 골라오는 사람이에요.",
-    ),
-    ("information", "set_direction"): FeatureCopy(
-        "핵심 요약왕",
-        "검색 결과가 너무 많아도 지금 필요한 정보부터 딱 짚어주는 사람이에요.",
+    ("information", "organize_and_coordinate"): FeatureCopy(
+        "정보 정리왕",
+        "정보가 많거나 서로 엇갈려도 확인된 사실과 핵심부터 정리해주는 사람이에요.",
     ),
     ("information", "lift_mood"): FeatureCopy(
         "설명 예능인",
@@ -305,17 +281,9 @@ RELATIONSHIP_ROLE_COPY: dict[tuple[str, str], FeatureCopy] = {
         "실행 설계자",
         "찾은 정보를 그래서 뭘 하면 되는지까지 정리해주는 사람이에요.",
     ),
-    ("information", "draw_people_out"): FeatureCopy(
-        "질문 맛집",
-        "뭘 물어봐도 귀찮아하지 않고, 궁금한 걸 더 편하게 묻게 만드는 사람이에요.",
-    ),
-    ("information", "coordinate_opinions"): FeatureCopy(
-        "팩트 정리왕",
-        "서로 다른 말을 할 때 확인된 사실부터 나눠 혼란을 정리하는 사람이에요.",
-    ),
-    ("information", "remember_and_care"): FeatureCopy(
+    ("information", "care_for_others"): FeatureCopy(
         "맞춤 정보통",
-        "친구의 상황과 취향을 기억해 그 사람에게 필요한 정보만 골라주는 사람이에요.",
+        "친구의 상황을 살펴 그 사람에게 꼭 필요한 정보만 골라 알려주는 사람이에요.",
     ),
 }
 

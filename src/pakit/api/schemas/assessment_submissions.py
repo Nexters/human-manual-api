@@ -11,11 +11,11 @@ from pakit.domain.assessment_submission import (
 )
 
 ASSESSMENT_SUBMISSION_EXAMPLE: dict[str, object] = {
-    "assessment_version": "2026-08-18.1",
+    "assessment_version": "2026-08-19.1",
     "participant": {"nickname": "송송"},
     "answers": [
         {"question_id": "step1.q01", "value": "decision"},
-        {"question_id": "step1.q02", "value": "set_direction"},
+        {"question_id": "step1.q02", "value": "organize_and_coordinate"},
         {"question_id": "step1.q05", "value": "after_waking"},
         {"question_id": "step1.q06", "value": "rush"},
         {"question_id": "step1.q07", "value": "sleep_until_noon"},
@@ -92,9 +92,10 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
             ),
         },
         {
-            "title": "결정 대장",
+            "title": "결정 조율자",
             "description": (
-                "친구들이 아무거나만 반복하면 조건을 딱 정리해 선택지를 좁혀주는 사람이에요."
+                "친구들 의견이 갈리면 기준과 공통점을 정리해 "
+                "모두가 납득할 방향을 만드는 사람이에요."
             ),
         },
         {

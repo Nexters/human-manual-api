@@ -1,5 +1,5 @@
 {
-  "assessment_version": "2026-08-18.1",
+  "assessment_version": "2026-08-19.1",
   "identifier_status": "published",
   "id_policy": {
     "question_id": "step{number}.q{two_digit_stable_sequence}",
@@ -26,12 +26,10 @@
       "question_id": "step1.q02",
       "answer_kind": "choice",
       "values": [
-        "set_direction",
+        "organize_and_coordinate",
         "lift_mood",
         "make_it_happen",
-        "draw_people_out",
-        "coordinate_opinions",
-        "remember_and_care"
+        "care_for_others"
       ]
     },
     {

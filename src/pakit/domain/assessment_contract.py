@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import StrEnum
 
-ASSESSMENT_VERSION = "2026-08-18.1"
+ASSESSMENT_VERSION = "2026-08-19.1"
 
 
 class AnswerKind(StrEnum):
@@ -25,16 +25,7 @@ QUESTION_CONTRACTS: dict[str, QuestionContract] = {
     ),
     "step1.q02": QuestionContract(
         AnswerKind.CHOICE,
-        frozenset(
-            {
-                "set_direction",
-                "lift_mood",
-                "make_it_happen",
-                "draw_people_out",
-                "coordinate_opinions",
-                "remember_and_care",
-            }
-        ),
+        frozenset({"organize_and_coordinate", "lift_mood", "make_it_happen", "care_for_others"}),
     ),
     "step1.q05": QuestionContract(
         AnswerKind.CHOICE, frozenset({"after_waking", "during_meal", "after_work", "late_night"})

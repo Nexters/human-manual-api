@@ -479,9 +479,10 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
             ),
         },
         {
-            "title": "결정 대장",
+            "title": "결정 조율자",
             "description": (
-                "친구들이 아무거나만 반복하면 조건을 딱 정리해 선택지를 좁혀주는 사람이에요."
+                "친구들 의견이 갈리면 기준과 공통점을 정리해 "
+                "모두가 납득할 방향을 만드는 사람이에요."
             ),
         },
         {
@@ -638,7 +639,7 @@ def test_submission_uses_q01_and_q02_for_the_relationship_role_only() -> None:
         if answer["question_id"] == "step1.q01":
             answer["value"] = "decision"
         elif answer["question_id"] == "step1.q02":
-            answer["value"] = "set_direction"
+            answer["value"] = "organize_and_coordinate"
     for answer in worries_answers:
         if answer["question_id"] == "step1.q01":
             answer["value"] = "worries"
@@ -652,7 +653,7 @@ def test_submission_uses_q01_and_q02_for_the_relationship_role_only() -> None:
     assert worries_response.status_code == 200
     decision_features = decision_response.json()["features"]
     worries_features = worries_response.json()["features"]
-    assert decision_features[1]["title"] == "결정 대장"
+    assert decision_features[1]["title"] == "결정 조율자"
     assert worries_features[1]["title"] == "현실 해결사"
     assert decision_features[0] == worries_features[0]
     assert decision_features[2:] == worries_features[2:]

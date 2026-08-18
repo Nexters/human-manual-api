@@ -107,7 +107,7 @@
     const choices = (id, prompt, options, defaultValue) => ({ id, prompt, options, defaultValue });
     const questions = [
       choices("step1.q01", "친구들이 나를 찾는 순간은 언제인가요?", [["decision","결정이 필요할 때"],["worries","고민 있을 때"],["hangout","놀 사람 필요할 때"],["information","정보 필요할 때"]], "hangout"),
-      choices("step1.q02", "친구들과 함께 있으면 나도 모르게 맡게 되는 역할은?", [["set_direction","다들 우왕좌왕하면 방향부터 정한다"],["lift_mood","어색해지면 먼저 분위기를 푼다"],["make_it_happen","말만 나온 일을 실제 계획으로 만든다"],["draw_people_out","누가 이야기하면 잘 받아줘 더 말하게 한다"],["coordinate_opinions","의견이 부딪히면 중간에서 정리한다"],["remember_and_care","각자 좋아하는 걸 기억해 챙긴다"]], "lift_mood"),
+      choices("step1.q02", "친구들과 있을 때, 나와 가장 닮은 토끼는?", [["organize_and_coordinate","잠깐, 의견 정리해서 방향부터 잡자."],["lift_mood","분위기 왜 이래ㅋㅋ 일단 웃고 보자."],["make_it_happen","재밌겠다. 일단 해보고 생각하자!"],["care_for_others","넌 뭐가 좋아? 말해주면 내가 챙길게."]], "lift_mood"),
       choices("step1.q05", "하루 중 절대 건드리면 안 되는 시간은 언제인가요?", [["after_waking","기상 직후"],["during_meal","밥 먹을 때"],["after_work","퇴근 직후"],["late_night","새벽 감성 타임"]], "after_waking"),
       choices("step1.q06", "나를 화나게 하는 가장 빠른 방법", [["rush","재촉하기"],["interrupt","말 끊기"],["take_food","음식 뺏어먹기"],["arrive_late","약속 늦기"],["nag","잔소리"],["change_plan","내 계획 바꾸기"]], "nag"),
       choices("step1.q07", "기다리고 기다리던 휴일, 첫 스케줄은 무엇인가요?", [["sleep_until_noon","낮 12시 기상"],["morning_run","아침 러닝"],["brunch_cafe","브런치 카페"],["stay_in_bed","이불 밖은 위험해"],["watch_streaming","밀린 OTT 시청"],["self_development","자기개발"]], "stay_in_bed"),
@@ -196,7 +196,7 @@
         const response = await fetch("/api/tests/submissions", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ assessment_version:"2026-08-18.1", participant:{ nickname:document.querySelector("#nickname").value }, answers, mbti:mbti.value })
+          body: JSON.stringify({ assessment_version:"2026-08-19.1", participant:{ nickname:document.querySelector("#nickname").value }, answers, mbti:mbti.value })
         });
         const data = await response.json();
         if (!response.ok) throw new Error(JSON.stringify(data, null, 2));

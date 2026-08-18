@@ -65,20 +65,36 @@ def test_defines_copy_for_all_unboxing_combinations() -> None:
 def test_defines_one_relationship_role_for_every_q01_q02_combination() -> None:
     q01_values = {"decision", "worries", "hangout", "information"}
     q02_values = {
-        "set_direction",
+        "organize_and_coordinate",
         "lift_mood",
         "make_it_happen",
-        "draw_people_out",
-        "coordinate_opinions",
-        "remember_and_care",
+        "care_for_others",
     }
 
     assert set(RELATIONSHIP_ROLE_COPY) == {
         (q01_value, q02_value) for q01_value in q01_values for q02_value in q02_values
     }
-    assert len({copy.title for copy in RELATIONSHIP_ROLE_COPY.values()}) == 24
-    assert len({copy.description for copy in RELATIONSHIP_ROLE_COPY.values()}) == 24
+    assert len({copy.title for copy in RELATIONSHIP_ROLE_COPY.values()}) == 16
+    assert len({copy.description for copy in RELATIONSHIP_ROLE_COPY.values()}) == 16
     assert all(len(copy.description) <= 50 for copy in RELATIONSHIP_ROLE_COPY.values())
+    assert {key: copy.title for key, copy in RELATIONSHIP_ROLE_COPY.items()} == {
+        ("decision", "organize_and_coordinate"): "결정 조율자",
+        ("decision", "lift_mood"): "말문 트기왕",
+        ("decision", "make_it_happen"): "실행 총무",
+        ("decision", "care_for_others"): "의견 챙김왕",
+        ("worries", "organize_and_coordinate"): "고민 길잡이",
+        ("worries", "lift_mood"): "기분 환기담당",
+        ("worries", "make_it_happen"): "현실 해결사",
+        ("worries", "care_for_others"): "맞춤 위로왕",
+        ("hangout", "organize_and_coordinate"): "모임 조율대장",
+        ("hangout", "lift_mood"): "분위기 메이커",
+        ("hangout", "make_it_happen"): "약속 추진대장",
+        ("hangout", "care_for_others"): "모임 챙김대장",
+        ("information", "organize_and_coordinate"): "정보 정리왕",
+        ("information", "lift_mood"): "설명 예능인",
+        ("information", "make_it_happen"): "실행 설계자",
+        ("information", "care_for_others"): "맞춤 정보통",
+    }
 
 
 def test_relationship_roles_do_not_repeat_answer_labels() -> None:
@@ -87,12 +103,10 @@ def test_relationship_roles_do_not_repeat_answer_labels() -> None:
         "고민 있을 때",
         "놀 사람 필요할 때",
         "정보 필요할 때",
-        "다들 우왕좌왕하면 방향부터 정한다",
-        "어색해지면 먼저 분위기를 푼다",
-        "말만 나온 일을 실제 계획으로 만든다",
-        "누가 이야기하면 잘 받아줘 더 말하게 한다",
-        "의견이 부딪히면 중간에서 정리한다",
-        "각자 좋아하는 걸 기억해 챙긴다",
+        "잠깐, 의견 정리해서 방향부터 잡자.",
+        "분위기 왜 이래ㅋㅋ 일단 웃고 보자.",
+        "재밌겠다. 일단 해보고 생각하자!",
+        "넌 뭐가 좋아? 말해주면 내가 챙길게.",
     }
 
     rendered_copy = " ".join(
@@ -263,7 +277,7 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-18.13"
+    assert RESULT_CONTENT_VERSION == "2026-08-19.1"
 
 
 def test_defines_all_warning_copy_variants() -> None:

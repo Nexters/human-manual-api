@@ -11,7 +11,7 @@ from pakit.domain.assessment_submission import (
 from pakit.domain.characters import CHARACTERS
 from pakit.services.result_repository import ResultRepository
 
-COMPATIBILITY_PROFILE_VERSION = "2026-08-17.1"
+COMPATIBILITY_PROFILE_VERSION = "2026-08-19.1"
 
 PRIMARY_COMPATIBLE_MBTI: dict[MbtiType, MbtiType] = {
     MbtiType.INTJ: MbtiType.ENFP,
@@ -123,30 +123,22 @@ class CompatibilityScores:
 
 
 RELATIONSHIP_ROLE_BY_ANSWERS: dict[tuple[str, str], str] = {
-    ("decision", "set_direction"): "guide",
+    ("decision", "organize_and_coordinate"): "guide",
     ("decision", "lift_mood"): "connector",
     ("decision", "make_it_happen"): "organizer",
-    ("decision", "draw_people_out"): "connector",
-    ("decision", "coordinate_opinions"): "supporter",
-    ("decision", "remember_and_care"): "supporter",
-    ("worries", "set_direction"): "guide",
+    ("decision", "care_for_others"): "supporter",
+    ("worries", "organize_and_coordinate"): "guide",
     ("worries", "lift_mood"): "energizer",
     ("worries", "make_it_happen"): "guide",
-    ("worries", "draw_people_out"): "supporter",
-    ("worries", "coordinate_opinions"): "supporter",
-    ("worries", "remember_and_care"): "supporter",
-    ("hangout", "set_direction"): "organizer",
+    ("worries", "care_for_others"): "supporter",
+    ("hangout", "organize_and_coordinate"): "organizer",
     ("hangout", "lift_mood"): "energizer",
     ("hangout", "make_it_happen"): "organizer",
-    ("hangout", "draw_people_out"): "connector",
-    ("hangout", "coordinate_opinions"): "organizer",
-    ("hangout", "remember_and_care"): "supporter",
-    ("information", "set_direction"): "guide",
+    ("hangout", "care_for_others"): "supporter",
+    ("information", "organize_and_coordinate"): "guide",
     ("information", "lift_mood"): "connector",
     ("information", "make_it_happen"): "guide",
-    ("information", "draw_people_out"): "connector",
-    ("information", "coordinate_opinions"): "supporter",
-    ("information", "remember_and_care"): "supporter",
+    ("information", "care_for_others"): "supporter",
 }
 
 MOTIVATION_GROUPS = {

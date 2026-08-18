@@ -1,5 +1,5 @@
 {
-  "assessment_version": "2026-08-18.1",
+  "assessment_version": "2026-08-19.1",
   "content_status": "baseline_with_product_mapping",
   "locale": "ko-KR",
   "source": {
@@ -156,15 +156,29 @@
       "question_id": "step1.q02",
       "step": 1,
       "order": 2,
-      "prompt": "친구들과 함께 있으면 나도 모르게 맡게 되는 역할은?",
+      "prompt": "친구들과 있을 때, 나와 가장 닮은 토끼는?",
       "answer_kind": "choice",
       "options": [
-        {"value": "set_direction", "label": "다들 우왕좌왕하면 방향부터 정한다"},
-        {"value": "lift_mood", "label": "어색해지면 먼저 분위기를 푼다"},
-        {"value": "make_it_happen", "label": "말만 나온 일을 실제 계획으로 만든다"},
-        {"value": "draw_people_out", "label": "누가 이야기하면 잘 받아줘 더 말하게 한다"},
-        {"value": "coordinate_opinions", "label": "의견이 부딪히면 중간에서 정리한다"},
-        {"value": "remember_and_care", "label": "각자 좋아하는 걸 기억해 챙긴다"}
+        {
+          "value": "organize_and_coordinate",
+          "label": "잠깐, 의견 정리해서 방향부터 잡자.",
+          "role": "정리·조율"
+        },
+        {
+          "value": "lift_mood",
+          "label": "분위기 왜 이래ㅋㅋ 일단 웃고 보자.",
+          "role": "분위기 전환"
+        },
+        {
+          "value": "make_it_happen",
+          "label": "재밌겠다. 일단 해보고 생각하자!",
+          "role": "실행·추진"
+        },
+        {
+          "value": "care_for_others",
+          "label": "넌 뭐가 좋아? 말해주면 내가 챙길게.",
+          "role": "관심·배려"
+        }
       ],
       "calculation": {
         "status": "mapped",

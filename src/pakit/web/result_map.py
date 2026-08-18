@@ -41,7 +41,7 @@ def noun(mbti: MbtiType) -> str:
 # ── 질문 화면 문구 (docs/assessment-content.md 기준) ─────────────────────
 Q_TITLE = {
     "step1.q01": "친구들이 나를 찾는 순간은 언제인가요?",
-    "step1.q02": "함께 있으면 나도 모르게 맡는 역할은?",
+    "step1.q02": "친구들과 있을 때, 나와 가장 닮은 토끼는?",
     "step1.q05": "절대 건드리면 안 되는 시간은?",
     "step1.q06": "나를 화나게 하는 가장 빠른 방법은?",
     "step1.q07": "기다리던 휴일, 첫 스케줄은?",
@@ -60,12 +60,10 @@ CHOICE = {
         "information": "정보 필요할 때",
     },
     "step1.q02": {
-        "set_direction": "방향부터 정한다",
-        "lift_mood": "먼저 분위기를 푼다",
-        "make_it_happen": "말 나온 일을 실제 계획으로 만든다",
-        "draw_people_out": "잘 받아줘 더 말하게 한다",
-        "coordinate_opinions": "중간에서 의견을 정리한다",
-        "remember_and_care": "각자 좋아하는 걸 기억해 챙긴다",
+        "organize_and_coordinate": "잠깐, 의견 정리해서 방향부터 잡자.",
+        "lift_mood": "분위기 왜 이래ㅋㅋ 일단 웃고 보자.",
+        "make_it_happen": "재밌겠다. 일단 해보고 생각하자!",
+        "care_for_others": "넌 뭐가 좋아? 말해주면 내가 챙길게.",
     },
     "step1.q05": {
         "after_waking": "기상 직후",
@@ -382,7 +380,7 @@ A×B 조합 제목·설명은 기존 결과 스냅샷 복원용 내부 데이터
             "핵심 특징 (4슬롯)",
             f"{qchip('step1.q11')}{qchip('step1.q01')}{qchip('step1.q02')}"
             f"{axchip('expr')}{axchip('egen')}{mbtichip()}",
-            "6 · 24 · 24 · 4 · 16",
+            "6 · 24 · 16 · 4 · 16",
             features_body,
         )
     )

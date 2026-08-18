@@ -37,3 +37,33 @@ def test_runtime_contract_matches_published_identifier_document() -> None:
     mbti_input = document["mbti_input"]
     assert mbti_input["field"] == "mbti"
     assert set(mbti_input["allowed_values"]) == {mbti.value for mbti in MbtiType}
+
+
+def test_q02_content_defines_four_role_choices_without_asset_metadata() -> None:
+    document_path = Path(__file__).parents[2] / "docs" / "assessment-content.v1.json"
+    document = json.loads(document_path.read_text(encoding="utf-8"))
+    question = next(item for item in document["questions"] if item["question_id"] == "step1.q02")
+
+    assert question["prompt"] == "친구들과 있을 때, 나와 가장 닮은 토끼는?"
+    assert question["options"] == [
+        {
+            "value": "organize_and_coordinate",
+            "label": "잠깐, 의견 정리해서 방향부터 잡자.",
+            "role": "정리·조율",
+        },
+        {
+            "value": "lift_mood",
+            "label": "분위기 왜 이래ㅋㅋ 일단 웃고 보자.",
+            "role": "분위기 전환",
+        },
+        {
+            "value": "make_it_happen",
+            "label": "재밌겠다. 일단 해보고 생각하자!",
+            "role": "실행·추진",
+        },
+        {
+            "value": "care_for_others",
+            "label": "넌 뭐가 좋아? 말해주면 내가 챙길게.",
+            "role": "관심·배려",
+        },
+    ]

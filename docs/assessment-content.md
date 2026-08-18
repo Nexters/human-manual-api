@@ -1,6 +1,6 @@
 # 테스트 질문지 기준 자료
 
-이 문서는 제공된 테스트 화면을 `assessment_version` `2026-08-18.1`의 질문 원문과 선택지에
+이 문서는 제공된 테스트 화면을 `assessment_version` `2026-08-19.1`의 질문 원문과 선택지에
 연결한 사람이 읽기 위한 목록이다. 백엔드에서 읽을 수 있는 동일 기준 데이터는
 [`assessment-content.v1.json`](./assessment-content.v1.json)에 있다. ID와 제출 값의 불변 계약은
 [`assessment-identifiers.v1.json`](./assessment-identifiers.v1.json)이 계속 담당한다.
@@ -16,7 +16,7 @@
 | 문항 | 상태 | 변경 내용 | 사용처 |
 |---|---|---|---|
 | `step1.q01` | 확정·구현 | 질문과 선택지를 모바일용 축약 문구로 개편 | 핵심 특징 `관계 속의 나` |
-| `step1.q02` | 확정·구현 | 친구들 사이에서 자연스럽게 맡는 역할을 묻는 문항으로 개편 | 핵심 특징 `관계 속의 나` |
+| `step1.q02` | 확정·구현 | 토끼 4종의 말풍선으로 관계 역할을 고르는 문항으로 개편 | 핵심 특징 `관계 속의 나` |
 | `step1.q03`, `step1.q04` | 삭제 | 결과 생성에 사용되지 않아 질문지와 제출 계약에서 제거 | 없음 |
 | `step1.q11` | 확정·구현 | 질문과 선택지를 모바일에서 빠르게 읽히는 짧은 문구로 개편 | 핵심 특징 `동원력` |
 | `step1.q12` | 확정·구현 | 질문과 선택지를 모바일용 축약 문구로 개편 | `이렇게 다뤄주세요` 결과 재료 |
@@ -26,7 +26,7 @@
 | ID | 질문 | 선택지 (`value` → 화면 문구) |
 |---|---|---|
 | `step1.q01` | 친구들이 나를 찾는 순간은 언제인가요? | `decision` → 결정이 필요할 때<br>`worries` → 고민 있을 때<br>`hangout` → 놀 사람 필요할 때<br>`information` → 정보 필요할 때 |
-| `step1.q02` | 친구들과 함께 있으면 나도 모르게 맡게 되는 역할은? | `set_direction` → 다들 우왕좌왕하면 방향부터 정한다<br>`lift_mood` → 어색해지면 먼저 분위기를 푼다<br>`make_it_happen` → 말만 나온 일을 실제 계획으로 만든다<br>`draw_people_out` → 누가 이야기하면 잘 받아줘 더 말하게 한다<br>`coordinate_opinions` → 의견이 부딪히면 중간에서 정리한다<br>`remember_and_care` → 각자 좋아하는 걸 기억해 챙긴다 |
+| `step1.q02` | 친구들과 있을 때, 나와 가장 닮은 토끼는? | `organize_and_coordinate` → “잠깐, 의견 정리해서 방향부터 잡자.” · 정리·조율<br>`lift_mood` → “분위기 왜 이래ㅋㅋ 일단 웃고 보자.” · 분위기 전환<br>`make_it_happen` → “재밌겠다. 일단 해보고 생각하자!” · 실행·추진<br>`care_for_others` → “넌 뭐가 좋아? 말해주면 내가 챙길게.” · 관심·배려 |
 | `step1.q05` | 하루 중 절대 건드리면 안 되는 시간은 언제인가요? | `after_waking` → 기상 직후<br>`during_meal` → 밥 먹을 때<br>`after_work` → 퇴근 직후<br>`late_night` → 새벽 감성 타임 |
 | `step1.q06` | 송송님을 화나게 하는 가장 빠른 방법 | `rush` → 재촉하기<br>`interrupt` → 말 끊기<br>`take_food` → 음식 뺏어먹기<br>`arrive_late` → 약속 늦기<br>`nag` → 잔소리<br>`change_plan` → 내 계획 바꾸기 |
 | `step1.q07` | 기다리고 기다리던 휴일, 송송님의 첫 스케줄은 무엇인가요? | `sleep_until_noon` → 낮 12시 기상<br>`morning_run` → 아침 러닝<br>`brunch_cafe` → 브런치 카페<br>`stay_in_bed` → 이불 밖은 위험해<br>`watch_streaming` → 밀린 OTT 시청<br>`self_development` → 자기개발 |
