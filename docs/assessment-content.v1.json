@@ -1,11 +1,11 @@
 {
-  "assessment_version": "2026-08-14.3",
+  "assessment_version": "2026-08-18.1",
   "content_status": "baseline_with_product_mapping",
   "locale": "ko-KR",
   "source": {
     "type": "user_provided_test_screen_images",
     "received_on": "2026-08-13",
-    "scope": "STEP 1 12문항, STEP 2 12문항, MBTI 선택 화면"
+    "scope": "STEP 1 10문항, STEP 2 12문항, MBTI 선택 화면"
   },
   "identifier_contract": "docs/assessment-identifiers.v1.json",
   "result_material_contract": {
@@ -137,13 +137,13 @@
       "question_id": "step1.q01",
       "step": 1,
       "order": 1,
-      "prompt": "친구들이 유독 나부터 찾는 순간은 언제인가요?",
+      "prompt": "친구들이 나를 찾는 순간은 언제인가요?",
       "answer_kind": "choice",
       "options": [
-        {"value": "decision", "label": "다들 ‘아무거나’만 반복하고 결정을 못 할 때"},
-        {"value": "worries", "label": "혼자 생각해도 답이 안 나는 고민이 생겼을 때"},
-        {"value": "hangout", "label": "심심한데 누구를 불러야 재밌을지 고민될 때"},
-        {"value": "information", "label": "검색해도 원하는 정보를 찾지 못했을 때"}
+        {"value": "decision", "label": "결정이 필요할 때"},
+        {"value": "worries", "label": "고민 있을 때"},
+        {"value": "hangout", "label": "놀 사람 필요할 때"},
+        {"value": "information", "label": "정보 필요할 때"}
       ],
       "calculation": {
         "status": "mapped",
@@ -174,39 +174,9 @@
       }
     },
     {
-      "question_id": "step1.q03",
-      "step": 1,
-      "order": 3,
-      "prompt": "남들은 이해 못하는 습관이 있나요?",
-      "answer_kind": "choice",
-      "options": [
-        {"value": "save_favorites", "label": "좋아하는 물건은 아까워서 쉽게 사용하지 못한다"},
-        {"value": "multiple_alarms", "label": "알람을 하나보다 여러 개 맞춰두는 편이다"},
-        {"value": "duplicate_clothes", "label": "마음에 드는 옷은 같은 걸 여러 벌 사는 편이다"},
-        {"value": "check_spoilers", "label": "영화를 보기 전에 결말을 먼저 찾아보는 편이다"}
-      ],
-      "calculation": {"status": "retained_unmapped", "role": "unused_result_material"}
-    },
-    {
-      "question_id": "step1.q04",
-      "step": 1,
-      "order": 4,
-      "prompt": "자주 듣는 잔소리는 무엇인가요?",
-      "answer_kind": "choice",
-      "options": [
-        {"value": "phone_overuse", "label": "폰 좀 그만봐 진짜."},
-        {"value": "sleep_late", "label": "니가 올빼미냐 잠 좀 자"},
-        {"value": "overspending", "label": "거지가 꿈이니?"},
-        {"value": "slow_reply", "label": "읽씹 ㄴㄴ 대답 좀 해라"},
-        {"value": "messy_room", "label": "돼지우리냐 방 좀 치우고 살아라"},
-        {"value": "low_battery", "label": "폰 충전 좀 해라"}
-      ],
-      "calculation": {"status": "retained_unmapped", "role": "unused_result_material"}
-    },
-    {
       "question_id": "step1.q05",
       "step": 1,
-      "order": 5,
+      "order": 3,
       "prompt": "하루 중 절대 건드리면 안 되는 시간은 언제인가요?",
       "answer_kind": "choice",
       "options": [
@@ -225,7 +195,7 @@
     {
       "question_id": "step1.q06",
       "step": 1,
-      "order": 6,
+      "order": 4,
       "prompt": "송송님을 화나게 하는 가장 빠른 방법",
       "answer_kind": "choice",
       "options": [
@@ -246,7 +216,7 @@
     {
       "question_id": "step1.q07",
       "step": 1,
-      "order": 7,
+      "order": 5,
       "prompt": "기다리고 기다리던 휴일, 송송님의 첫 스케줄은 무엇인가요?",
       "answer_kind": "choice",
       "options": [
@@ -262,7 +232,7 @@
     {
       "question_id": "step1.q08",
       "step": 1,
-      "order": 8,
+      "order": 6,
       "prompt": "금요일 저녁, 약속이 갑자기 취소됐을 때 송송님은",
       "answer_kind": "choice",
       "options": [
@@ -276,7 +246,7 @@
     {
       "question_id": "step1.q09",
       "step": 1,
-      "order": 9,
+      "order": 7,
       "prompt": "송송님은 어떤 친구랑 오랫동안 놀 수 있나요?",
       "answer_kind": "choice",
       "presentation": "character_carousel",
@@ -291,7 +261,7 @@
     {
       "question_id": "step1.q10",
       "step": 1,
-      "order": 10,
+      "order": 8,
       "prompt": "이 친구랑은 절대 같이 여행가기 싫다!",
       "answer_kind": "choice",
       "presentation": "character_carousel",
@@ -306,7 +276,7 @@
     {
       "question_id": "step1.q11",
       "step": 1,
-      "order": 11,
+      "order": 9,
       "prompt": "집에만 있으려던 주말, 나를 밖으로 나오게 한 건?",
       "answer_kind": "choice",
       "options": [
@@ -329,7 +299,7 @@
     {
       "question_id": "step1.q12",
       "step": 1,
-      "order": 12,
+      "order": 10,
       "prompt": "기분 안 좋은 티가 났는지 친구에게서 연락이 왔다. 다음 중 가장 반가운 메시지는?",
       "answer_kind": "choice",
       "options": [

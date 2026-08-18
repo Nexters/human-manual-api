@@ -162,7 +162,7 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
     assert operation["tags"] == ["Test"]
     assert operation["summary"] == "테스트 결과 제출"
     assert "요청 데이터" in operation["description"]
-    assert "24개 문항" in operation["description"]
+    assert "22개 문항" in operation["description"]
     assert "서버에서 확인하는 항목" in operation["description"]
     assert "현재 응답 범위" in operation["description"]
     swagger_example = operation["requestBody"]["content"]["application/json"]["examples"][
@@ -749,6 +749,21 @@ def test_rejects_unknown_question_id() -> None:
     first = answers[0]
     assert isinstance(first, dict)
     first["question_id"] = "unknown.question"
+
+    response = client.post("/api/tests/submissions", json=payload)
+
+    assert response.status_code == 422
+    assert "알 수 없는 문항 ID" in response.json()["error"]["message"]
+
+
+@pytest.mark.parametrize("removed_question_id", ["step1.q03", "step1.q04"])
+def test_rejects_removed_question_id(removed_question_id: str) -> None:
+    payload = _valid_submission()
+    answers = payload["answers"]
+    assert isinstance(answers, list)
+    first = answers[0]
+    assert isinstance(first, dict)
+    first["question_id"] = removed_question_id
 
     response = client.post("/api/tests/submissions", json=payload)
 

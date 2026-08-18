@@ -83,10 +83,10 @@ def test_defines_one_relationship_role_for_every_q01_q02_combination() -> None:
 
 def test_relationship_roles_do_not_repeat_answer_labels() -> None:
     answer_labels = {
-        '다들 "아무거나"만 반복하고 결정을 못 할 때',
-        "혼자 생각해도 답이 안 나는 고민이 생겼을 때",
-        "심심한데 누구를 불러야 재밌을지 고민될 때",
-        "검색해도 원하는 정보를 찾지 못했을 때",
+        "결정이 필요할 때",
+        "고민 있을 때",
+        "놀 사람 필요할 때",
+        "정보 필요할 때",
         "다들 우왕좌왕하면 방향부터 정한다",
         "어색해지면 먼저 분위기를 푼다",
         "말만 나온 일을 실제 계획으로 만든다",

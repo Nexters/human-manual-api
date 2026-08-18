@@ -1,10 +1,10 @@
 {
-  "assessment_version": "2026-08-14.3",
+  "assessment_version": "2026-08-18.1",
   "identifier_status": "published",
   "id_policy": {
-    "question_id": "step{number}.q{two_digit_order}",
+    "question_id": "step{number}.q{two_digit_stable_sequence}",
     "answer_value": "lower_snake_case for choice and action answers",
-    "immutable_after_publish": true,
+    "immutable_within_assessment_version": true,
     "display_copy_is_not_an_identifier": true
   },
   "mbti_input": {
@@ -32,28 +32,6 @@
         "draw_people_out",
         "coordinate_opinions",
         "remember_and_care"
-      ]
-    },
-    {
-      "question_id": "step1.q03",
-      "answer_kind": "choice",
-      "values": [
-        "save_favorites",
-        "multiple_alarms",
-        "duplicate_clothes",
-        "check_spoilers"
-      ]
-    },
-    {
-      "question_id": "step1.q04",
-      "answer_kind": "choice",
-      "values": [
-        "phone_overuse",
-        "sleep_late",
-        "overspending",
-        "slow_reply",
-        "messy_room",
-        "low_battery"
       ]
     },
     {

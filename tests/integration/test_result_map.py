@@ -27,6 +27,11 @@ def test_question_chips_show_question_and_choices_on_hover_or_focus() -> None:
 
     assert 'class="chip chip-q question-chip"' in body
     assert 'tabindex="0"' in body
+    assert "친구들이 나를 찾는 순간은 언제인가요?" in body
+    assert "결정이 필요할 때" in body
+    assert "고민 있을 때" in body
+    assert "놀 사람 필요할 때" in body
+    assert "정보 필요할 때" in body
     assert "집에만 있으려던 주말, 나를 밖으로 나오게 한 건?" in body
     assert "curiosity" in body
     assert "궁금한 새 장소" in body

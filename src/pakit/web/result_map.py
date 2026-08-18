@@ -40,7 +40,7 @@ def noun(mbti: MbtiType) -> str:
 
 # ── 질문 화면 문구 (docs/assessment-content.md 기준) ─────────────────────
 Q_TITLE = {
-    "step1.q01": "친구들이 유독 나부터 찾는 순간은?",
+    "step1.q01": "친구들이 나를 찾는 순간은 언제인가요?",
     "step1.q02": "함께 있으면 나도 모르게 맡는 역할은?",
     "step1.q05": "절대 건드리면 안 되는 시간은?",
     "step1.q06": "나를 화나게 하는 가장 빠른 방법은?",
@@ -54,10 +54,10 @@ Q_TITLE = {
 
 CHOICE = {
     "step1.q01": {
-        "decision": "아무거나만 반복하고 결정을 못 할 때",
-        "worries": "혼자 답이 안 나는 고민이 생겼을 때",
-        "hangout": "누구를 불러야 재밌을지 고민될 때",
-        "information": "검색해도 정보를 못 찾았을 때",
+        "decision": "결정이 필요할 때",
+        "worries": "고민 있을 때",
+        "hangout": "놀 사람 필요할 때",
+        "information": "정보 필요할 때",
     },
     "step1.q02": {
         "set_direction": "방향부터 정한다",
@@ -243,7 +243,7 @@ def _build_sections() -> list[tuple[str, str, str, str, str, str]]:
     legend_body = f"""
 <p class="lead">STEP2의 12문항이 <b>4개 성향 축</b>으로 집계되고, 그 축을 둘씩 묶어
 <b>포장 코드(A1–A4)</b>와 <b>개봉 코드(B1–B4)</b>가 정해져요. 아래 코드가 여러 결과 칸에서
-반복 사용되니 먼저 봐두면 편해요. MBTI는 24문항으로 채점하지 않고 사용자가 직접 제출해요.</p>
+반복 사용되니 먼저 봐두면 편해요. MBTI는 22문항으로 채점하지 않고 사용자가 직접 제출해요.</p>
 {axis_table}
 <div class="two-col">
   <div><h4>포장 코드 · A = 표현 × 애착</h4>{a_table}</div>

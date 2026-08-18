@@ -12,7 +12,8 @@ def test_runtime_contract_matches_published_identifier_document() -> None:
 
     assert document["assessment_version"] == ASSESSMENT_VERSION
     assert document["identifier_status"] == "published"
-    assert len(document["questions"]) == 24
+    assert len(document["questions"]) == 22
+    assert {"step1.q03", "step1.q04"}.isdisjoint(QUESTION_CONTRACTS)
     assert {question["question_id"] for question in document["questions"]} == set(
         QUESTION_CONTRACTS
     )
