@@ -300,14 +300,14 @@
       "question_id": "step1.q12",
       "step": 1,
       "order": 10,
-      "prompt": "기분 안 좋은 티가 났는지 친구에게서 연락이 왔다. 다음 중 가장 반가운 메시지는?",
+      "prompt": "기분이 안 좋을 때, 가장 반가운 친구의 연락은?",
       "answer_kind": "choice",
       "options": [
-        {"value": "listen_to_me", "label": "“무슨 일인지 천천히 들어줄게.”"},
-        {"value": "take_me_out", "label": "“일단 나와. 맛있는 거 먹자.”"},
-        {"value": "give_me_space", "label": "“혼자 정리되면 연락해. 기다릴게.”"},
-        {"value": "solve_together", "label": "“내가 같이 해결해볼까?”"},
-        {"value": "make_me_laugh", "label": "“이거 보고 일단 웃어ㅋㅋ”"}
+        {"value": "listen_to_me", "label": "무슨 일인지 천천히 들어줄게"},
+        {"value": "take_me_out", "label": "일단 나와. 맛있는 거 먹자"},
+        {"value": "give_me_space", "label": "혼자 정리되면 연락해. 기다릴게"},
+        {"value": "solve_together", "label": "내가 같이 해결해볼까?"},
+        {"value": "make_me_laugh", "label": "이거 보고 일단 웃어ㅋㅋ"}
       ],
       "calculation": {
         "status": "mapped",

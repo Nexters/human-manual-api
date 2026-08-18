@@ -40,6 +40,12 @@ def test_question_chips_show_question_and_choices_on_hover_or_focus() -> None:
     assert "지켜야 할 약속" in body
     assert "오늘뿐인 기회" in body
     assert "재밌어 보이는 모임" in body
+    assert "기분이 안 좋을 때, 가장 반가운 친구의 연락은?" in body
+    assert "무슨 일인지 천천히 들어줄게" in body
+    assert "일단 나와. 맛있는 거 먹자" in body
+    assert "혼자 정리되면 연락해. 기다릴게" in body
+    assert "내가 같이 해결해볼까?" in body
+    assert "이거 보고 일단 웃어ㅋㅋ" in body
     assert ".question-chip:hover .question-tooltip" in body
     assert ".question-chip:focus .question-tooltip" in body
 
