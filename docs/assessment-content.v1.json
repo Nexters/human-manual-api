@@ -1,5 +1,5 @@
 {
-  "assessment_version": "2026-08-19.2",
+  "assessment_version": "2026-08-19.3",
   "content_status": "baseline_with_product_mapping",
   "locale": "ko-KR",
   "source": {
@@ -98,7 +98,13 @@
   "calculation_contract": {
     "status": "scoring_confirmed",
     "mapping_source": "temp.txt",
-    "aggregation": "equal_weight_rounded_mean",
+    "aggregation": {
+      "default": "equal_weight_rounded_mean",
+      "attachment": {
+        "method": "weighted_mean_rounded_to_nearest_integer",
+        "weights": {"step2.q04": 50, "step2.q05": 30, "step2.q06": 20}
+      }
+    },
     "classification_boundary": {"operator": ">=", "threshold": 50, "side": "score_100"},
     "unresolved_fields": [
       "features MBTI 16종 대표 특징의 최종 콘텐츠 검수",
@@ -369,11 +375,12 @@
       "answer_kind": "scale",
       "presentation": "distance_slider",
       "visual_endpoints": {"left": "밀착형", "right": "독립형"},
-      "constraints": {"minimum": 0, "maximum": 100, "step": 1},
+      "constraints": {"minimum": 0, "maximum": 100, "step": 25},
       "calculation": {
-        "status": "mapped_normalization_pending",
+        "status": "mapped",
         "role": "axis_signal",
         "axis": "attachment",
+        "weight_percent": 50,
         "input_endpoints": {
           "left": {"pole": "밀착", "canonical_score": 100},
           "right": {"pole": "거리조절", "canonical_score": 0}
@@ -394,6 +401,7 @@
         "status": "mapped",
         "role": "axis_signal",
         "axis": "attachment",
+        "weight_percent": 30,
         "signals": {
           "share_everything": {"pole": "밀착", "canonical_score": 100},
           "share_selectively": {"pole": "거리조절", "canonical_score": 0}
@@ -413,6 +421,7 @@
         "status": "mapped",
         "role": "axis_signal",
         "axis": "attachment",
+        "weight_percent": 20,
         "rules": [
           {"operator": "<", "threshold": 300, "pole": "밀착", "canonical_score": 100},
           {"operator": "=", "threshold": 300, "pole": "중립", "canonical_score": 50},

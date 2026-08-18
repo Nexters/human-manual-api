@@ -94,6 +94,14 @@ def _validate_answers(submission: AssessmentSubmission) -> None:
             raise InvalidSubmissionError(
                 f"{answer.question_id}의 value는 {contract.maximum} 이하여야 합니다."
             )
+        elif (
+            contract.step is not None
+            and contract.minimum is not None
+            and (answer.value - contract.minimum) % contract.step != 0
+        ):
+            raise InvalidSubmissionError(
+                f"{answer.question_id}의 value는 {contract.step} 단위여야 합니다."
+            )
 
 
 def _unboxing_item(item: UnboxingItemCopy, asset_directory: str) -> UnboxingItemData:

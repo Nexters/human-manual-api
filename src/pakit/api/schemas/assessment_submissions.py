@@ -11,7 +11,7 @@ from pakit.domain.assessment_submission import (
 )
 
 ASSESSMENT_SUBMISSION_EXAMPLE: dict[str, object] = {
-    "assessment_version": "2026-08-19.2",
+    "assessment_version": "2026-08-19.3",
     "participant": {"nickname": "송송"},
     "answers": [
         {"question_id": "step1.q01", "value": "decision"},
@@ -52,7 +52,7 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
     },
     "unboxing_kit": {
         "axis_scores": {
-            "attachment": 83,
+            "attachment": 75,
             "expression": 0,
             "routine": 67,
             "egen": 100,
@@ -117,7 +117,8 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
     },
     "can_do": [
         "내 말의 표면만 보지 말고, 왜 이런 말을 하는지까지 이해해주세요",
-        "별일 없어도 자주 안부를 묻고 곁에 있어주세요",
+        "오늘 뭐 했는지 사소한 일까지 나눠주세요. "
+        "별것 아닌 이야기를 주고받을수록 가까워졌다고 느낍니다.",
         "평소와 다른 티가 나면 먼저 물어봐주고, 마음을 정리해 말할 때까지 기다려주세요.",
         "말과 리액션에 담긴 애정을 알아봐주세요",
     ],

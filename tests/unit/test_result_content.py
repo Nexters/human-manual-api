@@ -209,7 +209,7 @@ def test_defines_every_handling_guide_copy() -> None:
         for preference in support_preferences
         for group in {"NT", "ST", "NF", "SF"}
     }
-    assert set(RELATIONSHIP_DISTANCE_COPY) == {"close", "independent"}
+    assert set(RELATIONSHIP_DISTANCE_COPY) == {"0_24", "25_49", "50_74", "75_100"}
     assert set(CONFLICT_SUPPORT_COPY) == {
         (conflict_style, message_style)
         for conflict_style in {"hint_and_wait", "resolve_immediately"}
@@ -281,7 +281,7 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-19.3"
+    assert RESULT_CONTENT_VERSION == "2026-08-19.4"
 
 
 def test_defines_all_warning_copy_variants() -> None:

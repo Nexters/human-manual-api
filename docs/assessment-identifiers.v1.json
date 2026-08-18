@@ -1,5 +1,5 @@
 {
-  "assessment_version": "2026-08-19.2",
+  "assessment_version": "2026-08-19.3",
   "identifier_status": "published",
   "id_policy": {
     "question_id": "step{number}.q{two_digit_stable_sequence}",
@@ -100,7 +100,7 @@
     {
       "question_id": "step2.q04",
       "answer_kind": "scale",
-      "constraints": {"minimum": 0, "maximum": 100, "step": 1}
+      "constraints": {"minimum": 0, "maximum": 100, "step": 25}
     },
     {
       "question_id": "step2.q05",

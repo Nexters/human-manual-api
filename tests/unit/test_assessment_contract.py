@@ -25,6 +25,7 @@ def test_runtime_contract_matches_published_identifier_document() -> None:
         constraints = question.get("constraints", {})
         assert contract.minimum == constraints.get("minimum")
         assert contract.maximum == constraints.get("maximum")
+        assert contract.step == constraints.get("step")
 
     example_answers = ASSESSMENT_SUBMISSION_EXAMPLE["answers"]
     assert isinstance(example_answers, list)

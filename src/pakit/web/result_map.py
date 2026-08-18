@@ -132,7 +132,14 @@ MIDDLE_GROUP_LABEL = {
 
 AXES = [
     ("expr", "표현방식", "탐색", "직진", "step2.q01 · q02 · q03", "50↑ 직진"),
-    ("att", "애착유형", "거리조절", "밀착", "step2.q04 · q05 · q06", "50↑ 밀착"),
+    (
+        "att",
+        "애착유형",
+        "거리조절",
+        "밀착",
+        "step2.q04 · q05 · q06",
+        "Q04 50% · Q05 30% · Q06 20% / 50↑ 밀착",
+    ),
     ("egen", "에겐테토", "테토", "에겐", "step2.q07 · q08 · q09", "50↑ 에겐"),
     ("rout", "자극추구", "탐험", "루틴", "step2.q10 · q11 · q12", "50↑ 루틴"),
 ]
@@ -416,8 +423,10 @@ A×B 조합 제목·설명은 기존 결과 스냅샷 복원용 내부 데이터
     dist_table = table(
         ["애착 점수", "문구"],
         [
-            ["<span class='val'>close</span> (애착 50↑)", esc(rc.RELATIONSHIP_DISTANCE_COPY["close"])],
-            ["<span class='val'>independent</span> (애착 50↓)", esc(rc.RELATIONSHIP_DISTANCE_COPY["independent"])],
+            ["<span class='val'>0~24</span>", esc(rc.RELATIONSHIP_DISTANCE_COPY["0_24"])],
+            ["<span class='val'>25~49</span>", esc(rc.RELATIONSHIP_DISTANCE_COPY["25_49"])],
+            ["<span class='val'>50~74</span>", esc(rc.RELATIONSHIP_DISTANCE_COPY["50_74"])],
+            ["<span class='val'>75~100</span>", esc(rc.RELATIONSHIP_DISTANCE_COPY["75_100"])],
         ],
     )
     conf_table = table(
@@ -452,7 +461,7 @@ A×B 조합 제목·설명은 기존 결과 스냅샷 복원용 내부 데이터
             "이렇게 다뤄주세요 (4슬롯)",
             f"{qchip('step1.q12')}{qchip('step2.q02')}{qchip('step2.q03')}"
             f"{qchip('step2.q08')}{axchip('att')}{mbtichip()}",
-            "20 · 2 · 4 · 2",
+            "20 · 4 · 4 · 2",
             cando_body,
         )
     )

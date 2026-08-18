@@ -65,7 +65,7 @@ def _valid_submission() -> dict[str, object]:
                 {"question_id": question_id, "value": sorted(contract.allowed_values)[0]}
             )
         elif contract.answer_kind is AnswerKind.SCALE:
-            answers.append({"question_id": question_id, "value": 35})
+            answers.append({"question_id": question_id, "value": 50})
         else:
             answers.append({"question_id": question_id, "value": 247})
 
@@ -504,7 +504,7 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
     }
     assert body["can_do"] == [
         "내 말의 표면만 보지 말고, 왜 이런 말을 하는지까지 이해해주세요",
-        "연락이 뜸해도 각자의 시간을 믿어주세요",
+        "혼자 있는 시간을 넉넉히 주세요. 답장이 하루 늦어도 삐진 게 아니라 그저 충전 중입니다.",
         "서운한 일은 돌려 넘기지 말고, 그 자리에서 바로 확인하고 풀어주세요.",
         "말없이 챙기는 행동을 애정으로 알아봐주세요",
     ]
@@ -825,9 +825,32 @@ def test_rejects_out_of_range_numeric_answer(
     assert expected_limit in response.json()["error"]["message"]
 
 
+@pytest.mark.parametrize("value", [1, 24, 26, 99])
+def test_rejects_q04_value_outside_25_point_steps(value: int) -> None:
+    payload = _valid_submission()
+    answers = payload["answers"]
+    assert isinstance(answers, list)
+    answer = next(answer for answer in answers if answer["question_id"] == "step2.q04")
+    assert isinstance(answer, dict)
+    answer["value"] = value
+
+    response = client.post("/api/tests/submissions", json=payload)
+
+    assert response.status_code == 422
+    assert "25 단위" in response.json()["error"]["message"]
+
+
 @pytest.mark.parametrize(
     ("question_id", "value"),
-    [("step2.q04", 0), ("step2.q04", 100), ("step2.q06", 0), ("step2.q06", 999)],
+    [
+        ("step2.q04", 0),
+        ("step2.q04", 25),
+        ("step2.q04", 50),
+        ("step2.q04", 75),
+        ("step2.q04", 100),
+        ("step2.q06", 0),
+        ("step2.q06", 999),
+    ],
 )
 def test_accepts_numeric_answer_boundaries(question_id: str, value: int) -> None:
     payload = _valid_submission()

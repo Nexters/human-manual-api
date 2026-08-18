@@ -16,7 +16,7 @@ def test_builds_four_handling_instructions_in_fixed_order() -> None:
 
     assert result == (
         "막힌 이유부터 함께 정리해주세요",
-        "별일 없어도 자주 안부를 묻고 곁에 있어주세요",
+        "별일 없어도 가끔 안부를 나눠주세요. 짧은 한마디만으로도 연결되어 있다고 느낍니다.",
         "서운한 일은 돌려 넘기지 말고, 그 자리에서 바로 확인하고 풀어주세요.",
         "말없이 챙기는 행동을 애정으로 알아봐주세요",
     )
@@ -25,11 +25,45 @@ def test_builds_four_handling_instructions_in_fixed_order() -> None:
 @pytest.mark.parametrize(
     ("score", "expected"),
     [
-        (49, "연락이 뜸해도 각자의 시간을 믿어주세요"),
-        (50, "별일 없어도 자주 안부를 묻고 곁에 있어주세요"),
+        (
+            0,
+            "혼자 있는 시간을 넉넉히 주세요. 답장이 하루 늦어도 삐진 게 아니라 그저 충전 중입니다.",
+        ),
+        (
+            24,
+            "혼자 있는 시간을 넉넉히 주세요. 답장이 하루 늦어도 삐진 게 아니라 그저 충전 중입니다.",
+        ),
+        (
+            25,
+            "연락은 편하게 주고받되 각자의 속도도 존중해주세요. "
+            "늘 붙어 있지 않아도 관계는 그대로입니다.",
+        ),
+        (
+            49,
+            "연락은 편하게 주고받되 각자의 속도도 존중해주세요. "
+            "늘 붙어 있지 않아도 관계는 그대로입니다.",
+        ),
+        (
+            50,
+            "별일 없어도 가끔 안부를 나눠주세요. 짧은 한마디만으로도 연결되어 있다고 느낍니다.",
+        ),
+        (
+            74,
+            "별일 없어도 가끔 안부를 나눠주세요. 짧은 한마디만으로도 연결되어 있다고 느낍니다.",
+        ),
+        (
+            75,
+            "오늘 뭐 했는지 사소한 일까지 나눠주세요. "
+            "별것 아닌 이야기를 주고받을수록 가까워졌다고 느낍니다.",
+        ),
+        (
+            100,
+            "오늘 뭐 했는지 사소한 일까지 나눠주세요. "
+            "별것 아닌 이야기를 주고받을수록 가까워졌다고 느낍니다.",
+        ),
     ],
 )
-def test_uses_50_point_attachment_boundary(score: int, expected: str) -> None:
+def test_uses_four_attachment_score_bands(score: int, expected: str) -> None:
     result = build_handling_guide(
         support_preference="listen_to_me",
         mbti=MbtiType.ENTP,
@@ -40,6 +74,19 @@ def test_uses_50_point_attachment_boundary(score: int, expected: str) -> None:
     )
 
     assert result[1] == expected
+
+
+@pytest.mark.parametrize("score", [-1, 101])
+def test_rejects_invalid_attachment_score(score: int) -> None:
+    with pytest.raises(ValueError, match="attachment_score must be between 0 and 100"):
+        build_handling_guide(
+            support_preference="listen_to_me",
+            mbti=MbtiType.ENTP,
+            attachment_score=score,
+            conflict_style="hint_and_wait",
+            conflict_message_style="rehearse_with_ai",
+            affection_style="express_with_words",
+        )
 
 
 @pytest.mark.parametrize(

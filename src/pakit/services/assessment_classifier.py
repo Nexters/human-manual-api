@@ -37,6 +37,12 @@ def _rounded_mean(*scores: int) -> int:
     return (sum(scores) + len(scores) // 2) // len(scores)
 
 
+def _weighted_score(*score_weights: tuple[int, int]) -> int:
+    weighted_sum = sum(score * weight for score, weight in score_weights)
+    total_weight = sum(weight for _, weight in score_weights)
+    return (weighted_sum + total_weight // 2) // total_weight
+
+
 def _choice_score(value: str, score_100_value: str) -> int:
     return 100 if value == score_100_value else 0
 
@@ -69,10 +75,10 @@ def classify_submission(submission: AssessmentSubmission) -> AssessmentClassific
         _choice_score(str(answers["step2.q02"]), "resolve_immediately"),
         _choice_score(str(answers["step2.q03"]), "send_immediately"),
     )
-    attachment = _rounded_mean(
-        100 - int(answers["step2.q04"]),
-        _choice_score(str(answers["step2.q05"]), "share_everything"),
-        _message_count_score(int(answers["step2.q06"])),
+    attachment = _weighted_score(
+        (100 - int(answers["step2.q04"]), 50),
+        (_choice_score(str(answers["step2.q05"]), "share_everything"), 30),
+        (_message_count_score(int(answers["step2.q06"])), 20),
     )
     egen = _rounded_mean(
         _choice_score(str(answers["step2.q07"]), "decorate_for_mood"),

@@ -8,6 +8,18 @@ from pakit.services.result_content import (
 )
 
 
+def _relationship_distance_key(attachment_score: int) -> str:
+    if not 0 <= attachment_score <= 100:
+        raise ValueError("attachment_score must be between 0 and 100")
+    if attachment_score <= 24:
+        return "0_24"
+    if attachment_score <= 49:
+        return "25_49"
+    if attachment_score <= 74:
+        return "50_74"
+    return "75_100"
+
+
 def build_handling_guide(
     *,
     support_preference: str,
@@ -18,7 +30,7 @@ def build_handling_guide(
     affection_style: str,
 ) -> tuple[str, str, str, str]:
     mbti_group = MBTI_MIDDLE_GROUP[mbti]
-    distance = "close" if attachment_score >= 50 else "independent"
+    distance = _relationship_distance_key(attachment_score)
     return (
         SUPPORT_PREFERENCE_COPY[(support_preference, mbti_group)],
         RELATIONSHIP_DISTANCE_COPY[distance],

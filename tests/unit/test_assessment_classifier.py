@@ -37,7 +37,7 @@ def _submission(overrides: dict[str, str | int] | None = None) -> AssessmentSubm
 def test_scores_axes_and_selects_adjective_from_submission() -> None:
     result = classify_submission(_submission())
 
-    assert result.axis_scores.attachment == 83
+    assert result.axis_scores.attachment == 75
     assert result.axis_scores.expression == 0
     assert result.axis_scores.routine == 67
     assert result.axis_scores.egen == 100
@@ -57,7 +57,29 @@ def test_treats_exactly_300_messages_as_neutral_signal() -> None:
         )
     )
 
-    assert result.axis_scores.attachment == 17
+    assert result.axis_scores.attachment == 10
+
+
+@pytest.mark.parametrize(
+    ("q04", "q05", "q06", "expected"),
+    [
+        (0, "share_selectively", 999, 50),
+        (100, "share_everything", 0, 50),
+        (25, "share_selectively", 999, 38),
+        (75, "share_everything", 0, 63),
+    ],
+)
+def test_weights_attachment_inputs_50_30_20(
+    q04: int,
+    q05: str,
+    q06: int,
+    expected: int,
+) -> None:
+    result = classify_submission(
+        _submission({"step2.q04": q04, "step2.q05": q05, "step2.q06": q06})
+    )
+
+    assert result.axis_scores.attachment == expected
 
 
 @pytest.mark.parametrize(

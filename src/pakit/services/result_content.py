@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-19.3"
+RESULT_CONTENT_VERSION = "2026-08-19.4"
 
 
 @dataclass(frozen=True)
@@ -123,8 +123,18 @@ SUPPORT_PREFERENCE_COPY: dict[tuple[str, str], str] = {
 
 
 RELATIONSHIP_DISTANCE_COPY: dict[str, str] = {
-    "close": "별일 없어도 자주 안부를 묻고 곁에 있어주세요",
-    "independent": "연락이 뜸해도 각자의 시간을 믿어주세요",
+    "0_24": (
+        "혼자 있는 시간을 넉넉히 주세요. 답장이 하루 늦어도 삐진 게 아니라 그저 충전 중입니다."
+    ),
+    "25_49": (
+        "연락은 편하게 주고받되 각자의 속도도 존중해주세요. "
+        "늘 붙어 있지 않아도 관계는 그대로입니다."
+    ),
+    "50_74": ("별일 없어도 가끔 안부를 나눠주세요. 짧은 한마디만으로도 연결되어 있다고 느낍니다."),
+    "75_100": (
+        "오늘 뭐 했는지 사소한 일까지 나눠주세요. "
+        "별것 아닌 이야기를 주고받을수록 가까워졌다고 느낍니다."
+    ),
 }
 
 

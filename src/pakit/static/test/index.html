@@ -133,7 +133,7 @@
       const fieldset = document.createElement("fieldset");
       fieldset.innerHTML = `<legend>${question.id} · ${question.prompt}</legend>`;
       if (question.kind === "scale") {
-        fieldset.innerHTML += `<span>밀착</span> <input name="${question.id}" type="range" min="0" max="100" step="1" value="50"> <output>선택 안 함</output> <span>거리조절</span>`;
+        fieldset.innerHTML += `<span>밀착</span> <input name="${question.id}" type="range" min="0" max="100" step="25" value="50"> <output>선택 안 함</output> <span>거리조절</span>`;
         const input = fieldset.querySelector("input");
         const selectScaleValue = () => {
           input.setCustomValidity("");
@@ -194,7 +194,7 @@
         const response = await fetch("/api/tests/submissions", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ assessment_version:"2026-08-19.2", participant:{ nickname:document.querySelector("#nickname").value }, answers, mbti:mbti.value })
+          body: JSON.stringify({ assessment_version:"2026-08-19.3", participant:{ nickname:document.querySelector("#nickname").value }, answers, mbti:mbti.value })
         });
         const data = await response.json();
         if (!response.ok) throw new Error(JSON.stringify(data, null, 2));
