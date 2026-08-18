@@ -307,15 +307,15 @@
       "question_id": "step1.q11",
       "step": 1,
       "order": 11,
-      "prompt": "주말 내내 집에만 있으려고 했는데, 결국 밖에 나와버리고 말았다. 그 이유는?",
+      "prompt": "집에만 있으려던 주말, 나를 밖으로 나오게 한 건?",
       "answer_kind": "choice",
       "options": [
-        {"value": "curiosity", "label": "SNS에서 처음 보는, 흥미로워 보이는 팝업을 봤다."},
-        {"value": "needed_by_someone", "label": "친구가 ‘이건 진짜 너밖에 못 도와줘’라며 불러냈다."},
-        {"value": "clear_goal", "label": "러닝 앱을 켜보니 이번 주 목표까지 딱 한 번만 남아 있었다."},
-        {"value": "responsibility", "label": "친구의 이사를 도와주기로 한 시간이 다가오고 있었다."},
-        {"value": "last_chance", "label": "계속 미뤄둔 전시가 오늘 문을 닫는다는 걸 알았다."},
-        {"value": "fun", "label": "친구들이 벌써 모여 웃고 난리 난 영상을 단톡방에 올리며 당장 나오라고 했다."}
+        {"value": "curiosity", "label": "궁금한 새 장소"},
+        {"value": "needed_by_someone", "label": "나를 꼭 찾는 친구"},
+        {"value": "clear_goal", "label": "딱 하나 남은 목표"},
+        {"value": "responsibility", "label": "지켜야 할 약속"},
+        {"value": "last_chance", "label": "오늘뿐인 기회"},
+        {"value": "fun", "label": "재밌어 보이는 모임"}
       ],
       "calculation": {
         "status": "mapped",

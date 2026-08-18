@@ -27,9 +27,14 @@ def test_question_chips_show_question_and_choices_on_hover_or_focus() -> None:
 
     assert 'class="chip chip-q question-chip"' in body
     assert 'tabindex="0"' in body
-    assert "집에만 있으려다 결국 나온 이유는?" in body
+    assert "집에만 있으려던 주말, 나를 밖으로 나오게 한 건?" in body
     assert "curiosity" in body
-    assert "흥미로운 팝업을 봤다" in body
+    assert "궁금한 새 장소" in body
+    assert "나를 꼭 찾는 친구" in body
+    assert "딱 하나 남은 목표" in body
+    assert "지켜야 할 약속" in body
+    assert "오늘뿐인 기회" in body
+    assert "재밌어 보이는 모임" in body
     assert ".question-chip:hover .question-tooltip" in body
     assert ".question-chip:focus .question-tooltip" in body
 
