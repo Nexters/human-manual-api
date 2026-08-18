@@ -3,6 +3,9 @@ services:
     build:
       context: .
     restart: unless-stopped
+    # 👇 [추가] 컨테이너 종료 시 기존 요청 처리를 위해 최대 10초 동안 대기
+    stop_grace_period: 10s
+    stop_signal: SIGTERM
     env_file:
       - path: .env
         required: false
@@ -40,8 +43,10 @@ services:
 
   front:
     build:
-      context: ../frontend-app  # 👈 프론트엔드 소스 폴더 경로 (상황에 맞게 수정)
+      context: ../frontend-app
     restart: unless-stopped
+    # Nginx(프론트)도 안전한 종료를 위해 5초 정도 유예를 주면 좋습니다.
+    stop_grace_period: 5s
     ports:
       - "3000:80"
     depends_on:
