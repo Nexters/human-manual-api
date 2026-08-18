@@ -162,7 +162,7 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
     assert operation["tags"] == ["Test"]
     assert operation["summary"] == "테스트 결과 제출"
     assert "요청 데이터" in operation["description"]
-    assert "22개 문항" in operation["description"]
+    assert "20개 문항" in operation["description"]
     assert "서버에서 확인하는 항목" in operation["description"]
     assert "현재 응답 범위" in operation["description"]
     swagger_example = operation["requestBody"]["content"]["application/json"]["examples"][

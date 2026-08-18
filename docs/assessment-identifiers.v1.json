@@ -1,5 +1,5 @@
 {
-  "assessment_version": "2026-08-19.1",
+  "assessment_version": "2026-08-19.2",
   "identifier_status": "published",
   "id_policy": {
     "question_id": "step{number}.q{two_digit_stable_sequence}",
@@ -58,16 +58,6 @@
       "question_id": "step1.q08",
       "answer_kind": "choice",
       "values": ["go_to_bed", "contact_others", "eat_alone", "go_for_drive"]
-    },
-    {
-      "question_id": "step1.q09",
-      "answer_kind": "choice",
-      "values": ["tsundere", "planner", "meme_addict", "foodie"]
-    },
-    {
-      "question_id": "step1.q10",
-      "answer_kind": "choice",
-      "values": ["morning_person", "no_plan", "photo_obsessed", "hates_walking"]
     },
     {
       "question_id": "step1.q11",

@@ -1,6 +1,6 @@
 # 테스트 질문지 기준 자료
 
-이 문서는 제공된 테스트 화면을 `assessment_version` `2026-08-19.1`의 질문 원문과 선택지에
+이 문서는 제공된 테스트 화면을 `assessment_version` `2026-08-19.2`의 질문 원문과 선택지에
 연결한 사람이 읽기 위한 목록이다. 백엔드에서 읽을 수 있는 동일 기준 데이터는
 [`assessment-content.v1.json`](./assessment-content.v1.json)에 있다. ID와 제출 값의 불변 계약은
 [`assessment-identifiers.v1.json`](./assessment-identifiers.v1.json)이 계속 담당한다.
@@ -18,6 +18,7 @@
 | `step1.q01` | 확정·구현 | 질문과 선택지를 모바일용 축약 문구로 개편 | 핵심 특징 `관계 속의 나` |
 | `step1.q02` | 확정·구현 | 토끼 4종의 말풍선으로 관계 역할을 고르는 문항으로 개편 | 핵심 특징 `관계 속의 나` |
 | `step1.q03`, `step1.q04` | 삭제 | 결과 생성에 사용되지 않아 질문지와 제출 계약에서 제거 | 없음 |
+| STEP 1 친구 선호 2문항 | 삭제 | 개인 결과와 궁합 계산에 모두 사용되지 않아 질문지와 제출 계약에서 제거 | 없음 |
 | `step1.q11` | 확정·구현 | 질문과 선택지를 모바일에서 빠르게 읽히는 짧은 문구로 개편 | 핵심 특징 `동원력` |
 | `step1.q12` | 확정·구현 | 질문과 선택지를 모바일용 축약 문구로 개편 | `이렇게 다뤄주세요` 결과 재료 |
 
@@ -31,8 +32,6 @@
 | `step1.q06` | 송송님을 화나게 하는 가장 빠른 방법 | `rush` → 재촉하기<br>`interrupt` → 말 끊기<br>`take_food` → 음식 뺏어먹기<br>`arrive_late` → 약속 늦기<br>`nag` → 잔소리<br>`change_plan` → 내 계획 바꾸기 |
 | `step1.q07` | 기다리고 기다리던 휴일, 송송님의 첫 스케줄은 무엇인가요? | `sleep_until_noon` → 낮 12시 기상<br>`morning_run` → 아침 러닝<br>`brunch_cafe` → 브런치 카페<br>`stay_in_bed` → 이불 밖은 위험해<br>`watch_streaming` → 밀린 OTT 시청<br>`self_development` → 자기개발 |
 | `step1.q08` | 금요일 저녁, 약속이 갑자기 취소됐을 때 송송님은 | `go_to_bed` → 개꿀! 당장 침대로 간다<br>`contact_others` → 다른 친구한테 연락 돌린다<br>`eat_alone` → 혼자라도 식당 가서 먹고 온다<br>`go_for_drive` → 이 때다, 안 가 본 곳으로 드라이브! |
-| `step1.q09` | 송송님은 어떤 친구랑 오랫동안 놀 수 있나요? | `tsundere` → 츤데레<br>`planner` → 계획형<br>`meme_addict` → 밈 중독자<br>`foodie` → 먹짱 |
-| `step1.q10` | 이 친구랑은 절대 같이 여행가기 싫다! | `morning_person` → 아침형 인간<br>`no_plan` → 무계획형<br>`photo_obsessed` → 사진 집착러<br>`hates_walking` → 걷기 싫어하는 친구 |
 | `step1.q11` | 집에만 있으려던 주말, 나를 밖으로 나오게 한 건? | `curiosity` → 궁금한 새 장소<br>`needed_by_someone` → 나를 꼭 찾는 친구<br>`clear_goal` → 딱 하나 남은 목표<br>`responsibility` → 지켜야 할 약속<br>`last_chance` → 오늘뿐인 기회<br>`fun` → 재밌어 보이는 모임 |
 | `step1.q12` | 기분이 안 좋을 때, 가장 반가운 친구의 연락은? | `listen_to_me` → 무슨 일인지 천천히 들어줄게<br>`take_me_out` → 일단 나와. 맛있는 거 먹자<br>`give_me_space` → 혼자 정리되면 연락해. 기다릴게<br>`solve_together` → 내가 같이 해결해볼까?<br>`make_me_laugh` → 이거 보고 일단 웃어ㅋㅋ |
 
@@ -60,7 +59,7 @@ STEP 2 마지막 두 화면의 바깥 프레임명은 `STEP2_12`, `STEP2_11` 순
 ## MBTI 입력
 
 문항 응답 이후 `E/I`, `S/N`, `T/F`, `J/P`를 각각 선택하고 조합한 네 글자 값을 API의
-`mbti` 필드로 제출한다. 이 값은 22개 문항에서 채점해 산출하지 않는다.
+`mbti` 필드로 제출한다. 이 값은 20개 문항에서 채점해 산출하지 않는다.
 
 ## 결과 재료 매핑
 
@@ -172,23 +171,8 @@ Q07 선택지는 충전 결과에서 다음 메커니즘과 첫 문장으로 해
 
 ### 6. 함께하면 좋은 친구 (`friend_compatibility`)
 
-#### 잘 맞는 유형: `step1.q09` 송송님은 어떤 친구랑 오랫동안 놀 수 있나요?
-
-- `tsundere` → 츤데레
-- `planner` → 계획형
-- `meme_addict` → 밈 중독자
-- `foodie` → 먹짱
-
-#### 안 맞는 유형: `step1.q10` 이 친구랑은 절대 같이 여행가기 싫다!
-
-- `morning_person` → 아침형 인간
-- `no_plan` → 무계획형
-- `photo_obsessed` → 사진 집착러
-- `hates_walking` → 걷기 싫어하는 친구
-
-개인 결과 API는 이 영역을 `compatible_friends` 카드 2개로 제공한다. `step1.q09`,
-`step1.q10`은 상대에 대한 선호를 사용자의 성향으로 뒤집어 해석할 위험이 있어 카드 계산에는
-사용하지 않는다. 추천 장난감은 MBTI로 선택하고, 설명은 실제 성향 축을 보조로 사용한다.
+개인 결과 API는 이 영역을 `compatible_friends` 카드 2개로 제공한다. 직접 연결된 질문은 없고,
+추천 장난감은 MBTI로 선택하며 설명은 실제 성향 축을 보조로 사용한다.
 
 ## 성향 축 매핑
 

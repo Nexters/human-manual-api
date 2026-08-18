@@ -12,8 +12,9 @@ def test_runtime_contract_matches_published_identifier_document() -> None:
 
     assert document["assessment_version"] == ASSESSMENT_VERSION
     assert document["identifier_status"] == "published"
-    assert len(document["questions"]) == 22
+    assert len(document["questions"]) == 20
     assert {"step1.q03", "step1.q04"}.isdisjoint(QUESTION_CONTRACTS)
+    assert sum(question_id.startswith("step1.") for question_id in QUESTION_CONTRACTS) == 8
     assert {question["question_id"] for question in document["questions"]} == set(
         QUESTION_CONTRACTS
     )
@@ -66,4 +67,17 @@ def test_q02_content_defines_four_role_choices_without_asset_metadata() -> None:
             "label": "넌 뭐가 좋아? 말해주면 내가 챙길게.",
             "role": "관심·배려",
         },
+    ]
+
+    step1_questions = [item for item in document["questions"] if item["step"] == 1]
+    assert [item["order"] for item in step1_questions] == list(range(1, 9))
+    assert [item["question_id"] for item in step1_questions] == [
+        "step1.q01",
+        "step1.q02",
+        "step1.q05",
+        "step1.q06",
+        "step1.q07",
+        "step1.q08",
+        "step1.q11",
+        "step1.q12",
     ]

@@ -1,11 +1,11 @@
 {
-  "assessment_version": "2026-08-19.1",
+  "assessment_version": "2026-08-19.2",
   "content_status": "baseline_with_product_mapping",
   "locale": "ko-KR",
   "source": {
     "type": "user_provided_test_screen_images",
     "received_on": "2026-08-13",
-    "scope": "STEP 1 10문항, STEP 2 12문항, MBTI 선택 화면"
+    "scope": "STEP 1 8문항, STEP 2 12문항, MBTI 선택 화면"
   },
   "identifier_contract": "docs/assessment-identifiers.v1.json",
   "result_material_contract": {
@@ -93,11 +93,6 @@
       "question_ids": ["step1.q07", "step1.q08", "step1.q11", "step1.q12"],
       "additional_input": null,
       "rule": "base_recovery_and_motivation_sentence_with_three_charging_keywords"
-    },
-    "friend_compatibility": {
-      "compatible_question_id": "step1.q09",
-      "incompatible_question_id": "step1.q10",
-      "api_status": "not_in_current_result_contract"
     }
   },
   "calculation_contract": {
@@ -258,39 +253,9 @@
       "calculation": {"status": "mapped", "role": "result_material", "result_section": "charging"}
     },
     {
-      "question_id": "step1.q09",
-      "step": 1,
-      "order": 7,
-      "prompt": "송송님은 어떤 친구랑 오랫동안 놀 수 있나요?",
-      "answer_kind": "choice",
-      "presentation": "character_carousel",
-      "options": [
-        {"value": "tsundere", "label": "츤데레"},
-        {"value": "planner", "label": "계획형"},
-        {"value": "meme_addict", "label": "밈 중독자"},
-        {"value": "foodie", "label": "먹짱"}
-      ],
-      "calculation": {"status": "mapped", "role": "result_material", "result_section": "friend_compatibility", "relationship": "compatible"}
-    },
-    {
-      "question_id": "step1.q10",
-      "step": 1,
-      "order": 8,
-      "prompt": "이 친구랑은 절대 같이 여행가기 싫다!",
-      "answer_kind": "choice",
-      "presentation": "character_carousel",
-      "options": [
-        {"value": "morning_person", "label": "아침형 인간"},
-        {"value": "no_plan", "label": "무계획형"},
-        {"value": "photo_obsessed", "label": "사진 집착러"},
-        {"value": "hates_walking", "label": "걷기 싫어하는 친구"}
-      ],
-      "calculation": {"status": "mapped", "role": "result_material", "result_section": "friend_compatibility", "relationship": "incompatible"}
-    },
-    {
       "question_id": "step1.q11",
       "step": 1,
-      "order": 9,
+      "order": 7,
       "prompt": "집에만 있으려던 주말, 나를 밖으로 나오게 한 건?",
       "answer_kind": "choice",
       "options": [
@@ -313,7 +278,7 @@
     {
       "question_id": "step1.q12",
       "step": 1,
-      "order": 10,
+      "order": 8,
       "prompt": "기분이 안 좋을 때, 가장 반가운 친구의 연락은?",
       "answer_kind": "choice",
       "options": [

@@ -33,11 +33,11 @@ results_router = APIRouter(prefix="/results", tags=["Test"])
         "### 요청 데이터\n"
         "- `assessment_version`: 프론트에 적용한 문항 계약 버전\n"
         "- `participant.nickname`: 결과에 표시할 이름 또는 닉네임\n"
-        "- `answers`: `docs/assessment-identifiers.v1.json`에 정의된 22개 문항의 답변\n"
+        "- `answers`: `docs/assessment-identifiers.v1.json`에 정의된 20개 문항의 답변\n"
         "- `mbti`: 화면에서 선택한 네 글자 MBTI 유형. 예: `ENTP`\n\n"
         "### 서버에서 확인하는 항목\n"
         "- 테스트 버전이 현재 서버 버전과 일치하는지 확인합니다.\n"
-        "- 22개 문항이 빠짐없이 한 번씩 제출됐는지 확인합니다.\n"
+        "- 20개 문항이 빠짐없이 한 번씩 제출됐는지 확인합니다.\n"
         "- 문항별 `value`가 계약에 맞는 문자열 또는 정수인지 확인합니다.\n"
         "- STEP 2 답변으로 성향 점수, 형용사, 포장 상자와 개봉 도구를 결정합니다.\n"
         "- 선택한 MBTI에 맞는 장난감 명사, 캐릭터와 이미지를 결정합니다.\n\n"
@@ -72,7 +72,7 @@ async def create_assessment_submission(
         Body(
             openapi_examples={
                 "complete": {
-                    "summary": "22개 문항과 MBTI 입력을 모두 포함한 예시",
+                    "summary": "20개 문항과 MBTI 입력을 모두 포함한 예시",
                     "description": (
                         "`docs/assessment-identifiers.v1.json`에 게시된 실제 문항·선택지 "
                         "ID를 사용한 유효한 요청입니다. Swagger의 'Try it out'에서 바로 "

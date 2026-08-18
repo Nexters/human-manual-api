@@ -11,7 +11,7 @@ from pakit.domain.assessment_submission import (
 )
 
 ASSESSMENT_SUBMISSION_EXAMPLE: dict[str, object] = {
-    "assessment_version": "2026-08-19.1",
+    "assessment_version": "2026-08-19.2",
     "participant": {"nickname": "송송"},
     "answers": [
         {"question_id": "step1.q01", "value": "decision"},
@@ -20,8 +20,6 @@ ASSESSMENT_SUBMISSION_EXAMPLE: dict[str, object] = {
         {"question_id": "step1.q06", "value": "rush"},
         {"question_id": "step1.q07", "value": "sleep_until_noon"},
         {"question_id": "step1.q08", "value": "go_to_bed"},
-        {"question_id": "step1.q09", "value": "tsundere"},
-        {"question_id": "step1.q10", "value": "morning_person"},
         {"question_id": "step1.q11", "value": "curiosity"},
         {"question_id": "step1.q12", "value": "listen_to_me"},
         {"question_id": "step2.q01", "value": "inspect_profile"},
