@@ -154,7 +154,23 @@ def code_chip(code: str) -> str:
 
 
 def qchip(qid: str) -> str:
-    return f'<span class="chip chip-q" title="{esc(Q_TITLE.get(qid, ""))}">{esc(qid)}</span>'
+    question = Q_TITLE.get(qid, qid)
+    choices = CHOICE.get(qid, {})
+    choice_rows = "".join(
+        f"<li>{val(value)}<span>{esc(label)}</span></li>" for value, label in choices.items()
+    )
+    choice_summary = ", ".join(f"{value}: {label}" for value, label in choices.items())
+    aria_label = f"{qid}. {question}. 선택지: {choice_summary}"
+    return (
+        f'<span class="chip chip-q question-chip" tabindex="0" aria-label="{esc(aria_label)}">'
+        f"{esc(qid)}"
+        f'<span class="question-tooltip" role="tooltip">'
+        f'<span class="question-tooltip-id">{esc(qid)}</span>'
+        f"<strong>{esc(question)}</strong>"
+        f"<ul>{choice_rows}</ul>"
+        f"</span>"
+        f"</span>"
+    )
 
 
 def axchip(short: str) -> str:
@@ -668,6 +684,24 @@ main{display:flex;flex-direction:column;gap:20px;min-width:0}
   font-weight:600;border:1px solid transparent;white-space:nowrap}
 .chip-q{background:var(--mono-bg);color:var(--mono-text);font-family:ui-monospace,'SF Mono',Menlo,monospace;
   border-color:var(--border-strong)}
+.question-chip{position:relative;cursor:help;outline:none}
+.question-chip:focus-visible{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent)}
+.question-tooltip{position:absolute;z-index:50;top:calc(100% + 9px);left:0;width:max-content;
+  max-width:min(440px,calc(100vw - 40px));padding:13px 14px;border:1px solid var(--border-strong);
+  border-radius:10px;background:var(--surface);color:var(--text);box-shadow:0 12px 32px rgba(0,0,0,.22);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;
+  font-weight:400;line-height:1.45;white-space:normal;opacity:0;visibility:hidden;pointer-events:none;
+  transform:translateY(-3px);transition:opacity .12s ease,transform .12s ease,visibility .12s}
+.question-chip:hover .question-tooltip,.question-chip:focus .question-tooltip{opacity:1;visibility:visible;
+  transform:translateY(0)}
+.question-tooltip-id{display:block;margin-bottom:3px;color:var(--accent);font-family:ui-monospace,
+  'SF Mono',Menlo,monospace;font-size:10.5px;font-weight:700}
+.question-tooltip strong{display:block;font-size:13px;margin-bottom:8px}
+.question-tooltip ul{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.question-tooltip li{display:grid;grid-template-columns:minmax(92px,max-content) 1fr;gap:8px;
+  align-items:start;color:var(--text-dim)}
+.question-tooltip .val{color:var(--text)}
+.inputs .question-chip:last-of-type .question-tooltip{right:0;left:auto}
 .chip-mbti{background:var(--accent-soft);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 25%,transparent)}
 .chip-ax{color:#fff}
 .ax-expr{background:var(--ax-expr)} .ax-att{background:var(--ax-att)}

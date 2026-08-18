@@ -216,6 +216,8 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
     assert charging_schema["properties"]["description"]["maxLength"] == 61
     charging_activity_schema = document["components"]["schemas"]["ChargingActivityOutput"]
     assert charging_activity_schema["properties"]["label"]["maxLength"] == 10
+    feature_schema = document["components"]["schemas"]["FeatureOutput"]
+    assert feature_schema["properties"]["title"]["maxLength"] == 11
     unboxing_schema = document["components"]["schemas"]["UnboxingKitOutput"]
     assert set(unboxing_schema["properties"]) == {
         "axis_scores",
@@ -471,7 +473,7 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
     assert body["unboxing_kit"]["opening_tool"]["type"] == "chainsaw"
     assert body["features"] == [
         {
-            "title": "궁금하면 직진",
+            "title": "궁금한 건 못 참아요",
             "description": (
                 "궁금한 건 검색만으로 넘기지 않고, 원리와 다른 가능성까지 직접 확인해요."
             ),
@@ -534,8 +536,8 @@ def test_submission_uses_q11_for_the_motivation_feature_only() -> None:
     assert fun_response.status_code == 200
     curiosity_features = curiosity_response.json()["features"]
     fun_features = fun_response.json()["features"]
-    assert curiosity_features[0]["title"] == "궁금하면 직진"
-    assert fun_features[0]["title"] == "재미 못 참아"
+    assert curiosity_features[0]["title"] == "궁금한 건 못 참아요"
+    assert fun_features[0]["title"] == "재밌는 건 해야 해요"
     assert curiosity_features[1:] == fun_features[1:]
 
 

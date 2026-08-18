@@ -22,6 +22,18 @@ def test_result_map_hidden_from_openapi() -> None:
     assert "/result-map" not in document["paths"]
 
 
+def test_question_chips_show_question_and_choices_on_hover_or_focus() -> None:
+    body = render_result_map()
+
+    assert 'class="chip chip-q question-chip"' in body
+    assert 'tabindex="0"' in body
+    assert "집에만 있으려다 결국 나온 이유는?" in body
+    assert "curiosity" in body
+    assert "흥미로운 팝업을 봤다" in body
+    assert ".question-chip:hover .question-tooltip" in body
+    assert ".question-chip:focus .question-tooltip" in body
+
+
 def test_result_map_includes_copy_from_every_section() -> None:
     body = render_result_map()
 
@@ -30,7 +42,7 @@ def test_result_map_includes_copy_from_every_section() -> None:
         "취급주의 상자",  # 포장(A1)
         "전기톱",  # 개봉(B4)
         "브레이크가 고장 난",  # 언박싱 조합(A1 x B4)
-        "궁금하면 직진",  # 핵심 특징 · 동원력
+        "궁금한 건 못 참아요",  # 핵심 특징 · 동원력
         "큰그림을 봐요",  # 핵심 특징 · 타고난 무기(INTJ)
         "정해진 순서를 건너뛰지 않고 현장을 책임지는 헬리콥터",  # 캐릭터 스토리(ESTJ)
         "원리를 알아야 비로소 초점이 잡히는 망원경",  # 캐릭터 스토리(INTP)

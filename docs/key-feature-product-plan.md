@@ -53,12 +53,12 @@
 
 | 값 | 제목 |
 | --- | --- |
-| `curiosity` | 궁금하면 직진 |
-| `needed_by_someone` | 필요하면 출동 |
-| `clear_goal` | 목표 채워야지 |
-| `responsibility` | 맡으면 끝까지 |
-| `last_chance` | 기회 안 놓쳐 |
-| `fun` | 재미 못 참아 |
+| `curiosity` | 궁금한 건 못 참아요 |
+| `needed_by_someone` | 의리가 강해요 |
+| `clear_goal` | 끝은 봐야 해요 |
+| `responsibility` | 약속했으면 지켜요 |
+| `last_chance` | 기회는 꼭 잡아요 |
+| `fun` | 재밌는 건 해야 해요 |
 
 MBTI 그룹은 `NT = INTJ·ENTJ·INTP·ENTP`, `ST = ISTJ·ESTJ·ISTP·ESTP`,
 `NF = INFJ·ENFJ·INFP·ENFP`, `SF = ISFJ·ESFJ·ISFP·ESFP`로 나눈다. 실제 24개 문장은

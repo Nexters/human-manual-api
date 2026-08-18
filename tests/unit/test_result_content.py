@@ -167,6 +167,14 @@ def test_defines_motivation_copy_and_grouped_descriptions_for_every_allowed_inpu
         "last_chance",
         "fun",
     }
+    assert {value: copy.title for value, copy in MOTIVATION_COPY.items()} == {
+        "curiosity": "궁금한 건 못 참아요",
+        "needed_by_someone": "의리가 강해요",
+        "clear_goal": "끝은 봐야 해요",
+        "responsibility": "약속했으면 지켜요",
+        "last_chance": "기회는 꼭 잡아요",
+        "fun": "재밌는 건 해야 해요",
+    }
     assert set(MBTI_MIDDLE_GROUP) == set(MbtiType)
     assert set(MBTI_MIDDLE_GROUP.values()) == {"NT", "ST", "NF", "SF"}
     assert set(MOTIVATION_DESCRIPTION) == {
@@ -222,7 +230,7 @@ def test_feature_titles_are_at_most_seven_characters() -> None:
         len(feature.title) <= 7
         for feature in (*relationship_roles, *emotional_processing, *mbti_features)
     )
-    assert all(len(copy.title) <= 7 for copy in MOTIVATION_COPY.values())
+    assert all(len(copy.title) <= 11 for copy in MOTIVATION_COPY.values())
 
 
 def test_uses_confirmed_titles_for_revised_combinations() -> None:
@@ -255,7 +263,7 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-18.10"
+    assert RESULT_CONTENT_VERSION == "2026-08-18.13"
 
 
 def test_defines_all_warning_copy_variants() -> None:

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-18.10"
+RESULT_CONTENT_VERSION = "2026-08-18.13"
 
 
 @dataclass(frozen=True)
@@ -38,22 +38,22 @@ class UnboxingItemCopy:
 
 MOTIVATION_COPY: dict[str, MotivationCopy] = {
     "curiosity": MotivationCopy(
-        "궁금하면 직진",
+        "궁금한 건 못 참아요",
     ),
     "needed_by_someone": MotivationCopy(
-        "필요하면 출동",
+        "의리가 강해요",
     ),
     "clear_goal": MotivationCopy(
-        "목표 채워야지",
+        "끝은 봐야 해요",
     ),
     "responsibility": MotivationCopy(
-        "맡으면 끝까지",
+        "약속했으면 지켜요",
     ),
     "last_chance": MotivationCopy(
-        "기회 안 놓쳐",
+        "기회는 꼭 잡아요",
     ),
     "fun": MotivationCopy(
-        "재미 못 참아",
+        "재밌는 건 해야 해요",
     ),
 }
 
@@ -188,12 +188,16 @@ MOTIVATION_DESCRIPTION: dict[tuple[str, str], str] = {
         "누가 나를 꼭 찾으면 하던 걸 멈추고, 당장 필요한 것부터 챙겨 나서요."
     ),
     ("clear_goal", "NT"): (
-        "끝이 보이는 목표는 더 나은 방법까지 찾아, 마지막 한 칸을 채워야 마음이 놓여요."
+        "시작한 일은 끝을 봐야 하는 편이라, 마무리 전에 더 나은 방법이 없는지 한 번 더 따져봐요."
     ),
-    ("clear_goal", "ST"): "끝이 보이는 목표는 정한 순서대로 밀어붙여, 마지막 한 칸까지 끝내요.",
-    ("clear_goal", "NF"): "끝이 보이는 목표는 처음 품은 이유를 떠올리며, 마지막 한 칸까지 채워요.",
+    ("clear_goal", "ST"): (
+        "시작한 일은 끝을 봐야 하는 편이라, 정한 순서대로 밀어붙여 기어이 끝을 내요."
+    ),
+    ("clear_goal", "NF"): (
+        "시작한 일은 끝을 봐야 하는 편이라, 지칠 때도 처음 마음을 떠올리며 밀고 나가요."
+    ),
     ("clear_goal", "SF"): (
-        "끝이 보이는 목표는 자기 속도를 지키며, 빠진 것 없이 마지막 한 칸까지 채워요."
+        "시작한 일은 끝을 봐야 하는 편이라, 하나씩 지워가는 뿌듯함으로 마지막까지 채워요."
     ),
     ("responsibility", "NT"): (
         "하기로 한 일은 방법을 다시 짜서라도, 결과가 나올 때까지 자기 몫을 해요."
