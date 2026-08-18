@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-19.1"
+RESULT_CONTENT_VERSION = "2026-08-19.2"
 
 
 @dataclass(frozen=True)
@@ -262,8 +262,8 @@ RELATIONSHIP_ROLE_COPY: dict[tuple[str, str], FeatureCopy] = {
         "친구들이 모이면 먼저 웃길 거리를 꺼내 그 자리를 신나게 만드는 사람이에요.",
     ),
     ("hangout", "make_it_happen"): FeatureCopy(
-        "약속 추진대장",
-        "언제 한번 보자는 말을 진짜 날짜와 장소가 있는 약속으로 만드는 사람이에요.",
+        "번개 추진왕",
+        "재밌는 얘기가 나오면 다음으로 미루지 않고 바로 사람을 모아 움직이는 사람이에요.",
     ),
     ("hangout", "care_for_others"): FeatureCopy(
         "모임 챙김대장",

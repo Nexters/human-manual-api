@@ -88,7 +88,7 @@ def test_defines_one_relationship_role_for_every_q01_q02_combination() -> None:
         ("worries", "care_for_others"): "맞춤 위로왕",
         ("hangout", "organize_and_coordinate"): "모임 조율대장",
         ("hangout", "lift_mood"): "분위기 메이커",
-        ("hangout", "make_it_happen"): "약속 추진대장",
+        ("hangout", "make_it_happen"): "번개 추진왕",
         ("hangout", "care_for_others"): "모임 챙김대장",
         ("information", "organize_and_coordinate"): "정보 정리왕",
         ("information", "lift_mood"): "설명 예능인",
@@ -277,7 +277,7 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-19.1"
+    assert RESULT_CONTENT_VERSION == "2026-08-19.2"
 
 
 def test_defines_all_warning_copy_variants() -> None:
