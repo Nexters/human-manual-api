@@ -49,6 +49,7 @@ Q_TITLE = {
     "step1.q11": "집에만 있으려던 주말, 나를 밖으로 나오게 한 건?",
     "step1.q12": "기분이 안 좋을 때, 가장 반가운 친구의 연락은?",
     "step2.q02": "서운한 말을 들었을 때 대처는?",
+    "step2.q03": "친구와 싸운 뒤 메시지를 보내기 직전에는?",
     "step2.q08": "애정을 표현하는 방식은?",
 }
 
@@ -111,6 +112,10 @@ CHOICE = {
     "step2.q02": {
         "hint_and_wait": "티 내며 삭히는 고구마형",
         "resolve_immediately": "바로 풀어야 하는 사이다형",
+    },
+    "step2.q03": {
+        "rehearse_with_ai": "AI와 몇 번이고 상담한다",
+        "send_immediately": "고민 없이 바로 보낸다",
     },
     "step2.q08": {
         "express_with_words": "말·리액션·표현으로 채운다",
@@ -416,9 +421,16 @@ A×B 조합 제목·설명은 기존 결과 스냅샷 복원용 내부 데이터
         ],
     )
     conf_table = table(
-        ["step2.q02", "선택지", "문구"],
-        [[val(k), esc(CHOICE["step2.q02"][k]), esc(rc.CONFLICT_SUPPORT_COPY[k])]
-         for k in rc.CONFLICT_SUPPORT_COPY],
+        ["step2.q02 × step2.q03", "Q02 선택지", "Q03 선택지", "문구"],
+        [
+            [
+                f"{val(conflict_style)} × {val(message_style)}",
+                esc(CHOICE["step2.q02"][conflict_style]),
+                esc(CHOICE["step2.q03"][message_style]),
+                esc(copy),
+            ]
+            for (conflict_style, message_style), copy in rc.CONFLICT_SUPPORT_COPY.items()
+        ],
     )
     aff_table = table(
         ["step2.q08", "선택지", "문구"],
@@ -430,7 +442,7 @@ A×B 조합 제목·설명은 기존 결과 스냅샷 복원용 내부 데이터
 <div class="slot"><h4><span class="slot-n">1</span> 힘들 때 원하는 도움 · <span class="src">step1.q12 × MBTI중간축</span></h4>{sup_table}</div>
 <div class="two-col">
   <div class="slot"><h4><span class="slot-n">2</span> 편안한 관계 거리 · <span class="src">애착 점수</span></h4>{dist_table}</div>
-  <div class="slot"><h4><span class="slot-n">3</span> 갈등을 푸는 방식 · <span class="src">step2.q02</span></h4>{conf_table}</div>
+  <div class="slot"><h4><span class="slot-n">3</span> 갈등을 푸는 방식 · <span class="src">step2.q02 × step2.q03</span></h4>{conf_table}</div>
 </div>
 <div class="slot"><h4><span class="slot-n">4</span> 애정을 알아보는 법 · <span class="src">step2.q08</span></h4>{aff_table}</div>"""
     sections.append(
@@ -438,8 +450,9 @@ A×B 조합 제목·설명은 기존 결과 스냅샷 복원용 내부 데이터
             "cando",
             "결과 · can_do",
             "이렇게 다뤄주세요 (4슬롯)",
-            f"{qchip('step1.q12')}{qchip('step2.q02')}{qchip('step2.q08')}{axchip('att')}{mbtichip()}",
-            "20 · 2 · 2 · 2",
+            f"{qchip('step1.q12')}{qchip('step2.q02')}{qchip('step2.q03')}"
+            f"{qchip('step2.q08')}{axchip('att')}{mbtichip()}",
+            "20 · 2 · 4 · 2",
             cando_body,
         )
     )

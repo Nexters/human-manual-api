@@ -10,13 +10,14 @@ def test_builds_four_handling_instructions_in_fixed_order() -> None:
         mbti=MbtiType.ENTP,
         attachment_score=50,
         conflict_style="resolve_immediately",
+        conflict_message_style="send_immediately",
         affection_style="express_with_actions",
     )
 
     assert result == (
         "막힌 이유부터 함께 정리해주세요",
         "별일 없어도 자주 안부를 묻고 곁에 있어주세요",
-        "서운한 일은 피하지 말고 바로 이야기해주세요",
+        "서운한 일은 돌려 넘기지 말고, 그 자리에서 바로 확인하고 풀어주세요.",
         "말없이 챙기는 행동을 애정으로 알아봐주세요",
     )
 
@@ -34,6 +35,7 @@ def test_uses_50_point_attachment_boundary(score: int, expected: str) -> None:
         mbti=MbtiType.ENTP,
         attachment_score=score,
         conflict_style="hint_and_wait",
+        conflict_message_style="rehearse_with_ai",
         affection_style="express_with_words",
     )
 
@@ -55,6 +57,7 @@ def test_refines_support_preference_with_middle_mbti_group(mbti: MbtiType, expec
         mbti=mbti,
         attachment_score=0,
         conflict_style="hint_and_wait",
+        conflict_message_style="rehearse_with_ai",
         affection_style="express_with_words",
     )
 
@@ -106,19 +109,50 @@ def test_uses_confirmed_support_copy(
         mbti=mbti,
         attachment_score=0,
         conflict_style="hint_and_wait",
+        conflict_message_style="rehearse_with_ai",
         affection_style="express_with_words",
     )
 
     assert result[0] == expected
 
 
-def test_uses_confirmed_hint_and_wait_copy() -> None:
+@pytest.mark.parametrize(
+    ("conflict_style", "conflict_message_style", "expected"),
+    [
+        (
+            "hint_and_wait",
+            "rehearse_with_ai",
+            "평소와 다른 티가 나면 먼저 물어봐주고, 마음을 정리해 말할 때까지 기다려주세요.",
+        ),
+        (
+            "hint_and_wait",
+            "send_immediately",
+            "평소와 다른 티가 나면 먼저 물어봐주세요. 대화의 문만 열어주면 속마음은 바로 나와요.",
+        ),
+        (
+            "resolve_immediately",
+            "rehearse_with_ai",
+            "서운한 일은 바로 짚어주되, 할 말을 정리할 시간을 잠깐 주세요.",
+        ),
+        (
+            "resolve_immediately",
+            "send_immediately",
+            "서운한 일은 돌려 넘기지 말고, 그 자리에서 바로 확인하고 풀어주세요.",
+        ),
+    ],
+)
+def test_combines_conflict_response_and_message_preparation(
+    conflict_style: str,
+    conflict_message_style: str,
+    expected: str,
+) -> None:
     result = build_handling_guide(
         support_preference="listen_to_me",
         mbti=MbtiType.ENTP,
         attachment_score=0,
-        conflict_style="hint_and_wait",
+        conflict_style=conflict_style,
+        conflict_message_style=conflict_message_style,
         affection_style="express_with_words",
     )
 
-    assert result[2] == "평소보다 말수가 줄면 모른 척 넘기지 말고 먼저 물어봐주세요"
+    assert result[2] == expected

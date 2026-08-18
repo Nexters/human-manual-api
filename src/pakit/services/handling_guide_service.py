@@ -14,6 +14,7 @@ def build_handling_guide(
     mbti: MbtiType,
     attachment_score: int,
     conflict_style: str,
+    conflict_message_style: str,
     affection_style: str,
 ) -> tuple[str, str, str, str]:
     mbti_group = MBTI_MIDDLE_GROUP[mbti]
@@ -21,6 +22,6 @@ def build_handling_guide(
     return (
         SUPPORT_PREFERENCE_COPY[(support_preference, mbti_group)],
         RELATIONSHIP_DISTANCE_COPY[distance],
-        CONFLICT_SUPPORT_COPY[conflict_style],
+        CONFLICT_SUPPORT_COPY[(conflict_style, conflict_message_style)],
         AFFECTION_RECOGNITION_COPY[affection_style],
     )

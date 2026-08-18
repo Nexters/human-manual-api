@@ -505,7 +505,7 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
     assert body["can_do"] == [
         "내 말의 표면만 보지 말고, 왜 이런 말을 하는지까지 이해해주세요",
         "연락이 뜸해도 각자의 시간을 믿어주세요",
-        "서운한 일은 피하지 말고 바로 이야기해주세요",
+        "서운한 일은 돌려 넘기지 말고, 그 자리에서 바로 확인하고 풀어주세요.",
         "말없이 챙기는 행동을 애정으로 알아봐주세요",
     ]
     assert body["warnings"] == [

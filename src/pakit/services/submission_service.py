@@ -134,6 +134,7 @@ def _build_result(
         mbti=submission.mbti,
         attachment_score=classification.axis_scores.attachment,
         conflict_style=answers["step2.q02"],
+        conflict_message_style=answers["step2.q03"],
         affection_style=answers["step2.q08"],
     )
     warnings = build_warnings(

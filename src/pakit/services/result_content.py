@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-19.2"
+RESULT_CONTENT_VERSION = "2026-08-19.3"
 
 
 @dataclass(frozen=True)
@@ -128,9 +128,23 @@ RELATIONSHIP_DISTANCE_COPY: dict[str, str] = {
 }
 
 
-CONFLICT_SUPPORT_COPY: dict[str, str] = {
-    "hint_and_wait": "평소보다 말수가 줄면 모른 척 넘기지 말고 먼저 물어봐주세요",
-    "resolve_immediately": "서운한 일은 피하지 말고 바로 이야기해주세요",
+CONFLICT_SUPPORT_COPY: dict[tuple[str, str], str] = {
+    (
+        "hint_and_wait",
+        "rehearse_with_ai",
+    ): "평소와 다른 티가 나면 먼저 물어봐주고, 마음을 정리해 말할 때까지 기다려주세요.",
+    (
+        "hint_and_wait",
+        "send_immediately",
+    ): "평소와 다른 티가 나면 먼저 물어봐주세요. 대화의 문만 열어주면 속마음은 바로 나와요.",
+    (
+        "resolve_immediately",
+        "rehearse_with_ai",
+    ): "서운한 일은 바로 짚어주되, 할 말을 정리할 시간을 잠깐 주세요.",
+    (
+        "resolve_immediately",
+        "send_immediately",
+    ): "서운한 일은 돌려 넘기지 말고, 그 자리에서 바로 확인하고 풀어주세요.",
 }
 
 

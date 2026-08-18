@@ -67,7 +67,7 @@
       "product_plan": "docs/key-feature-product-plan.md"
     },
     "can_do": {
-      "question_ids": ["step1.q12", "step2.q02", "step2.q08"],
+      "question_ids": ["step1.q12", "step2.q02", "step2.q03", "step2.q08"],
       "axes": ["attachment"],
       "slot_order": [
         "support_preference",
