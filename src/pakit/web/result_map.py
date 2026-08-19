@@ -16,6 +16,7 @@ from pakit.domain.characters import CHARACTERS
 from pakit.services import assessment_classifier as ac
 from pakit.services import charging_service as ch
 from pakit.services import compatibility_service as cs
+from pakit.services import overview_tag_service as ot
 from pakit.services import result_content as rc
 from pakit.services.result_content import UnboxingItemCopy
 
@@ -279,6 +280,35 @@ def _build_sections() -> list[tuple[str, str, str, str, str, str]]:
         ["MBTI", "희귀도"],
         [[code_chip(m.value), esc(rc.MBTI_RARITY_COPY[m])] for m in MBTI],
     )
+    mbti_tag_table = table(
+        ["MBTI", "대표 키워드"],
+        [[code_chip(m.value), esc(ot.MBTI_OVERVIEW_TAG[m])] for m in MBTI],
+    )
+    axis_tag_label = {
+        ("attachment", "low"): ("애착유형", "거리조절 쪽"),
+        ("attachment", "high"): ("애착유형", "밀착 쪽"),
+        ("expression", "low"): ("표현방식", "탐색 쪽"),
+        ("expression", "high"): ("표현방식", "직진 쪽"),
+        ("routine", "low"): ("자극추구", "탐험 쪽"),
+        ("routine", "high"): ("자극추구", "루틴 쪽"),
+        ("egen", "low"): ("에겐테토", "테토 쪽"),
+        ("egen", "high"): ("에겐테토", "에겐 쪽"),
+    }
+    axis_tag_table = table(
+        ["성향 축", "강한 방향", "대표 키워드"],
+        [
+            [esc(axis_tag_label[key][0]), esc(axis_tag_label[key][1]), esc(tag)]
+            for key, tag in ot.AXIS_OVERVIEW_TAG.items()
+        ],
+    )
+    overview_tag_slots = table(
+        ["최종 결과", "출처", "선정 규칙", "예시"],
+        [
+            ["키워드 1", "MBTI", "제출한 MBTI의 대표 키워드", "장난꾸러기"],
+            ["키워드 2", "성향 축", "50점에서 가장 멀리 떨어진 축", "도파민 MAX"],
+            ["키워드 3", "성향 축", "두 번째로 멀리 떨어진 축", "혼자서도 잘 놀아요"],
+        ],
+    )
     overview_body = f"""
 <p class="lead">결과 이름 = <b>형용사 + 명사</b>. 형용사는 A·B 코드(4축)에서, 명사는 MBTI에서
 나와요. 이론상 16 형용사 × 16 명사 = 256가지 이름.</p>
@@ -288,9 +318,14 @@ def _build_sections() -> list[tuple[str, str, str, str, str, str]]:
   <div><h4>명사 16 · MBTI별</h4>{noun_table}</div>
   <div><h4>희귀도 16 · MBTI별</h4>{rarity_table}</div>
 </div>
-<div class="fixed-note">
-  <h4>아직 목업인 값</h4>
-  <ul><li><b>상단 태그</b> 도파민 MAX · 장난꾸러기 · 혼자서도 잘 놀아요 — 전원 동일</li></ul>
+<h4>상단 키워드 · MBTI 1개 + 강한 성향 축 2개</h4>
+<p>네 성향 축 중 50점에서 가장 멀리 떨어진 두 축을 사용해요. 동점 우선순위는
+애착유형 → 표현방식 → 자극추구 → 에겐테토.</p>
+{overview_tag_slots}
+<h4>키워드 원본 문구</h4>
+<div class="two-col">
+  <div>{mbti_tag_table}</div>
+  <div>{axis_tag_table}</div>
 </div>"""
     sections.append(
         (
@@ -298,7 +333,7 @@ def _build_sections() -> list[tuple[str, str, str, str, str, str]]:
             "결과 · overview",
             "제품 이름",
             f"{axchip('expr')}{axchip('att')}{axchip('egen')}{axchip('rout')}{mbtichip()}",
-            "형용사 16 · 명사 16 · 희귀도 16",
+            "최종 키워드 3개 · 원본 문구 24개",
             overview_body,
         )
     )

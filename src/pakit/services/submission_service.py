@@ -28,6 +28,7 @@ from pakit.services.compatibility_service import (
 from pakit.services.emotional_processing_service import build_emotional_processing_feature
 from pakit.services.handling_guide_service import build_handling_guide
 from pakit.services.motivation_service import build_motivation_feature
+from pakit.services.overview_tag_service import build_overview_tags
 from pakit.services.result_content import (
     CHARACTER_STORY_COPY,
     COMBINATION_COPY,
@@ -165,7 +166,7 @@ def _build_result(
             result_name=f"{adjective} {character.noun}",
             character_id=character.code,
             image_url=f"/assets/{character.asset_key}",
-            tags=("도파민 MAX", "장난꾸러기", "혼자서도 잘 놀아요"),
+            tags=build_overview_tags(submission.mbti, classification.axis_scores),
         ),
         unboxing_kit=UnboxingKitData(
             axis_scores=classification.axis_scores,

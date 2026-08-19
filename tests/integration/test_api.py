@@ -110,6 +110,8 @@ def test_serves_manual_assessment_test_page() -> None:
     assert "/api/tests/submissions" in response.text
     assert 'id="features"' in response.text
     assert "data.features.map" in response.text
+    assert 'id="overview-tags"' in response.text
+    assert "data.overview.tags.map" in response.text
     assert 'id="character-story-title"' in response.text
     assert "data.character_story.title" in response.text
     assert 'id="can-do"' in response.text

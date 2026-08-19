@@ -48,7 +48,7 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
         "result_name": "옷 예쁘게 입고 플러팅 했다고 하는 팽이",
         "character_id": "spinning_top",
         "image_url": "https://api.pakit.kr/assets/characters/spinning_top.png",
-        "tags": ["도파민 MAX", "장난꾸러기", "혼자서도 잘 놀아요"],
+        "tags": ["장난꾸러기", "속마음은 천천히", "감정 레이더 ON"],
     },
     "unboxing_kit": {
         "axis_scores": {
@@ -210,7 +210,11 @@ class OverviewOutput(BaseModel):
     result_name: str = Field(description="형용사와 명사를 합친 최종 결과명")
     character_id: str = Field(description="캐릭터 이미지 매핑용 고정 ID")
     image_url: str = Field(description="서버가 제공하는 캐릭터 이미지 절대 URL")
-    tags: list[str] = Field(min_length=3, max_length=3, description="말풍선 태그 3개")
+    tags: list[str] = Field(
+        min_length=3,
+        max_length=3,
+        description="MBTI 대표 키워드와 점수 편차가 가장 큰 성향 축 2개의 말풍선 태그",
+    )
 
 
 class AxisScoresOutput(BaseModel):
