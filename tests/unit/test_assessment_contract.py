@@ -32,6 +32,11 @@ def test_runtime_contract_matches_published_identifier_document() -> None:
     assert {question["question_id"] for question in document["questions"]} == set(
         QUESTION_CONTRACTS
     )
+    step1_questions = [question for question in document["questions"] if question["step"] == 1]
+    assert [question["order"] for question in step1_questions] == list(range(1, 9))
+    assert [question["question_id"] for question in step1_questions] == STEP1_DISPLAY_ORDER
+    step2_questions = [question for question in document["questions"] if question["step"] == 2]
+    assert [question["order"] for question in step2_questions] == list(range(1, 13))
     for question in document["questions"]:
         contract = QUESTION_CONTRACTS[question["question_id"]]
         assert contract.answer_kind is AnswerKind(question["answer_kind"])
