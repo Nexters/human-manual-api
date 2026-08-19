@@ -1,7 +1,7 @@
 from pakit.domain.assessment import MbtiType
 from pakit.services.result_content import (
-    AFFECTION_RECOGNITION_COPY,
     ANGER_TRIGGER_WARNING_COPY,
+    ATTRACTION_GUIDE_COPY,
     CHARACTER_STORY_COPY,
     COMBINATION_COPY,
     COMMUNICATION_WARNING_COPY,
@@ -215,10 +215,11 @@ def test_defines_every_handling_guide_copy() -> None:
         for conflict_style in {"hint_and_wait", "resolve_immediately"}
         for message_style in {"rehearse_with_ai", "send_immediately"}
     }
-    assert set(AFFECTION_RECOGNITION_COPY) == {
-        "express_with_words",
-        "express_with_actions",
-    }
+    assert set(ATTRACTION_GUIDE_COPY) == set(MbtiType)
+    assert len(set(ATTRACTION_GUIDE_COPY.values())) == len(MbtiType)
+    assert all(
+        "좋아해요. " in copy and copy.endswith("설레요.") for copy in ATTRACTION_GUIDE_COPY.values()
+    )
 
 
 def test_uses_confirmed_give_me_space_copy_for_every_mbti_middle_group() -> None:
@@ -281,7 +282,7 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-19.4"
+    assert RESULT_CONTENT_VERSION == "2026-08-19.5"
 
 
 def test_defines_all_warning_copy_variants() -> None:

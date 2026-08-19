@@ -2,6 +2,7 @@ import pytest
 
 from pakit.domain.assessment import MbtiType
 from pakit.services.handling_guide_service import build_handling_guide
+from pakit.services.result_content import ATTRACTION_GUIDE_COPY
 
 
 def test_builds_four_handling_instructions_in_fixed_order() -> None:
@@ -11,14 +12,14 @@ def test_builds_four_handling_instructions_in_fixed_order() -> None:
         attachment_score=50,
         conflict_style="resolve_immediately",
         conflict_message_style="send_immediately",
-        affection_style="express_with_actions",
     )
 
     assert result == (
         "막힌 이유부터 함께 정리해주세요",
         "별일 없어도 가끔 안부를 나눠주세요. 짧은 한마디만으로도 연결되어 있다고 느낍니다.",
         "서운한 일은 돌려 넘기지 말고, 그 자리에서 바로 확인하고 풀어주세요.",
-        "말없이 챙기는 행동을 애정으로 알아봐주세요",
+        "애매하게 재지 않고 궁금한 건 바로 물어보면 좋아해요. "
+        "내 장난에 밀리지 않고 먼저 훅 들어오면 설레요.",
     )
 
 
@@ -70,7 +71,6 @@ def test_uses_four_attachment_score_bands(score: int, expected: str) -> None:
         attachment_score=score,
         conflict_style="hint_and_wait",
         conflict_message_style="rehearse_with_ai",
-        affection_style="express_with_words",
     )
 
     assert result[1] == expected
@@ -85,7 +85,6 @@ def test_rejects_invalid_attachment_score(score: int) -> None:
             attachment_score=score,
             conflict_style="hint_and_wait",
             conflict_message_style="rehearse_with_ai",
-            affection_style="express_with_words",
         )
 
 
@@ -105,7 +104,6 @@ def test_refines_support_preference_with_middle_mbti_group(mbti: MbtiType, expec
         attachment_score=0,
         conflict_style="hint_and_wait",
         conflict_message_style="rehearse_with_ai",
-        affection_style="express_with_words",
     )
 
     assert result[0] == expected
@@ -157,7 +155,6 @@ def test_uses_confirmed_support_copy(
         attachment_score=0,
         conflict_style="hint_and_wait",
         conflict_message_style="rehearse_with_ai",
-        affection_style="express_with_words",
     )
 
     assert result[0] == expected
@@ -199,7 +196,19 @@ def test_combines_conflict_response_and_message_preparation(
         attachment_score=0,
         conflict_style=conflict_style,
         conflict_message_style=conflict_message_style,
-        affection_style="express_with_words",
     )
 
     assert result[2] == expected
+
+
+@pytest.mark.parametrize("mbti", list(MbtiType))
+def test_uses_mbti_specific_attraction_copy(mbti: MbtiType) -> None:
+    result = build_handling_guide(
+        support_preference="listen_to_me",
+        mbti=mbti,
+        attachment_score=0,
+        conflict_style="hint_and_wait",
+        conflict_message_style="rehearse_with_ai",
+    )
+
+    assert result[3] == ATTRACTION_GUIDE_COPY[mbti]

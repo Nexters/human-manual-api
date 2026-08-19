@@ -67,13 +67,14 @@
       "product_plan": "docs/key-feature-product-plan.md"
     },
     "can_do": {
-      "question_ids": ["step1.q12", "step2.q02", "step2.q03", "step2.q08"],
+      "question_ids": ["step1.q12", "step2.q02", "step2.q03"],
       "axes": ["attachment"],
+      "additional_input": "mbti",
       "slot_order": [
         "support_preference",
         "relationship_distance",
         "conflict_support",
-        "affection_recognition"
+        "attraction_guide"
       ],
       "status": "implemented"
     },
@@ -466,10 +467,6 @@
         "signals": {
           "express_with_words": {"pole": "에겐", "canonical_score": 100},
           "express_with_actions": {"pole": "테토", "canonical_score": 0}
-        },
-        "result_material": {
-          "result_section": "can_do",
-          "result_slot": "affection_recognition"
         }
       }
     },

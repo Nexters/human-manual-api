@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-19.4"
+RESULT_CONTENT_VERSION = "2026-08-19.5"
 
 
 @dataclass(frozen=True)
@@ -158,9 +158,65 @@ CONFLICT_SUPPORT_COPY: dict[tuple[str, str], str] = {
 }
 
 
-AFFECTION_RECOGNITION_COPY: dict[str, str] = {
-    "express_with_words": "말과 리액션에 담긴 애정을 알아봐주세요",
-    "express_with_actions": "말없이 챙기는 행동을 애정으로 알아봐주세요",
+ATTRACTION_GUIDE_COPY: dict[MbtiType, str] = {
+    MbtiType.INTJ: (
+        "요즘 깊게 파는 걸 물어봐주면 좋아해요. 대답에 날카로운 질문을 하나 더 얹으면 설레요."
+    ),
+    MbtiType.ISTJ: (
+        "사소한 약속도 잊지 않고 지켜주면 좋아해요. 만난 뒤 좋았던 순간을 정확히 짚어주면 설레요."
+    ),
+    MbtiType.ENTJ: (
+        "내가 잘하는 걸 구체적으로 칭찬해주면 좋아해요. 대화 끝에 다음 약속을 먼저 잡으면 설레요."
+    ),
+    MbtiType.ESTJ: (
+        "내 말에 무조건 맞추지 않고 자기 의견을 똑 부러지게 말해주면 좋아해요. "
+        "밀당 없이 또 보고 싶다고 말하면 설레요."
+    ),
+    MbtiType.INFJ: (
+        "내 얘기의 이유를 한 번 더 물어봐주면 좋아해요. 말하지 않은 기분까지 알아채주면 설레요."
+    ),
+    MbtiType.ISFJ: (
+        "좋아한다고 흘린 메뉴를 기억해 자연스럽게 골라주면 좋아해요. "
+        "물컵이나 수저를 말없이 챙겨주면 설레요."
+    ),
+    MbtiType.ENFJ: (
+        "요즘 가장 신나는 일을 묻고 눈 맞춰 들어주면 좋아해요. "
+        "그 열정을 구체적으로 칭찬하면 설레요."
+    ),
+    MbtiType.ESFJ: (
+        "처음부터 반갑게 웃고 리액션을 많이 해주면 좋아해요. "
+        "사람들 사이에서도 나한테 한 번 더 눈 맞춰주면 설레요."
+    ),
+    MbtiType.INFP: (
+        "남에게 잘 안 하는 진짜 이야기를 꺼내면 좋아해요. "
+        "내가 좋아하는 세계를 궁금해하고 같이 빠져주면 설레요."
+    ),
+    MbtiType.ISFP: (
+        "좋아하는 음악을 먼저 들려주면 좋아해요. 잘 어울리는 포인트를 슬쩍 칭찬하면 설레요."
+    ),
+    MbtiType.ENFP: (
+        "내 텐션을 부담스러워하지 않고 같이 신나주면 좋아해요. "
+        "장난 사이에 진심 어린 한마디를 툭 던지면 설레요."
+    ),
+    MbtiType.ESFP: (
+        "사람 많은 자리에서도 내 옆으로 와서 같이 놀아주면 좋아해요. "
+        "그러다 나한테만 슬쩍 눈 맞춰 웃어주면 설레요."
+    ),
+    MbtiType.INTP: (
+        "관심 있는 주제를 진지하게 물어봐주면 좋아해요. "
+        "내가 한 말을 나중에 찾아보고 다시 얘기해주면 설레요."
+    ),
+    MbtiType.ISTP: (
+        "잘하는 걸 물어보고 직접 보여달라고 하면 좋아해요. 필요한 걸 말없이 척 챙겨주면 설레요."
+    ),
+    MbtiType.ENTP: (
+        "애매하게 재지 않고 궁금한 건 바로 물어보면 좋아해요. "
+        "내 장난에 밀리지 않고 먼저 훅 들어오면 설레요."
+    ),
+    MbtiType.ESTP: (
+        "멀리서 눈치 보지 않고 눈을 맞추며 바로 말을 걸면 좋아해요. "
+        "내 장난에 몸 사리지 않고 같이 놀아주면 설레요."
+    ),
 }
 
 

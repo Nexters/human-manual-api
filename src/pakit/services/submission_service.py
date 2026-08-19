@@ -143,7 +143,6 @@ def _build_result(
         attachment_score=classification.axis_scores.attachment,
         conflict_style=answers["step2.q02"],
         conflict_message_style=answers["step2.q03"],
-        affection_style=answers["step2.q08"],
     )
     warnings = build_warnings(
         protected_time=answers["step1.q05"],

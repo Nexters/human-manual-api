@@ -441,27 +441,29 @@ A×B 조합 제목·설명은 기존 결과 스냅샷 복원용 내부 데이터
             for (conflict_style, message_style), copy in rc.CONFLICT_SUPPORT_COPY.items()
         ],
     )
-    aff_table = table(
-        ["step2.q08", "선택지", "문구"],
-        [[val(k), esc(CHOICE["step2.q08"][k]), esc(rc.AFFECTION_RECOGNITION_COPY[k])]
-         for k in rc.AFFECTION_RECOGNITION_COPY],
+    attraction_table = table(
+        ["MBTI", "문구"],
+        [
+            [f"<span class='val'>{esc(mbti.value)}</span>", esc(copy)]
+            for mbti, copy in rc.ATTRACTION_GUIDE_COPY.items()
+        ],
     )
     cando_body = f"""
-<p class="lead">순서 고정: <b>원하는 도움 · 관계 거리 · 갈등 푸는 법 · 애정 알아보는 법</b>.</p>
+<p class="lead">순서 고정: <b>원하는 도움 · 관계 거리 · 갈등 푸는 법 · 호감 포인트</b>.</p>
 <div class="slot"><h4><span class="slot-n">1</span> 힘들 때 원하는 도움 · <span class="src">step1.q12 × MBTI중간축</span></h4>{sup_table}</div>
 <div class="two-col">
   <div class="slot"><h4><span class="slot-n">2</span> 편안한 관계 거리 · <span class="src">애착 점수</span></h4>{dist_table}</div>
   <div class="slot"><h4><span class="slot-n">3</span> 갈등을 푸는 방식 · <span class="src">step2.q02 × step2.q03</span></h4>{conf_table}</div>
 </div>
-<div class="slot"><h4><span class="slot-n">4</span> 애정을 알아보는 법 · <span class="src">step2.q08</span></h4>{aff_table}</div>"""
+<div class="slot"><h4><span class="slot-n">4</span> 호감 포인트 · <span class="src">MBTI 16종</span></h4>{attraction_table}</div>"""
     sections.append(
         (
             "cando",
             "결과 · can_do",
             "이렇게 다뤄주세요 (4슬롯)",
             f"{qchip('step1.q12')}{qchip('step2.q02')}{qchip('step2.q03')}"
-            f"{qchip('step2.q08')}{axchip('att')}{mbtichip()}",
-            "20 · 4 · 4 · 2",
+            f"{axchip('att')}{mbtichip()}",
+            "20 · 4 · 4 · 16",
             cando_body,
         )
     )
