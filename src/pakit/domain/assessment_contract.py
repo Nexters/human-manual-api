@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import StrEnum
 
-ASSESSMENT_VERSION = "2026-08-19.3"
+ASSESSMENT_VERSION = "2026-08-20.1"
 
 
 class AnswerKind(StrEnum):
@@ -23,10 +23,6 @@ class QuestionContract:
 QUESTION_CONTRACTS: dict[str, QuestionContract] = {
     "step1.q01": QuestionContract(
         AnswerKind.CHOICE, frozenset({"decision", "worries", "hangout", "information"})
-    ),
-    "step1.q02": QuestionContract(
-        AnswerKind.CHOICE,
-        frozenset({"organize_and_coordinate", "lift_mood", "make_it_happen", "care_for_others"}),
     ),
     "step1.q05": QuestionContract(
         AnswerKind.CHOICE, frozenset({"after_waking", "during_meal", "after_work", "late_night"})
@@ -51,6 +47,18 @@ QUESTION_CONTRACTS: dict[str, QuestionContract] = {
     "step1.q08": QuestionContract(
         AnswerKind.CHOICE, frozenset({"go_to_bed", "contact_others", "eat_alone", "go_for_drive"})
     ),
+    "step1.q12": QuestionContract(
+        AnswerKind.CHOICE,
+        frozenset(
+            {
+                "listen_to_me",
+                "take_me_out",
+                "give_me_space",
+                "solve_together",
+                "make_me_laugh",
+            }
+        ),
+    ),
     "step1.q11": QuestionContract(
         AnswerKind.CHOICE,
         frozenset(
@@ -64,17 +72,9 @@ QUESTION_CONTRACTS: dict[str, QuestionContract] = {
             }
         ),
     ),
-    "step1.q12": QuestionContract(
+    "step1.q02": QuestionContract(
         AnswerKind.CHOICE,
-        frozenset(
-            {
-                "listen_to_me",
-                "take_me_out",
-                "give_me_space",
-                "solve_together",
-                "make_me_laugh",
-            }
-        ),
+        frozenset({"organize_and_coordinate", "lift_mood", "make_it_happen", "care_for_others"}),
     ),
     "step2.q01": QuestionContract(
         AnswerKind.CHOICE, frozenset({"inspect_profile", "approach_directly"})

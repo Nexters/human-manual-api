@@ -5,6 +5,17 @@ from pakit.api.schemas.assessment_submissions import ASSESSMENT_SUBMISSION_EXAMP
 from pakit.domain.assessment import MbtiType
 from pakit.domain.assessment_contract import ASSESSMENT_VERSION, QUESTION_CONTRACTS, AnswerKind
 
+STEP1_DISPLAY_ORDER = [
+    "step1.q01",
+    "step1.q05",
+    "step1.q06",
+    "step1.q07",
+    "step1.q08",
+    "step1.q12",
+    "step1.q11",
+    "step1.q02",
+]
+
 
 def test_runtime_contract_matches_published_identifier_document() -> None:
     document_path = Path(__file__).parents[2] / "docs" / "assessment-identifiers.v1.json"
@@ -15,6 +26,9 @@ def test_runtime_contract_matches_published_identifier_document() -> None:
     assert len(document["questions"]) == 20
     assert {"step1.q03", "step1.q04"}.isdisjoint(QUESTION_CONTRACTS)
     assert sum(question_id.startswith("step1.") for question_id in QUESTION_CONTRACTS) == 8
+    assert [
+        question_id for question_id in QUESTION_CONTRACTS if question_id.startswith("step1.")
+    ] == (STEP1_DISPLAY_ORDER)
     assert {question["question_id"] for question in document["questions"]} == set(
         QUESTION_CONTRACTS
     )
@@ -29,6 +43,11 @@ def test_runtime_contract_matches_published_identifier_document() -> None:
 
     example_answers = ASSESSMENT_SUBMISSION_EXAMPLE["answers"]
     assert isinstance(example_answers, list)
+    assert [
+        answer["question_id"]
+        for answer in example_answers
+        if str(answer["question_id"]).startswith("step1.")
+    ] == STEP1_DISPLAY_ORDER
     examples_by_question = {answer["question_id"]: answer for answer in example_answers}
     assert set(examples_by_question) == set(QUESTION_CONTRACTS)
     for question in document["questions"]:
@@ -70,15 +89,9 @@ def test_q02_content_defines_four_role_choices_without_asset_metadata() -> None:
         },
     ]
 
-    step1_questions = [item for item in document["questions"] if item["step"] == 1]
+    step1_questions = sorted(
+        (item for item in document["questions"] if item["step"] == 1),
+        key=lambda item: item["order"],
+    )
     assert [item["order"] for item in step1_questions] == list(range(1, 9))
-    assert [item["question_id"] for item in step1_questions] == [
-        "step1.q01",
-        "step1.q02",
-        "step1.q05",
-        "step1.q06",
-        "step1.q07",
-        "step1.q08",
-        "step1.q11",
-        "step1.q12",
-    ]
+    assert [item["question_id"] for item in step1_questions] == STEP1_DISPLAY_ORDER

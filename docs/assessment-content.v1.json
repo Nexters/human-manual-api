@@ -1,5 +1,5 @@
 {
-  "assessment_version": "2026-08-19.3",
+  "assessment_version": "2026-08-20.1",
   "content_status": "baseline_with_product_mapping",
   "locale": "ko-KR",
   "source": {
@@ -158,7 +158,7 @@
     {
       "question_id": "step1.q02",
       "step": 1,
-      "order": 2,
+      "order": 8,
       "prompt": "친구들과 있을 때, 나와 가장 닮은 토끼는?",
       "answer_kind": "choice",
       "options": [
@@ -193,7 +193,7 @@
     {
       "question_id": "step1.q05",
       "step": 1,
-      "order": 3,
+      "order": 2,
       "prompt": "하루 중 절대 건드리면 안 되는 시간은 언제인가요?",
       "answer_kind": "choice",
       "options": [
@@ -211,7 +211,7 @@
     {
       "question_id": "step1.q06",
       "step": 1,
-      "order": 4,
+      "order": 3,
       "prompt": "송송님을 화나게 하는 가장 빠른 방법",
       "answer_kind": "choice",
       "options": [
@@ -232,7 +232,7 @@
     {
       "question_id": "step1.q07",
       "step": 1,
-      "order": 5,
+      "order": 4,
       "prompt": "기다리고 기다리던 휴일, 송송님의 첫 스케줄은 무엇인가요?",
       "answer_kind": "choice",
       "options": [
@@ -248,7 +248,7 @@
     {
       "question_id": "step1.q08",
       "step": 1,
-      "order": 6,
+      "order": 5,
       "prompt": "금요일 저녁, 약속이 갑자기 취소됐을 때 송송님은",
       "answer_kind": "choice",
       "options": [
@@ -285,7 +285,7 @@
     {
       "question_id": "step1.q12",
       "step": 1,
-      "order": 8,
+      "order": 6,
       "prompt": "기분이 안 좋을 때, 가장 반가운 친구의 연락은?",
       "answer_kind": "choice",
       "options": [

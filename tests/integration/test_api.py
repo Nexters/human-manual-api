@@ -137,6 +137,19 @@ def test_serves_manual_assessment_test_page() -> None:
     assert 'document.querySelector("#nickname").value = "해서니"' in response.text
     assert 'choices("step1.q11"' in response.text
     assert 'choices("step1.q12"' in response.text
+    step1_markers = [
+        'choices("step1.q01"',
+        'choices("step1.q05"',
+        'choices("step1.q06"',
+        'choices("step1.q07"',
+        'choices("step1.q08"',
+        'choices("step1.q12"',
+        'choices("step1.q11"',
+        'choices("step1.q02"',
+    ]
+    assert [response.text.index(marker) for marker in step1_markers] == sorted(
+        response.text.index(marker) for marker in step1_markers
+    )
 
 
 def test_serves_manual_compatibility_test_page() -> None:

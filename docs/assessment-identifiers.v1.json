@@ -1,5 +1,5 @@
 {
-  "assessment_version": "2026-08-19.3",
+  "assessment_version": "2026-08-20.1",
   "identifier_status": "published",
   "id_policy": {
     "question_id": "step{number}.q{two_digit_stable_sequence}",

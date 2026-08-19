@@ -1,6 +1,6 @@
 # 테스트 질문지 기준 자료
 
-이 문서는 제공된 테스트 화면을 `assessment_version` `2026-08-19.3`의 질문 원문과 선택지에
+이 문서는 제공된 테스트 화면을 `assessment_version` `2026-08-20.1`의 질문 원문과 선택지에
 연결한 사람이 읽기 위한 목록이다. 백엔드에서 읽을 수 있는 동일 기준 데이터는
 [`assessment-content.v1.json`](./assessment-content.v1.json)에 있다. ID와 제출 값의 불변 계약은
 [`assessment-identifiers.v1.json`](./assessment-identifiers.v1.json)이 계속 담당한다.
@@ -27,13 +27,13 @@
 | ID | 질문 | 선택지 (`value` → 화면 문구) |
 |---|---|---|
 | `step1.q01` | 친구들이 나를 찾는 순간은 언제인가요? | `decision` → 결정이 필요할 때<br>`worries` → 고민 있을 때<br>`hangout` → 놀 사람 필요할 때<br>`information` → 정보 필요할 때 |
-| `step1.q02` | 친구들과 있을 때, 나와 가장 닮은 토끼는? | `organize_and_coordinate` → “잠깐, 의견 정리해서 방향부터 잡자.” · 정리·조율<br>`lift_mood` → “분위기 왜 이래ㅋㅋ 일단 웃고 보자.” · 분위기 전환<br>`make_it_happen` → “재밌겠다. 일단 해보고 생각하자!” · 실행·추진<br>`care_for_others` → “넌 뭐가 좋아? 말해주면 내가 챙길게.” · 관심·배려 |
 | `step1.q05` | 하루 중 절대 건드리면 안 되는 시간은 언제인가요? | `after_waking` → 기상 직후<br>`during_meal` → 밥 먹을 때<br>`after_work` → 퇴근 직후<br>`late_night` → 새벽 감성 타임 |
 | `step1.q06` | 송송님을 화나게 하는 가장 빠른 방법 | `rush` → 재촉하기<br>`interrupt` → 말 끊기<br>`take_food` → 음식 뺏어먹기<br>`arrive_late` → 약속 늦기<br>`nag` → 잔소리<br>`change_plan` → 내 계획 바꾸기 |
 | `step1.q07` | 기다리고 기다리던 휴일, 송송님의 첫 스케줄은 무엇인가요? | `sleep_until_noon` → 낮 12시 기상<br>`morning_run` → 아침 러닝<br>`brunch_cafe` → 브런치 카페<br>`stay_in_bed` → 이불 밖은 위험해<br>`watch_streaming` → 밀린 OTT 시청<br>`self_development` → 자기개발 |
 | `step1.q08` | 금요일 저녁, 약속이 갑자기 취소됐을 때 송송님은 | `go_to_bed` → 개꿀! 당장 침대로 간다<br>`contact_others` → 다른 친구한테 연락 돌린다<br>`eat_alone` → 혼자라도 식당 가서 먹고 온다<br>`go_for_drive` → 이 때다, 안 가 본 곳으로 드라이브! |
-| `step1.q11` | 집에만 있으려던 주말, 나를 밖으로 나오게 한 건? | `curiosity` → 궁금한 새 장소<br>`needed_by_someone` → 나를 꼭 찾는 친구<br>`clear_goal` → 딱 하나 남은 목표<br>`responsibility` → 지켜야 할 약속<br>`last_chance` → 오늘뿐인 기회<br>`fun` → 재밌어 보이는 모임 |
 | `step1.q12` | 기분이 안 좋을 때, 가장 반가운 친구의 연락은? | `listen_to_me` → 무슨 일인지 천천히 들어줄게<br>`take_me_out` → 일단 나와. 맛있는 거 먹자<br>`give_me_space` → 혼자 정리되면 연락해. 기다릴게<br>`solve_together` → 내가 같이 해결해볼까?<br>`make_me_laugh` → 이거 보고 일단 웃어ㅋㅋ |
+| `step1.q11` | 집에만 있으려던 주말, 나를 밖으로 나오게 한 건? | `curiosity` → 궁금한 새 장소<br>`needed_by_someone` → 나를 꼭 찾는 친구<br>`clear_goal` → 딱 하나 남은 목표<br>`responsibility` → 지켜야 할 약속<br>`last_chance` → 오늘뿐인 기회<br>`fun` → 재밌어 보이는 모임 |
+| `step1.q02` | 친구들과 있을 때, 나와 가장 닮은 토끼는? | `organize_and_coordinate` → “잠깐, 의견 정리해서 방향부터 잡자.” · 정리·조율<br>`lift_mood` → “분위기 왜 이래ㅋㅋ 일단 웃고 보자.” · 분위기 전환<br>`make_it_happen` → “재밌겠다. 일단 해보고 생각하자!” · 실행·추진<br>`care_for_others` → “넌 뭐가 좋아? 말해주면 내가 챙길게.” · 관심·배려 |
 
 ## STEP 2
 
