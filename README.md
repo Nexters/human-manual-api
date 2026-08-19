@@ -17,6 +17,7 @@ uv run uvicorn pakit.main:app --reload
 - 수동 테스트 페이지: <http://localhost:8000/test/>
 - 상태 확인: <http://localhost:8000/health>
 - API 상태 확인: <http://localhost:8000/api/health>
+- 운영 어드민: <http://localhost:8000/admin>
 
 브라우저 요청은 로컬 프론트엔드 `http://localhost:3000`, `http://localhost:5173`과 운영
 프론트엔드 `https://pakit.kr`에서 허용됩니다. 이 목록은 서버 코드에 고정되어 있으며 `.env`로
@@ -39,6 +40,27 @@ docker compose -f compose.yaml -f compose.local.yaml up -d db
 uv run alembic upgrade head
 uv run uvicorn pakit.main:app --reload
 ```
+
+### 운영 어드민과 백엔드 통계
+
+읽기 전용 어드민은 다음 환경변수를 모두 설정해야 열립니다. 하나라도 비어 있으면 `/admin`과
+`/api/admin/*`는 `503`으로 닫힙니다. 운영에서는 반드시 HTTPS와 배포 앞단의 접근 제어를 함께
+사용하세요.
+
+```dotenv
+PAKIT_ADMIN_USERNAME=operator
+PAKIT_ADMIN_PASSWORD=충분히-긴-임의의-비밀번호
+PAKIT_USAGE_TRACKING_STARTED_AT=2026-08-20T18:00:00+09:00
+```
+
+- `/admin`: 생성 결과·궁합 현황과 최근 7일 추이
+- `/admin/results`: 전체 결과 검색과 상세 스냅샷
+- `/admin/analytics`: MBTI·장난감·키워드·성향·궁합 분포
+
+`PAKIT_USAGE_TRACKING_STARTED_AT`은 `backend_usage_events` 계측을 실제로 배포한 시각입니다.
+설정하지 않으면 과거 결과를 미사용자로 오해하지 않도록 궁합 경험 비율을 표시하지 않습니다.
+공개 결과 조회와 궁합 계산의 성공 요청만 기록하며 닉네임, 원본 답변, IP, User-Agent는 사용
+기록에 저장하지 않습니다. 프론트 페이지뷰·클릭·유입 분석은 GA에서 관리합니다.
 
 개발을 마치면 DB 컨테이너만 중지할 수 있습니다. `postgres_data` 볼륨은 그대로 유지됩니다.
 

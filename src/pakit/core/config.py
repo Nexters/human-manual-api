@@ -1,3 +1,4 @@
+from datetime import datetime
 from functools import lru_cache
 from typing import Literal
 from urllib.parse import quote_plus
@@ -16,6 +17,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         env_prefix="PAKIT_",
+        env_ignore_empty=True,
         extra="ignore",
     )
 
@@ -28,6 +30,9 @@ class Settings(BaseSettings):
     database_name: str = "pakit"
     database_user: str = "pakit"
     database_password: SecretStr = SecretStr("")
+    admin_username: str | None = None
+    admin_password: SecretStr | None = None
+    usage_tracking_started_at: datetime | None = None
 
     @property
     def database_url(self) -> str:

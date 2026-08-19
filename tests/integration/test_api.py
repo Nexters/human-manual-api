@@ -6,7 +6,7 @@ from typing import Any
 import pytest
 from fastapi.testclient import TestClient
 
-from pakit.api.dependencies import get_result_repository
+from pakit.api.dependencies import get_result_repository, get_usage_event_repository
 from pakit.api.schemas.assessment_submissions import (
     ASSESSMENT_SUBMISSION_EXAMPLE,
     ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE,
@@ -34,8 +34,18 @@ class InMemoryResultRepository:
         return self.results.get(result_code)
 
 
+class InMemoryUsageEventRepository:
+    def __init__(self) -> None:
+        self.events: list[dict[str, Any]] = []
+
+    async def record(self, **event: Any) -> None:
+        self.events.append(event)
+
+
 result_repository = InMemoryResultRepository()
+usage_event_repository = InMemoryUsageEventRepository()
 app.dependency_overrides[get_result_repository] = lambda: result_repository
+app.dependency_overrides[get_usage_event_repository] = lambda: usage_event_repository
 client = TestClient(app)
 
 
@@ -278,6 +288,10 @@ def test_gets_submitted_result_by_result_code() -> None:
 
     assert response.status_code == 200
     assert response.json() == submitted_body
+    assert usage_event_repository.events[-1] == {
+        "event_name": "result_viewed",
+        "result_code": submitted_body["result_code"],
+    }
 
 
 def test_creates_a_distinct_result_code_for_each_submission() -> None:
@@ -331,6 +345,13 @@ def test_calculates_friend_compatibility_from_two_saved_results() -> None:
         "image_url": friend.json()["overview"]["image_url"],
     }
     assert 0 <= body["synergy"]["score"] <= 100
+    assert usage_event_repository.events[-1] == {
+        "event_name": "compatibility_completed",
+        "result_code": mine.json()["result_code"],
+        "related_result_code": friend.json()["result_code"],
+        "compatibility_score": body["synergy"]["score"],
+        "compatibility_version": "2026-08-19.1",
+    }
     assert len(body["synergy"]["tags"]) == 2
     assert [detail["key"] for detail in body["details"]] == [
         "distance",

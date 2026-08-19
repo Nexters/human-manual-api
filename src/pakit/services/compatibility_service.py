@@ -12,6 +12,7 @@ from pakit.domain.characters import CHARACTERS
 from pakit.services.result_repository import ResultRepository
 
 COMPATIBILITY_PROFILE_VERSION = "2026-08-19.1"
+COMPATIBILITY_RULES_VERSION = "2026-08-19.1"
 
 PRIMARY_COMPATIBLE_MBTI: dict[MbtiType, MbtiType] = {
     MbtiType.INTJ: MbtiType.ENFP,
