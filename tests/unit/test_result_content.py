@@ -10,11 +10,11 @@ from pakit.services.result_content import (
     MBTI_MIDDLE_GROUP,
     MBTI_RARITY_COPY,
     MBTI_STRENGTH_COPY,
+    MBTI_TRIGGER_WARNING_COPY,
     MOTIVATION_COPY,
     MOTIVATION_DESCRIPTION,
     OPENING_TOOL_COPY,
     PACKAGING_COPY,
-    PROTECTED_TIME_WARNING_COPY,
     RELATIONSHIP_DISTANCE_COPY,
     RELATIONSHIP_ROLE_COPY,
     RESULT_CONTENT_VERSION,
@@ -282,16 +282,11 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-19.5"
+    assert RESULT_CONTENT_VERSION == "2026-08-19.6"
 
 
 def test_defines_all_warning_copy_variants() -> None:
-    assert set(PROTECTED_TIME_WARNING_COPY) == {
-        "after_waking",
-        "during_meal",
-        "after_work",
-        "late_night",
-    }
+    assert set(MBTI_TRIGGER_WARNING_COPY) == set(MbtiType)
     assert set(ANGER_TRIGGER_WARNING_COPY) == {
         "rush",
         "interrupt",

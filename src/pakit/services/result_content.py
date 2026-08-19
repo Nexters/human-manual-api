@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-19.5"
+RESULT_CONTENT_VERSION = "2026-08-19.6"
 
 
 @dataclass(frozen=True)
@@ -220,11 +220,29 @@ ATTRACTION_GUIDE_COPY: dict[MbtiType, str] = {
 }
 
 
-PROTECTED_TIME_WARNING_COPY: dict[str, str] = {
-    "after_waking": "잠이 덜 깨면 첫 반응이 무뚝뚝해요",
-    "during_meal": "밥 먹는 흐름이 끊기면 바로 예민해져요",
-    "after_work": "퇴근 직후 할 일이 쏟아지면 바로 방전돼요",
-    "late_night": "새벽 감성을 끊으면 괜히 더 예민해져요",
+MBTI_TRIGGER_WARNING_COPY: dict[MbtiType, str] = {
+    MbtiType.INTJ: ('근거도 없이 "아니 그냥 내 말이 맞아"라고 우기면, 그 자리에서 말이 끊겨요'),
+    MbtiType.INTP: (
+        '대충 아는 걸로 "그거 원래 이런 거잖아"라며 아는 척하면, 납득할 때까지 머리가 안 꺼져요'
+    ),
+    MbtiType.ENTJ: (
+        '다 아는 얘기를 "이건 이렇게 하는 거야"라며 가르치려 들면, 듣는 척만 하고 마음이 떠나요'
+    ),
+    MbtiType.ENTP: ('내 아이디어에 "그건 원래 안 돼"라고 하면, 끝까지 뒤집어 보여주고 싶어져요'),
+    MbtiType.INFJ: ('무례한 행동을 해놓고 "예민하게 굴지 마"라고 하면, 그 사람한테만 문이 닫혀요'),
+    MbtiType.INFP: ('속마음을 말하는데 "그건 팩트잖아"라며 눌러버리면, 맞는 말이어도 오래 아파요'),
+    MbtiType.ENFJ: (
+        '좋게 풀어보려고 나섰는데 "네가 무슨 상관인데"라고 선을 그으면, 며칠씩 그 말이 안 잊혀요'
+    ),
+    MbtiType.ENFP: ('선 넘는 장난을 "농담인데 왜 정색해"라며 계속하면, 텐션이 급속 방전돼요'),
+    MbtiType.ISTJ: ('정해둔 약속을 계속 어겨놓고 "뭐 어때"라고 하면, 신뢰 잔량이 확 깎여요'),
+    MbtiType.ISFJ: "나 말고 내 가까운 사람을 건드리면, 그때부터 웃는 얼굴이 안 나와요",
+    MbtiType.ESTJ: ('해보지도 않고 "어차피 안 될걸"이라고 하면, 정색 모드가 바로 켜져요'),
+    MbtiType.ESFJ: ('내가 챙겨준 걸 "원래 네가 하는 거잖아"라고 넘기면, 웃고 있어도 속으로 쌓여요'),
+    MbtiType.ISTP: ('"그래서 지금 기분이 어떤데"라며 감정 표현을 강요하면, 대답이 점점 짧아져요'),
+    MbtiType.ISFP: ('내 속도로 가는데 "왜 이렇게 느려"라고 재촉하면, 하려던 마음이 강제 종료돼요'),
+    MbtiType.ESTP: "할 말을 빙빙 돌리며 결론을 안 내면, 인내심 잔량이 0%가 돼요",
+    MbtiType.ESFP: ('분위기 좋았는데 "좀 조용히 해"라며 눈치를 주면, 그 자리 전원이 같이 꺼져요'),
 }
 
 

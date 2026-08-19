@@ -79,14 +79,15 @@
       "status": "implemented"
     },
     "warnings": {
-      "question_ids": ["step1.q05", "step1.q06"],
+      "question_ids": ["step1.q06"],
       "additional_input": "mbti",
       "mbti_axes": ["E/I", "T/F"],
+      "uses_full_mbti": true,
       "slot_order": [
         "communication_landmine",
         "social_energy_boundary",
         "anger_trigger",
-        "protected_time"
+        "mbti_trigger"
       ],
       "status": "implemented"
     },
@@ -202,10 +203,9 @@
         {"value": "late_night", "label": "새벽 감성 타임"}
       ],
       "calculation": {
-        "status": "mapped",
-        "role": "result_material",
-        "result_section": "warnings",
-        "result_slot": "protected_time"
+        "status": "unmapped",
+        "role": "reserved_input",
+        "note": "문항 계약은 유지하며 새 결과 노출 위치는 제품 결정 대기"
       }
     },
     {

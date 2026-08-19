@@ -72,7 +72,7 @@ def test_result_map_includes_copy_from_every_section() -> None:
         "혼자만의 시간",  # 충전 방법 · Q08 키워드
         "관심 분야 탐구",  # 충전 방법 · MBTI 키워드(INTJ)
         "수다 떨기",  # 충전 방법 · MBTI 공통 키워드
-        "잠이 덜 깨면 첫 반응",  # 주의사항 · 보호 시간(after_waking)
+        "끝까지 뒤집어 보여주고 싶어져요",  # 주의사항 · MBTI 발작 버튼(ENTP)
         "찰떡궁합 환상의 장난감",  # 궁합 헤드라인
     ]
     for phrase in expected:

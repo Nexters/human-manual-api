@@ -145,7 +145,6 @@ def _build_result(
         conflict_message_style=answers["step2.q03"],
     )
     warnings = build_warnings(
-        protected_time=answers["step1.q05"],
         anger_trigger=answers["step1.q06"],
         mbti=submission.mbti,
     )

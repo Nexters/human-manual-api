@@ -513,7 +513,7 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
         "해결하려고 꺼낸 말에 차갑다는 말이 돌아오면 억울해져요",
         "혼자 정리할 틈이 없으면 대답이 점점 짧아져요",
         "재촉받으면 하려던 마음도 사라져요",
-        "잠이 덜 깨면 첫 반응이 무뚝뚝해요",
+        '대충 아는 걸로 "그거 원래 이런 거잖아"라며 아는 척하면, 납득할 때까지 머리가 안 꺼져요',
     ]
 
 
@@ -570,24 +570,6 @@ def test_uses_every_q12_support_preference(value: str, expected: str) -> None:
 @pytest.mark.parametrize(
     ("question_id", "value", "slot", "expected"),
     [
-        (
-            "step1.q05",
-            "during_meal",
-            3,
-            "밥 먹는 흐름이 끊기면 바로 예민해져요",
-        ),
-        (
-            "step1.q05",
-            "after_work",
-            3,
-            "퇴근 직후 할 일이 쏟아지면 바로 방전돼요",
-        ),
-        (
-            "step1.q05",
-            "late_night",
-            3,
-            "새벽 감성을 끊으면 괜히 더 예민해져요",
-        ),
         (
             "step1.q06",
             "interrupt",

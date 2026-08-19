@@ -484,27 +484,26 @@ A×B 조합 제목·설명은 기존 결과 스냅샷 복원용 내부 데이터
         [[val(k), esc(CHOICE["step1.q06"][k]), esc(rc.ANGER_TRIGGER_WARNING_COPY[k])]
          for k in CHOICE["step1.q06"]],
     )
-    time_table = table(
-        ["step1.q05", "선택지", "문구"],
-        [[val(k), esc(CHOICE["step1.q05"][k]), esc(rc.PROTECTED_TIME_WARNING_COPY[k])]
-         for k in CHOICE["step1.q05"]],
+    mbti_trigger_table = table(
+        ["MBTI", "문구"],
+        [[code_chip(k.value), esc(v)] for k, v in rc.MBTI_TRIGGER_WARNING_COPY.items()],
     )
     warn_body = f"""
-<p class="lead">순서 고정: <b>대화 상처 · 사회적 에너지 · 분노 버튼 · 건드리면 안 되는 시간</b>.
-Q05·Q06은 사용자가 고른 걸 그대로, MBTI는 축 하나씩만 써요.</p>
+<p class="lead">순서 고정: <b>대화 상처 · 사회적 에너지 · 분노 버튼 · 유형별 발작 버튼</b>.
+Q06은 사용자가 고른 걸 그대로, MBTI는 앞의 두 슬롯에서 축 하나씩, 마지막 슬롯에서 네 글자 전체를 써요.</p>
 <div class="two-col">
   <div class="slot"><h4><span class="slot-n">1</span> 대화에서 상처받는 지점 · <span class="src">MBTI T/F</span></h4>{comm_table}</div>
   <div class="slot"><h4><span class="slot-n">2</span> 사회적 에너지 경계 · <span class="src">MBTI E/I</span></h4>{soc_table}</div>
 </div>
 <div class="slot"><h4><span class="slot-n">3</span> 가장 빠른 분노 버튼 · <span class="src">step1.q06</span></h4>{anger_table}</div>
-<div class="slot"><h4><span class="slot-n">4</span> 건드리면 안 되는 시간 · <span class="src">step1.q05</span></h4>{time_table}</div>"""
+<div class="slot"><h4><span class="slot-n">4</span> 유형별 발작 버튼 · <span class="src">MBTI</span></h4>{mbti_trigger_table}</div>"""
     sections.append(
         (
             "warnings",
             "결과 · warnings",
             "이렇게 하면 고장나요 (4슬롯)",
-            f"{qchip('step1.q06')}{qchip('step1.q05')}{mbtichip()}",
-            "2 · 2 · 6 · 4",
+            f"{qchip('step1.q06')}{mbtichip()}",
+            "2 · 2 · 6 · 16",
             warn_body,
         )
     )
