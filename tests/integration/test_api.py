@@ -152,6 +152,23 @@ def test_serves_manual_assessment_test_page() -> None:
     assert [response.text.index(marker) for marker in step1_markers] == sorted(
         response.text.index(marker) for marker in step1_markers
     )
+    step2_markers = [
+        'choices("step2.q01"',
+        'choices("step2.q02"',
+        'choices("step2.q03"',
+        '{ id:"step2.q04"',
+        'choices("step2.q05"',
+        '{ id:"step2.q06"',
+        'choices("step2.q10"',
+        'choices("step2.q07"',
+        'choices("step2.q08"',
+        'choices("step2.q09"',
+        'choices("step2.q11"',
+        'choices("step2.q12"',
+    ]
+    assert [response.text.index(marker) for marker in step2_markers] == sorted(
+        response.text.index(marker) for marker in step2_markers
+    )
 
 
 def test_serves_manual_compatibility_test_page() -> None:

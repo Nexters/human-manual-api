@@ -46,6 +46,33 @@ def test_scores_axes_and_selects_adjective_from_submission() -> None:
     assert result.adjective == "옷 예쁘게 입고 플러팅 했다고 하는"
 
 
+def test_scores_are_independent_of_frontend_display_order() -> None:
+    submission = _submission()
+    answers_by_id = {answer.question_id: answer for answer in submission.answers}
+    display_order = [
+        "step2.q01",
+        "step2.q02",
+        "step2.q03",
+        "step2.q04",
+        "step2.q05",
+        "step2.q06",
+        "step2.q10",
+        "step2.q07",
+        "step2.q08",
+        "step2.q09",
+        "step2.q11",
+        "step2.q12",
+    ]
+    reordered_submission = AssessmentSubmission(
+        assessment_version=submission.assessment_version,
+        nickname=submission.nickname,
+        answers=tuple(answers_by_id[question_id] for question_id in display_order),
+        mbti=submission.mbti,
+    )
+
+    assert classify_submission(reordered_submission) == classify_submission(submission)
+
+
 def test_treats_exactly_300_messages_as_neutral_signal() -> None:
     result = classify_submission(
         _submission(

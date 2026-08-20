@@ -16,6 +16,21 @@ STEP1_DISPLAY_ORDER = [
     "step1.q02",
 ]
 
+STEP2_DISPLAY_ORDER = [
+    "step2.q01",
+    "step2.q02",
+    "step2.q03",
+    "step2.q04",
+    "step2.q05",
+    "step2.q06",
+    "step2.q10",
+    "step2.q07",
+    "step2.q08",
+    "step2.q09",
+    "step2.q11",
+    "step2.q12",
+]
+
 
 def test_runtime_contract_matches_published_identifier_document() -> None:
     document_path = Path(__file__).parents[2] / "docs" / "assessment-identifiers.v1.json"
@@ -37,6 +52,7 @@ def test_runtime_contract_matches_published_identifier_document() -> None:
     assert [question["question_id"] for question in step1_questions] == STEP1_DISPLAY_ORDER
     step2_questions = [question for question in document["questions"] if question["step"] == 2]
     assert [question["order"] for question in step2_questions] == list(range(1, 13))
+    assert [question["question_id"] for question in step2_questions] == STEP2_DISPLAY_ORDER
     for question in document["questions"]:
         contract = QUESTION_CONTRACTS[question["question_id"]]
         assert contract.answer_kind is AnswerKind(question["answer_kind"])
@@ -65,12 +81,12 @@ def test_runtime_contract_matches_published_identifier_document() -> None:
     assert set(mbti_input["allowed_values"]) == {mbti.value for mbti in MbtiType}
 
 
-def test_q02_content_defines_four_role_choices_without_asset_metadata() -> None:
+def test_content_matches_confirmed_copy_and_display_order() -> None:
     document_path = Path(__file__).parents[2] / "docs" / "assessment-content.v1.json"
     document = json.loads(document_path.read_text(encoding="utf-8"))
     question = next(item for item in document["questions"] if item["question_id"] == "step1.q02")
 
-    assert question["prompt"] == "친구들과 있을 때, 나와 가장 닮은 토끼는?"
+    assert question["prompt"] == "친구들과 있을 때, 송송님과 가장 닮은 토키는?"
     assert question["options"] == [
         {
             "value": "organize_and_coordinate",
@@ -100,3 +116,10 @@ def test_q02_content_defines_four_role_choices_without_asset_metadata() -> None:
     )
     assert [item["order"] for item in step1_questions] == list(range(1, 9))
     assert [item["question_id"] for item in step1_questions] == STEP1_DISPLAY_ORDER
+
+    step2_questions = sorted(
+        (item for item in document["questions"] if item["step"] == 2),
+        key=lambda item: item["order"],
+    )
+    assert [item["order"] for item in step2_questions] == list(range(1, 13))
+    assert [item["question_id"] for item in step2_questions] == STEP2_DISPLAY_ORDER

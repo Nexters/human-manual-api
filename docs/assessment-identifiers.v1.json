@@ -144,7 +144,11 @@
       "step": 2,
       "order": 4,
       "answer_kind": "scale",
-      "constraints": { "minimum": 0, "maximum": 100, "step": 25 }
+      "constraints": {
+        "minimum": 0,
+        "maximum": 100,
+        "step": 25
+      }
     },
     {
       "question_id": "step2.q05",
@@ -158,35 +162,39 @@
       "step": 2,
       "order": 6,
       "answer_kind": "integer",
-      "constraints": { "minimum": 0, "maximum": 999, "step": 1 }
+      "constraints": {
+        "minimum": 0,
+        "maximum": 999,
+        "step": 1
+      }
+    },
+    {
+      "question_id": "step2.q10",
+      "step": 2,
+      "order": 7,
+      "answer_kind": "choice",
+      "values": ["order_familiar_menu", "try_new_menu"]
     },
     {
       "question_id": "step2.q07",
       "step": 2,
-      "order": 7,
+      "order": 8,
       "answer_kind": "choice",
       "values": ["decorate_for_mood", "essentials_only"]
     },
     {
       "question_id": "step2.q08",
       "step": 2,
-      "order": 8,
+      "order": 9,
       "answer_kind": "choice",
       "values": ["express_with_words", "express_with_actions"]
     },
     {
       "question_id": "step2.q09",
       "step": 2,
-      "order": 9,
-      "answer_kind": "choice",
-      "values": ["ruminate", "forget_quickly"]
-    },
-    {
-      "question_id": "step2.q10",
-      "step": 2,
       "order": 10,
       "answer_kind": "choice",
-      "values": ["order_familiar_menu", "try_new_menu"]
+      "values": ["ruminate", "forget_quickly"]
     },
     {
       "question_id": "step2.q11",

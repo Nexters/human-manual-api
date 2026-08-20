@@ -33,7 +33,7 @@
 | `step1.q08` | 금요일 저녁, 약속이 갑자기 취소됐을 때 송송님은 | `go_to_bed` → 개꿀! 당장 침대로 간다<br>`contact_others` → 다른 친구한테 연락 돌린다<br>`eat_alone` → 혼자라도 식당 가서 먹고 온다<br>`go_for_drive` → 이 때다, 안 가 본 곳으로 드라이브! |
 | `step1.q12` | 기분이 안 좋을 때, 가장 반가운 친구의 연락은? | `listen_to_me` → 무슨 일인지 천천히 들어줄게<br>`take_me_out` → 일단 나와. 맛있는 거 먹자<br>`give_me_space` → 혼자 정리되면 연락해. 기다릴게<br>`solve_together` → 내가 같이 해결해볼까?<br>`make_me_laugh` → 이거 보고 일단 웃어ㅋㅋ |
 | `step1.q11` | 집에만 있으려던 주말, 나를 밖으로 나오게 한 건? | `curiosity` → 궁금한 새 장소<br>`needed_by_someone` → 나를 꼭 찾는 친구<br>`clear_goal` → 딱 하나 남은 목표<br>`responsibility` → 지켜야 할 약속<br>`last_chance` → 오늘뿐인 기회<br>`fun` → 재밌어 보이는 모임 |
-| `step1.q02` | 친구들과 있을 때, 나와 가장 닮은 토끼는? | `organize_and_coordinate` → “잠깐, 의견 정리해서 방향부터 잡자.” · 정리·조율<br>`lift_mood` → “분위기 왜 이래ㅋㅋ 일단 웃고 보자.” · 분위기 전환<br>`make_it_happen` → “재밌겠다. 일단 해보고 생각하자!” · 실행·추진<br>`care_for_others` → “넌 뭐가 좋아? 말해주면 내가 챙길게.” · 관심·배려 |
+| `step1.q02` | 친구들과 있을 때, 송송님과 가장 닮은 토키는? | `organize_and_coordinate` → “잠깐, 의견 정리해서 방향부터 잡자.” · 정리·조율<br>`lift_mood` → “분위기 왜 이래ㅋㅋ 일단 웃고 보자.” · 분위기 전환<br>`make_it_happen` → “재밌겠다. 일단 해보고 생각하자!” · 실행·추진<br>`care_for_others` → “넌 뭐가 좋아? 말해주면 내가 챙길게.” · 관심·배려 |
 
 ## STEP 2
 
@@ -45,10 +45,10 @@
 | `step2.q04` | 슬라이더 | 연애할 때, 우리 사이는 어느 정도가 편한가요? | `0·25·50·75·100`; 화면 왼쪽 `0`은 밀착형, 오른쪽 `100`은 독립형 |
 | `step2.q05` | 선택 | 소소한 일상, 얼마나 공유하나요? | `share_everything` → “오늘 뭐 먹었는지까지 다 말해야지!”<br>`share_selectively` → “굳이 하나하나 보고할 필요는 없잖아?” |
 | `step2.q06` | 정수 | 지금 쌓여있는 카톡 개수는? | `0~999` 정수 |
+| `step2.q10` | 선택 | 자주 가던 단골카페에 새로운 메뉴가 생겼다. | `order_familiar_menu` → 괜히 먹었다가 맛 없으면 어떡해? 원래 계속 먹던 거 또 시켜 먹는다<br>`try_new_menu` → 안 먹어본 신메뉴가 나왔다고? 일단 도전해보자! |
 | `step2.q07` | 선택 | 드디어 첫 자취 시작! 어떻게 방을 꾸미실 건가요? | `decorate_for_mood` → 조명 하나, 포스터 하나까지 감성은 필수<br>`essentials_only` → 매트리스랑 가전만 있으면 생활 쌉가능 |
 | `step2.q08` | 선택 | 누군가를 챙기거나 애정을 표현할 때 어떻게 하나요? | `express_with_words` → 다정한 말투, 폭풍 리액션, 눈빛과 표현으로 채운다<br>`express_with_actions` → 말은 별로 없지만 슬쩍 챙겨주거나 행동으로 보여준다 |
 | `step2.q09` | 선택 | 어젯밤 내가 단톡방에 보낸 드립에 그 누구도 관심 주지 않았을 때, | `ruminate` → “괜히 보냈나...” 계속해서 곱씹어본다<br>`forget_quickly` → 보낸 기억도 없다 |
-| `step2.q10` | 선택 | 자주 가던 단골카페에 새로운 메뉴가 생겼다. | `order_familiar_menu` → 괜히 먹었다가 맛 없으면 어떡해? 원래 계속 먹던 거 또 시켜 먹는다<br>`try_new_menu` → 안 먹어본 신메뉴가 나왔다고? 일단 도전해보자! |
 | `step2.q11` | 선택 | 배달 앱 최근 주문 내역에 들어가보세요. | `order_familiar_stores` → 늘 시키던 맛집 몇 곳만 돌아가며 주문한다.<br>`try_new_store` → 리뷰가 없어도 새로운 가게를 도전한다. |
 | `step2.q12` | 액션 | 송송님 앞에 나타난 금지 버튼, 누르실건가요? | `press` → PUSH 버튼 누르기<br>`skip` → 건너뛰기 |
 
