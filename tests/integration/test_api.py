@@ -535,7 +535,7 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
         ),
     }
     assert body["can_do"] == [
-        "내 말의 표면만 보지 말고, 왜 이런 말을 하는지까지 이해해주세요",
+        "내가 힘든 얘기를 꺼내면, 말의 표면만 듣지 말고 왜 그런 말이 나왔는지까지 들어주세요",
         "혼자 있는 시간을 넉넉히 주세요. 답장이 하루 늦어도 삐진 게 아니라 그저 충전 중입니다.",
         "서운한 일은 돌려 넘기지 말고, 그 자리에서 바로 확인하고 풀어주세요.",
         "관심 있는 주제를 진지하게 물어봐주면 좋아해요. "
@@ -578,11 +578,17 @@ def test_submission_uses_q11_for_the_motivation_feature_only() -> None:
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
-        ("listen_to_me", "내 말의 표면만 보지 말고, 왜 이런 말을 하는지까지 이해해주세요"),
-        ("take_me_out", "생각이 막히면 새로운 장소로 데려가주세요"),
-        ("give_me_space", "생각이 정리될 때까지 혼자 생각할 시간을 주세요"),
-        ("solve_together", "막힌 이유부터 함께 정리해주세요"),
-        ("make_me_laugh", "복잡한 생각에서 잠깐 빠져나오게 엉뚱한 이야기를 던져주세요"),
+        (
+            "listen_to_me",
+            "내가 힘든 얘기를 꺼내면, 말의 표면만 듣지 말고 왜 그런 말이 나왔는지까지 들어주세요",
+        ),
+        (
+            "take_me_out",
+            "내가 기분이 가라앉아 있으면, 생각이 막힌 거니까 안 가본 데로 데려가주세요",
+        ),
+        ("give_me_space", "내가 연락이 뜨문뜨문해지면, 생각이 정리될 때까지 혼자 둘 시간을 주세요"),
+        ("solve_together", "내가 혼자 끙끙대고 있으면, 뭐가 막힌 건지부터 같이 짚어주세요"),
+        ("make_me_laugh", "내 기분이 안 좋아 보이면, 생각에서 빠져나오게 엉뚱한 얘기를 던져주세요"),
     ],
 )
 def test_uses_every_q12_support_preference(value: str, expected: str) -> None:
@@ -640,6 +646,51 @@ def test_uses_warning_answers(
 
     assert response.status_code == 200
     assert response.json()["warnings"][slot] == expected
+
+
+def test_uses_mbti_energy_and_attachment_for_social_energy_warning() -> None:
+    high_attachment = deepcopy(ASSESSMENT_SUBMISSION_EXAMPLE)
+    low_attachment = _valid_submission()
+    low_answers = low_attachment["answers"]
+    assert isinstance(low_answers, list)
+    low_attachment_values = {
+        "step2.q04": 100,
+        "step2.q05": "share_selectively",
+        "step2.q06": 999,
+    }
+    for answer in low_answers:
+        if answer["question_id"] in low_attachment_values:
+            answer["value"] = low_attachment_values[answer["question_id"]]
+    cases = [
+        (
+            high_attachment,
+            "ENTP",
+            "혼자 있는 시간이 길어지면 기운이 빠져서, 연락이 없으면 먼저 찾게 돼요",
+        ),
+        (
+            high_attachment,
+            "INTP",
+            "가까운 사람은 계속 보고 싶은데, 혼자 정리할 틈이 없으면 대답이 짧아져요",
+        ),
+        (
+            low_attachment,
+            "ENTP",
+            "사람은 좋은데 하루 종일 붙어 있으면, 어느 순간 혼자 있고 싶어져요",
+        ),
+        (
+            low_attachment,
+            "INTP",
+            "혼자 정리할 틈이 없으면 대답이 점점 짧아져요",
+        ),
+    ]
+
+    for base_payload, mbti, expected in cases:
+        payload = deepcopy(base_payload)
+        payload["mbti"] = mbti
+        response = client.post("/api/tests/submissions", json=payload)
+
+        assert response.status_code == 200
+        assert response.json()["warnings"][1] == expected
 
 
 def test_submission_uses_q01_and_q02_for_the_relationship_role_only() -> None:

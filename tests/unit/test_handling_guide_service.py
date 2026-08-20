@@ -15,7 +15,7 @@ def test_builds_four_handling_instructions_in_fixed_order() -> None:
     )
 
     assert result == (
-        "막힌 이유부터 함께 정리해주세요",
+        "내가 혼자 끙끙대고 있으면, 뭐가 막힌 건지부터 같이 짚어주세요",
         "별일 없어도 가끔 안부를 나눠주세요. 짧은 한마디만으로도 연결되어 있다고 느낍니다.",
         "서운한 일은 돌려 넘기지 말고, 그 자리에서 바로 확인하고 풀어주세요.",
         "애매하게 재지 않고 궁금한 건 바로 물어보면 좋아해요. "
@@ -91,10 +91,13 @@ def test_rejects_invalid_attachment_score(score: int) -> None:
 @pytest.mark.parametrize(
     ("mbti", "expected"),
     [
-        (MbtiType.ENTP, "내 말의 표면만 보지 말고, 왜 이런 말을 하는지까지 이해해주세요"),
-        (MbtiType.ESTP, "무슨 일이 있었는지 처음부터 차근차근 들어주세요"),
-        (MbtiType.ENFP, "해결책보다 지금 느끼는 마음부터 들어주세요"),
-        (MbtiType.ESFP, "말이 정리되지 않아도 중간에 판단하지 말고 끝까지 들어주세요"),
+        (
+            MbtiType.ENTP,
+            "내가 힘든 얘기를 꺼내면, 말의 표면만 듣지 말고 왜 그런 말이 나왔는지까지 들어주세요",
+        ),
+        (MbtiType.ESTP, "내가 힘든 얘기를 꺼내면, 무슨 일이 있었는지 처음부터 차근차근 들어주세요"),
+        (MbtiType.ENFP, "내가 힘든 얘기를 꺼내면, 어떻게 하라는 말보다 지금 마음부터 물어봐주세요"),
+        (MbtiType.ESFP, "내가 힘든 얘기를 꺼내면, 말이 뒤죽박죽이어도 끊지 말고 끝까지 들어주세요"),
     ],
 )
 def test_refines_support_preference_with_middle_mbti_group(mbti: MbtiType, expected: str) -> None:
@@ -115,32 +118,32 @@ def test_refines_support_preference_with_middle_mbti_group(mbti: MbtiType, expec
         (
             "take_me_out",
             MbtiType.ENFP,
-            "마음이 답답해 보이면 내가 좋아할 만한 곳으로 함께 바람 쐬러 가주세요",
+            "내가 기분이 가라앉아 있으면, 답답한 게 풀리게 바람 쐬러 데려가주세요",
         ),
         (
             "take_me_out",
             MbtiType.ESFP,
-            "무슨 일인지 캐묻기보다 좋아하는 걸 먹으러 슬쩍 불러내주세요",
+            "내가 기분이 가라앉아 있으면, 캐묻지 말고 맛있는 거 먹으러 슬쩍 불러내주세요",
         ),
         (
             "give_me_space",
             MbtiType.ESTP,
-            "괜찮냐고 계속 묻기보다 평소처럼 지내주세요",
+            "내가 연락이 뜨문뜨문해지면, 괜찮냐고 계속 묻지 말고 평소처럼 지내주세요",
         ),
         (
             "make_me_laugh",
             MbtiType.ENTP,
-            "복잡한 생각에서 잠깐 빠져나오게 엉뚱한 이야기를 던져주세요",
+            "내 기분이 안 좋아 보이면, 생각에서 빠져나오게 엉뚱한 얘기를 던져주세요",
         ),
         (
             "make_me_laugh",
             MbtiType.ESTP,
-            "길게 위로하기보다 바로 웃을 수 있는 사진이나 영상을 보내주세요",
+            "내 기분이 안 좋아 보이면, 길게 위로하지 말고 웃긴 영상이나 보내주세요",
         ),
         (
             "make_me_laugh",
             MbtiType.ENFP,
-            "내가 좋아할 만한 농담으로 무거워진 마음을 살짝 풀어주세요",
+            "내 기분이 안 좋아 보이면, 내가 좋아할 만한 농담으로 마음을 살짝 풀어주세요",
         ),
     ],
 )

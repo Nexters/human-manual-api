@@ -148,6 +148,7 @@ def _build_result(
     warnings = build_warnings(
         anger_trigger=answers["step1.q06"],
         mbti=submission.mbti,
+        attachment_score=classification.axis_scores.attachment,
     )
     charging = build_charging(
         holiday_choice=answers["step1.q07"],

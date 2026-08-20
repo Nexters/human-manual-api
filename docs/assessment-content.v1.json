@@ -84,6 +84,7 @@
     },
     "warnings": {
       "question_ids": ["step1.q06"],
+      "axes": ["attachment"],
       "additional_input": "mbti",
       "mbti_axes": ["E/I", "T/F"],
       "uses_full_mbti": true,

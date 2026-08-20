@@ -8,9 +8,10 @@ def test_builds_four_warnings_in_fixed_order() -> None:
     assert build_warnings(
         anger_trigger="rush",
         mbti=MbtiType.ENTP,
+        attachment_score=50,
     ) == (
         "해결하려고 꺼낸 말에 차갑다는 말이 돌아오면 억울해져요",
-        "내 얘기에 반응이 없으면 신나서 하던 이야기도 금세 재미없어져요",
+        "혼자 있는 시간이 길어지면 기운이 빠져서, 연락이 없으면 먼저 찾게 돼요",
         "재촉받으면 하려던 마음도 사라져요",
         '내 아이디어에 "그건 원래 안 돼"라고 하면, 끝까지 뒤집어 보여주고 싶어져요',
     )
@@ -86,7 +87,7 @@ def test_builds_four_warnings_in_fixed_order() -> None:
     ],
 )
 def test_maps_every_mbti_trigger(mbti: MbtiType, expected: str) -> None:
-    assert build_warnings("rush", mbti)[3] == expected
+    assert build_warnings("rush", mbti, 50)[3] == expected
 
 
 @pytest.mark.parametrize(
@@ -101,29 +102,33 @@ def test_maps_every_mbti_trigger(mbti: MbtiType, expected: str) -> None:
     ],
 )
 def test_maps_every_anger_trigger(anger_trigger: str, expected: str) -> None:
-    assert build_warnings(anger_trigger, MbtiType.ENTP)[2] == expected
+    assert build_warnings(anger_trigger, MbtiType.ENTP, 50)[2] == expected
 
 
 @pytest.mark.parametrize(
-    ("mbti", "social_energy", "communication"),
+    ("mbti", "attachment_score", "social_energy", "communication"),
     [
         (
             MbtiType.ENTP,
-            "내 얘기에 반응이 없으면 신나서 하던 이야기도 금세 재미없어져요",
+            50,
+            "혼자 있는 시간이 길어지면 기운이 빠져서, 연락이 없으면 먼저 찾게 돼요",
             "해결하려고 꺼낸 말에 차갑다는 말이 돌아오면 억울해져요",
         ),
         (
-            MbtiType.INTP,
-            "혼자 정리할 틈이 없으면 대답이 점점 짧아져요",
+            MbtiType.ENTP,
+            49,
+            "사람은 좋은데 하루 종일 붙어 있으면, 어느 순간 혼자 있고 싶어져요",
             "해결하려고 꺼낸 말에 차갑다는 말이 돌아오면 억울해져요",
         ),
         (
-            MbtiType.ENFP,
-            "내 얘기에 반응이 없으면 신나서 하던 이야기도 금세 재미없어져요",
+            MbtiType.INFP,
+            50,
+            "가까운 사람은 계속 보고 싶은데, 혼자 정리할 틈이 없으면 대답이 짧아져요",
             "속마음을 꺼냈는데 유난이라는 말이 돌아오면 오래 마음에 남아요",
         ),
         (
             MbtiType.INFP,
+            49,
             "혼자 정리할 틈이 없으면 대답이 점점 짧아져요",
             "속마음을 꺼냈는데 유난이라는 말이 돌아오면 오래 마음에 남아요",
         ),
@@ -131,9 +136,16 @@ def test_maps_every_anger_trigger(anger_trigger: str, expected: str) -> None:
 )
 def test_uses_mbti_energy_and_communication_axes(
     mbti: MbtiType,
+    attachment_score: int,
     social_energy: str,
     communication: str,
 ) -> None:
-    result = build_warnings("rush", mbti)
+    result = build_warnings("rush", mbti, attachment_score)
 
     assert result[:2] == (communication, social_energy)
+
+
+@pytest.mark.parametrize("attachment_score", [-1, 101])
+def test_rejects_invalid_attachment_score(attachment_score: int) -> None:
+    with pytest.raises(ValueError, match="attachment_score must be between 0 and 100"):
+        build_warnings("rush", MbtiType.ENTP, attachment_score)

@@ -222,21 +222,28 @@ def test_defines_every_handling_guide_copy() -> None:
     )
 
 
-def test_uses_confirmed_give_me_space_copy_for_every_mbti_middle_group() -> None:
-    assert {
-        group: SUPPORT_PREFERENCE_COPY[("give_me_space", group)]
-        for group in ("NT", "ST", "NF", "SF")
-    } == {
-        "NT": "생각이 정리될 때까지 혼자 생각할 시간을 주세요",
-        "ST": "괜찮냐고 계속 묻기보다 평소처럼 지내주세요",
-        "NF": "내가 마음을 꺼낼 준비가 됐을 때 알아봐주세요",
-        "SF": "말은 안 걸어도 좋으니, 곁에 있다는 표시만 남겨주세요",
-    }
-
-
-def test_uses_confirmed_take_me_out_copy_for_st_group() -> None:
-    assert SUPPORT_PREFERENCE_COPY[("take_me_out", "ST")] == (
-        "왜 그러냐고 묻는 대신, 늘 가던 곳에 같이 가서 시간 보내주세요"
+def test_uses_confirmed_support_preference_copy() -> None:
+    assert tuple(SUPPORT_PREFERENCE_COPY.values()) == (
+        "내가 힘든 얘기를 꺼내면, 말의 표면만 듣지 말고 왜 그런 말이 나왔는지까지 들어주세요",
+        "내가 힘든 얘기를 꺼내면, 무슨 일이 있었는지 처음부터 차근차근 들어주세요",
+        "내가 힘든 얘기를 꺼내면, 어떻게 하라는 말보다 지금 마음부터 물어봐주세요",
+        "내가 힘든 얘기를 꺼내면, 말이 뒤죽박죽이어도 끊지 말고 끝까지 들어주세요",
+        "내가 기분이 가라앉아 있으면, 생각이 막힌 거니까 안 가본 데로 데려가주세요",
+        "내가 기분이 가라앉아 있으면, 왜 그러냐고 묻지 말고 늘 가던 데로 불러내주세요",
+        "내가 기분이 가라앉아 있으면, 답답한 게 풀리게 바람 쐬러 데려가주세요",
+        "내가 기분이 가라앉아 있으면, 캐묻지 말고 맛있는 거 먹으러 슬쩍 불러내주세요",
+        "내가 연락이 뜨문뜨문해지면, 생각이 정리될 때까지 혼자 둘 시간을 주세요",
+        "내가 연락이 뜨문뜨문해지면, 괜찮냐고 계속 묻지 말고 평소처럼 지내주세요",
+        "내가 연락이 뜨문뜨문해지면, 마음을 꺼낼 준비가 될 때까지 기다려주세요",
+        "내가 연락이 뜨문뜨문해지면, 말은 안 걸어도 좋으니 곁에 있다는 표시만 남겨주세요",
+        "내가 혼자 끙끙대고 있으면, 뭐가 막힌 건지부터 같이 짚어주세요",
+        "내가 혼자 끙끙대고 있으면, 지금 당장 할 일부터 같이 처리해주세요",
+        "내가 혼자 끙끙대고 있으면, 왜 이렇게까지 힘든지부터 같이 봐주세요",
+        "내가 혼자 끙끙대고 있으면, 당장 필요한 것부터 같이 챙겨주세요",
+        "내 기분이 안 좋아 보이면, 생각에서 빠져나오게 엉뚱한 얘기를 던져주세요",
+        "내 기분이 안 좋아 보이면, 길게 위로하지 말고 웃긴 영상이나 보내주세요",
+        "내 기분이 안 좋아 보이면, 내가 좋아할 만한 농담으로 마음을 살짝 풀어주세요",
+        "내 기분이 안 좋아 보이면, 같이 웃어주면서 분위기를 평소처럼 돌려놔주세요",
     )
 
 
@@ -282,7 +289,7 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-20.1"
+    assert RESULT_CONTENT_VERSION == "2026-08-21.2"
 
 
 def test_defines_all_warning_copy_variants() -> None:
@@ -295,7 +302,12 @@ def test_defines_all_warning_copy_variants() -> None:
         "nag",
         "change_plan",
     }
-    assert set(SOCIAL_ENERGY_WARNING_COPY) == {"E", "I"}
+    assert SOCIAL_ENERGY_WARNING_COPY == {
+        ("E", "high"): "혼자 있는 시간이 길어지면 기운이 빠져서, 연락이 없으면 먼저 찾게 돼요",
+        ("E", "low"): "사람은 좋은데 하루 종일 붙어 있으면, 어느 순간 혼자 있고 싶어져요",
+        ("I", "high"): "가까운 사람은 계속 보고 싶은데, 혼자 정리할 틈이 없으면 대답이 짧아져요",
+        ("I", "low"): "혼자 정리할 틈이 없으면 대답이 점점 짧아져요",
+    }
     assert COMMUNICATION_WARNING_COPY == {
         "T": "해결하려고 꺼낸 말에 차갑다는 말이 돌아오면 억울해져요",
         "F": "속마음을 꺼냈는데 유난이라는 말이 돌아오면 오래 마음에 남아요",

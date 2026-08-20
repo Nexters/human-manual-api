@@ -10,11 +10,15 @@ from pakit.services.result_content import (
 def build_warnings(
     anger_trigger: str,
     mbti: MbtiType,
+    attachment_score: int,
 ) -> tuple[str, str, str, str]:
     """Build warnings in the stable result-page slot order."""
+    if not 0 <= attachment_score <= 100:
+        raise ValueError("attachment_score must be between 0 and 100")
+    attachment_pole = "high" if attachment_score >= 50 else "low"
     return (
         COMMUNICATION_WARNING_COPY[mbti.value[2]],
-        SOCIAL_ENERGY_WARNING_COPY[mbti.value[0]],
+        SOCIAL_ENERGY_WARNING_COPY[(mbti.value[0], attachment_pole)],
         ANGER_TRIGGER_WARNING_COPY[anger_trigger],
         MBTI_TRIGGER_WARNING_COPY[mbti],
     )

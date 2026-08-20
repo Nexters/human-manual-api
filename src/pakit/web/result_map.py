@@ -510,9 +510,25 @@ A×B 조합 제목·설명은 기존 결과 스냅샷 복원용 내부 데이터
          ["<span class='val'>F</span>", esc(rc.COMMUNICATION_WARNING_COPY["F"])]],
     )
     soc_table = table(
-        ["MBTI E/I", "문구"],
-        [["<span class='val'>E</span>", esc(rc.SOCIAL_ENERGY_WARNING_COPY["E"])],
-         ["<span class='val'>I</span>", esc(rc.SOCIAL_ENERGY_WARNING_COPY["I"])]],
+        ["MBTI E/I × 애착유형", "문구"],
+        [
+            [
+                "<span class='val'>E · 밀착</span>",
+                esc(rc.SOCIAL_ENERGY_WARNING_COPY[("E", "high")]),
+            ],
+            [
+                "<span class='val'>E · 거리조절</span>",
+                esc(rc.SOCIAL_ENERGY_WARNING_COPY[("E", "low")]),
+            ],
+            [
+                "<span class='val'>I · 밀착</span>",
+                esc(rc.SOCIAL_ENERGY_WARNING_COPY[("I", "high")]),
+            ],
+            [
+                "<span class='val'>I · 거리조절</span>",
+                esc(rc.SOCIAL_ENERGY_WARNING_COPY[("I", "low")]),
+            ],
+        ],
     )
     anger_table = table(
         ["step1.q06", "선택지", "문구"],
@@ -525,10 +541,10 @@ A×B 조합 제목·설명은 기존 결과 스냅샷 복원용 내부 데이터
     )
     warn_body = f"""
 <p class="lead">순서 고정: <b>대화 상처 · 사회적 에너지 · 분노 버튼 · 유형별 발작 버튼</b>.
-Q06은 사용자가 고른 걸 그대로, MBTI는 앞의 두 슬롯에서 축 하나씩, 마지막 슬롯에서 네 글자 전체를 써요.</p>
+Q06은 사용자가 고른 걸 그대로, 첫 슬롯은 MBTI T/F, 두 번째 슬롯은 MBTI E/I×애착유형, 마지막 슬롯은 MBTI 네 글자 전체를 써요.</p>
 <div class="two-col">
   <div class="slot"><h4><span class="slot-n">1</span> 대화에서 상처받는 지점 · <span class="src">MBTI T/F</span></h4>{comm_table}</div>
-  <div class="slot"><h4><span class="slot-n">2</span> 사회적 에너지 경계 · <span class="src">MBTI E/I</span></h4>{soc_table}</div>
+  <div class="slot"><h4><span class="slot-n">2</span> 사회적 에너지 경계 · <span class="src">MBTI E/I × 애착유형</span></h4>{soc_table}</div>
 </div>
 <div class="slot"><h4><span class="slot-n">3</span> 가장 빠른 분노 버튼 · <span class="src">step1.q06</span></h4>{anger_table}</div>
 <div class="slot"><h4><span class="slot-n">4</span> 유형별 발작 버튼 · <span class="src">MBTI</span></h4>{mbti_trigger_table}</div>"""
@@ -537,8 +553,8 @@ Q06은 사용자가 고른 걸 그대로, MBTI는 앞의 두 슬롯에서 축 �
             "warnings",
             "결과 · warnings",
             "이렇게 하면 고장나요 (4슬롯)",
-            f"{qchip('step1.q06')}{mbtichip()}",
-            "2 · 2 · 6 · 16",
+            f"{qchip('step1.q06')}{axchip('att')}{mbtichip()}",
+            "2 · 4 · 6 · 16",
             warn_body,
         )
     )
