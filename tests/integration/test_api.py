@@ -542,7 +542,7 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
         "내가 한 말을 나중에 찾아보고 다시 얘기해주면 설레요.",
     ]
     assert body["warnings"] == [
-        "해결하려고 꺼낸 말에 차갑다는 말이 돌아오면 억울해져요",
+        "내 일처럼 해결책을 생각해줬는데 “너 T야?” 소리를 들으면, 그대로 멈춰요",
         "혼자 정리할 틈이 없으면 대답이 점점 짧아져요",
         "재촉받으면 하려던 마음도 사라져요",
         '대충 아는 걸로 "그거 원래 이런 거잖아"라며 아는 척하면, 납득할 때까지 머리가 안 꺼져요',
@@ -646,6 +646,53 @@ def test_uses_warning_answers(
 
     assert response.status_code == 200
     assert response.json()["warnings"][slot] == expected
+
+
+def test_uses_mbti_tf_and_expression_for_communication_warning() -> None:
+    explore_expression = deepcopy(ASSESSMENT_SUBMISSION_EXAMPLE)
+    direct_expression = deepcopy(ASSESSMENT_SUBMISSION_EXAMPLE)
+    direct_answers = direct_expression["answers"]
+    assert isinstance(direct_answers, list)
+    direct_expression_values = {
+        "step2.q01": "approach_directly",
+        "step2.q02": "resolve_immediately",
+        "step2.q03": "send_immediately",
+    }
+    for answer in direct_answers:
+        if answer["question_id"] in direct_expression_values:
+            answer["value"] = direct_expression_values[answer["question_id"]]
+    cases = [
+        (
+            direct_expression,
+            "ENTP",
+            "내 일처럼 해결책을 생각해줬는데 “너 T야?” 소리를 들으면, 그대로 멈춰요",
+        ),
+        (
+            explore_expression,
+            "ENTP",
+            "생각을 정리해서 조심스럽게 말했는데 “너무 복잡하게 생각해”라고 하면, "
+            "대화를 강제 종료해요",
+        ),
+        (
+            direct_expression,
+            "ENFP",
+            "큰맘 먹고 서운하다고 바로 말했는데 “그걸로 왜 그래?”라고 하면, "
+            "솔직 버튼을 다시 잠가버려요",
+        ),
+        (
+            explore_expression,
+            "ENFP",
+            "알아봐 달라고 신호를 보냈는데 “말 안 했잖아”라고 하면, 서운함에 눈물 버튼이 눌려요",
+        ),
+    ]
+
+    for base_payload, mbti, expected in cases:
+        payload = deepcopy(base_payload)
+        payload["mbti"] = mbti
+        response = client.post("/api/tests/submissions", json=payload)
+
+        assert response.status_code == 200
+        assert response.json()["warnings"][0] == expected
 
 
 def test_uses_mbti_energy_and_attachment_for_social_energy_warning() -> None:

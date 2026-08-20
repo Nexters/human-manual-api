@@ -148,6 +148,7 @@ def _build_result(
     warnings = build_warnings(
         anger_trigger=answers["step1.q06"],
         mbti=submission.mbti,
+        expression_score=classification.axis_scores.expression,
         attachment_score=classification.axis_scores.attachment,
     )
     charging = build_charging(

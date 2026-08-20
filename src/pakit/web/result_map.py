@@ -505,9 +505,25 @@ A×B 조합 제목·설명은 기존 결과 스냅샷 복원용 내부 데이터
 
     # ── 6. 이렇게 하면 고장나요 (4슬롯) ──────────────────────────────────
     comm_table = table(
-        ["MBTI T/F", "문구"],
-        [["<span class='val'>T</span>", esc(rc.COMMUNICATION_WARNING_COPY["T"])],
-         ["<span class='val'>F</span>", esc(rc.COMMUNICATION_WARNING_COPY["F"])]],
+        ["MBTI T/F × 표현방식", "문구"],
+        [
+            [
+                "<span class='val'>T · 직진</span>",
+                esc(rc.COMMUNICATION_WARNING_COPY[("T", "high")]),
+            ],
+            [
+                "<span class='val'>T · 탐색</span>",
+                esc(rc.COMMUNICATION_WARNING_COPY[("T", "low")]),
+            ],
+            [
+                "<span class='val'>F · 직진</span>",
+                esc(rc.COMMUNICATION_WARNING_COPY[("F", "high")]),
+            ],
+            [
+                "<span class='val'>F · 탐색</span>",
+                esc(rc.COMMUNICATION_WARNING_COPY[("F", "low")]),
+            ],
+        ],
     )
     soc_table = table(
         ["MBTI E/I × 애착유형", "문구"],
@@ -541,9 +557,9 @@ A×B 조합 제목·설명은 기존 결과 스냅샷 복원용 내부 데이터
     )
     warn_body = f"""
 <p class="lead">순서 고정: <b>대화 상처 · 사회적 에너지 · 분노 버튼 · 유형별 발작 버튼</b>.
-Q06은 사용자가 고른 걸 그대로, 첫 슬롯은 MBTI T/F, 두 번째 슬롯은 MBTI E/I×애착유형, 마지막 슬롯은 MBTI 네 글자 전체를 써요.</p>
+Q06은 사용자가 고른 걸 그대로, 첫 슬롯은 MBTI T/F×표현방식, 두 번째 슬롯은 MBTI E/I×애착유형, 마지막 슬롯은 MBTI 네 글자 전체를 써요.</p>
 <div class="two-col">
-  <div class="slot"><h4><span class="slot-n">1</span> 대화에서 상처받는 지점 · <span class="src">MBTI T/F</span></h4>{comm_table}</div>
+  <div class="slot"><h4><span class="slot-n">1</span> 대화에서 상처받는 지점 · <span class="src">MBTI T/F × 표현방식</span></h4>{comm_table}</div>
   <div class="slot"><h4><span class="slot-n">2</span> 사회적 에너지 경계 · <span class="src">MBTI E/I × 애착유형</span></h4>{soc_table}</div>
 </div>
 <div class="slot"><h4><span class="slot-n">3</span> 가장 빠른 분노 버튼 · <span class="src">step1.q06</span></h4>{anger_table}</div>
@@ -553,8 +569,8 @@ Q06은 사용자가 고른 걸 그대로, 첫 슬롯은 MBTI T/F, 두 번째 슬
             "warnings",
             "결과 · warnings",
             "이렇게 하면 고장나요 (4슬롯)",
-            f"{qchip('step1.q06')}{axchip('att')}{mbtichip()}",
-            "2 · 4 · 6 · 16",
+            f"{qchip('step1.q06')}{axchip('expr')}{axchip('att')}{mbtichip()}",
+            "4 · 4 · 6 · 16",
             warn_body,
         )
     )

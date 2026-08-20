@@ -289,7 +289,7 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-21.2"
+    assert RESULT_CONTENT_VERSION == "2026-08-21.3"
 
 
 def test_defines_all_warning_copy_variants() -> None:
@@ -309,6 +309,23 @@ def test_defines_all_warning_copy_variants() -> None:
         ("I", "low"): "혼자 정리할 틈이 없으면 대답이 점점 짧아져요",
     }
     assert COMMUNICATION_WARNING_COPY == {
-        "T": "해결하려고 꺼낸 말에 차갑다는 말이 돌아오면 억울해져요",
-        "F": "속마음을 꺼냈는데 유난이라는 말이 돌아오면 오래 마음에 남아요",
+        ("T", "high"): ("내 일처럼 해결책을 생각해줬는데 “너 T야?” 소리를 들으면, 그대로 멈춰요"),
+        (
+            "T",
+            "low",
+        ): (
+            "생각을 정리해서 조심스럽게 말했는데 “너무 복잡하게 생각해”라고 하면, "
+            "대화를 강제 종료해요"
+        ),
+        (
+            "F",
+            "high",
+        ): (
+            "큰맘 먹고 서운하다고 바로 말했는데 “그걸로 왜 그래?”라고 하면, "
+            "솔직 버튼을 다시 잠가버려요"
+        ),
+        (
+            "F",
+            "low",
+        ): ("알아봐 달라고 신호를 보냈는데 “말 안 했잖아”라고 하면, 서운함에 눈물 버튼이 눌려요"),
     }
