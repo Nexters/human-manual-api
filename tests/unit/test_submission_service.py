@@ -30,6 +30,9 @@ class ConflictOnceRepository:
     async def get(self, result_code: str) -> SubmissionResultData | None:
         return None
 
+    async def count(self) -> int:
+        return len(self.saved_codes)
+
 
 def test_reissues_the_result_code_when_it_conflicts(monkeypatch: MonkeyPatch) -> None:
     generated_codes: Iterator[str] = iter(("AAAAAAAA", "BBBBBBBB"))

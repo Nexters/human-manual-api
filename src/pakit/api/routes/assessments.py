@@ -9,6 +9,7 @@ from pakit.api.schemas.assessment_submissions import (
     ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE,
     AssessmentSubmissionInput,
     AssessmentSubmissionOutput,
+    CompletedTestCountOutput,
     ErrorResponse,
 )
 from pakit.services.result_repository import ResultRepository
@@ -16,12 +17,25 @@ from pakit.services.submission_service import (
     InvalidSubmissionError,
     ResultNotFoundError,
     UnsupportedAssessmentVersionError,
+    count_completed_tests,
     get_result,
     submit_assessment,
 )
 
 router = APIRouter(prefix="/tests", tags=["Test"])
 results_router = APIRouter(prefix="/results", tags=["Test"])
+
+
+@router.get(
+    "/submissions/count",
+    response_model=CompletedTestCountOutput,
+    summary="누적 테스트 완료 수 조회",
+    description="결과 저장까지 성공한 누적 테스트 수를 반환합니다.",
+)
+async def get_completed_test_count(
+    repository: Annotated[ResultRepository, Depends(get_result_repository)],
+) -> CompletedTestCountOutput:
+    return CompletedTestCountOutput(completed_count=await count_completed_tests(repository))
 
 
 @router.post(

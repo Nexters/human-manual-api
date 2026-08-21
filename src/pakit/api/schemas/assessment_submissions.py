@@ -10,6 +10,8 @@ from pakit.domain.assessment_submission import (
     SubmittedAnswer,
 )
 
+from .image_urls import absolute_image_url
+
 ASSESSMENT_SUBMISSION_EXAMPLE: dict[str, object] = {
     "assessment_version": "2026-08-20.1",
     "participant": {"nickname": "송송"},
@@ -353,21 +355,30 @@ class AssessmentSubmissionOutput(BaseModel):
     ) -> "AssessmentSubmissionOutput":
         payload = asdict(result)
 
-        def absolute_url(path: str) -> str:
-            if path.startswith(("http://", "https://")):
-                return path
-            return f"{public_base_url.rstrip('/')}/{path.lstrip('/')}"
-
-        payload["overview"]["image_url"] = absolute_url(payload["overview"]["image_url"])
-        payload["unboxing_kit"]["packaging"]["image_url"] = absolute_url(
-            payload["unboxing_kit"]["packaging"]["image_url"]
+        payload["overview"]["image_url"] = absolute_image_url(
+            payload["overview"]["image_url"], public_base_url=public_base_url
         )
-        payload["unboxing_kit"]["opening_tool"]["image_url"] = absolute_url(
-            payload["unboxing_kit"]["opening_tool"]["image_url"]
+        payload["unboxing_kit"]["packaging"]["image_url"] = absolute_image_url(
+            payload["unboxing_kit"]["packaging"]["image_url"],
+            public_base_url=public_base_url,
+        )
+        payload["unboxing_kit"]["opening_tool"]["image_url"] = absolute_image_url(
+            payload["unboxing_kit"]["opening_tool"]["image_url"],
+            public_base_url=public_base_url,
         )
         for friend in payload["compatible_friends"]:
-            friend["image_url"] = absolute_url(friend["image_url"])
+            friend["image_url"] = absolute_image_url(
+                friend["image_url"], public_base_url=public_base_url
+            )
         return cls.model_validate(payload)
+
+
+class CompletedTestCountOutput(BaseModel):
+    completed_count: int = Field(
+        ge=0,
+        description="결과 저장까지 완료된 누적 테스트 수",
+        examples=[3174082],
+    )
 
 
 class ErrorDetail(BaseModel):

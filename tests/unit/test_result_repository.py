@@ -135,6 +135,28 @@ def test_returns_none_for_an_unknown_result_code() -> None:
     asyncio.run(run())
 
 
+def test_counts_persisted_results() -> None:
+    async def run() -> None:
+        engine = create_async_engine("sqlite+aiosqlite://")
+        async with engine.begin() as connection:
+            await connection.run_sync(Base.metadata.create_all)
+
+        sessions = async_sessionmaker(engine, expire_on_commit=False)
+        async with sessions() as session:
+            repository = SqlAlchemyResultRepository(session)
+            assert await repository.count() == 0
+            await repository.save(
+                _result(),
+                assessment_version="assessment-v1",
+                content_version="content-v1",
+            )
+            assert await repository.count() == 1
+
+        await engine.dispose()
+
+    asyncio.run(run())
+
+
 def test_rejects_a_duplicate_result_code() -> None:
     async def run() -> None:
         engine = create_async_engine("sqlite+aiosqlite://")

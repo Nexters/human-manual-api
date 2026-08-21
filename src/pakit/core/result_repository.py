@@ -1,7 +1,7 @@
 from dataclasses import asdict
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -154,3 +154,7 @@ class SqlAlchemyResultRepository:
         if record is None:
             return None
         return _result_from_snapshot(record.result_snapshot)
+
+    async def count(self) -> int:
+        count = await self._session.scalar(select(func.count()).select_from(AssessmentResultRecord))
+        return count or 0

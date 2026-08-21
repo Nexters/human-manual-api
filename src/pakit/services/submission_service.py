@@ -245,3 +245,7 @@ async def get_result(result_code: str, repository: ResultRepository) -> Submissi
     if result is None:
         raise ResultNotFoundError
     return result
+
+
+async def count_completed_tests(repository: ResultRepository) -> int:
+    return await repository.count()

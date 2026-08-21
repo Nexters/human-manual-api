@@ -33,6 +33,9 @@ class InMemoryResultRepository:
     async def get(self, result_code: str) -> SubmissionResultData | None:
         return self.results.get(result_code)
 
+    async def count(self) -> int:
+        return len(self.results)
+
 
 result_repository = InMemoryResultRepository()
 app.dependency_overrides[get_result_repository] = lambda: result_repository
@@ -41,18 +44,18 @@ client = TestClient(app)
 
 def _testserver_response_example() -> dict[str, Any]:
     expected = deepcopy(ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE)
-    expected["overview"]["image_url"] = "http://testserver/assets/characters/spinning_top.png"
+    expected["overview"]["image_url"] = "https://testserver/assets/characters/spinning_top.png"
     expected["unboxing_kit"]["packaging"]["image_url"] = (
-        "http://testserver/assets/packaging_boxes/matryoshka_box.png"
+        "https://testserver/assets/packaging_boxes/matryoshka_box.png"
     )
     expected["unboxing_kit"]["opening_tool"]["image_url"] = (
-        "http://testserver/assets/opening_tools/glove.png"
+        "https://testserver/assets/opening_tools/glove.png"
     )
     expected["compatible_friends"][0]["image_url"] = (
-        "http://testserver/assets/characters/secret_box.png"
+        "https://testserver/assets/characters/secret_box.png"
     )
     expected["compatible_friends"][1]["image_url"] = (
-        "http://testserver/assets/characters/teddy_bear.png"
+        "https://testserver/assets/characters/teddy_bear.png"
     )
     return expected
 
@@ -82,6 +85,17 @@ def test_health() -> None:
 
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
+
+
+def test_returns_completed_test_count() -> None:
+    count_before_submission = len(result_repository.results)
+
+    submitted = client.post("/api/tests/submissions", json=_valid_submission())
+    response = client.get("/api/tests/submissions/count")
+
+    assert submitted.status_code == 200
+    assert response.status_code == 200
+    assert response.json() == {"completed_count": count_before_submission + 1}
 
 
 @pytest.mark.parametrize(
@@ -368,7 +382,7 @@ def test_calculates_friend_compatibility_from_two_saved_results() -> None:
         body["friend"]["image_url"],
         *(tip["image_url"] for tip in body["tips"]),
     ):
-        assert image_url.startswith("http://testserver/assets/characters/")
+        assert image_url.startswith("https://testserver/assets/characters/")
         assert client.get(image_url).status_code == 200
 
 
@@ -440,7 +454,7 @@ def test_submits_complete_assessment_and_returns_mixed_result() -> None:
     assert body["participant"] == {"nickname": "송송"}
     assert body["overview"]["noun"] == "망원경"
     assert body["overview"]["character_id"] == "telescope"
-    assert body["overview"]["image_url"] == "http://testserver/assets/characters/telescope.png"
+    assert body["overview"]["image_url"] == "https://testserver/assets/characters/telescope.png"
     assert body["overview"]["result_name"].endswith("망원경")
     assert len(body["overview"]["tags"]) == 3
     assert all(0 <= score <= 100 for score in body["unboxing_kit"]["axis_scores"].values())
@@ -497,7 +511,7 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
         "noun": "망원경",
         "result_name": '"어디야" 물을 때마다 다른 나라 가 있는 망원경',
         "character_id": "telescope",
-        "image_url": "http://testserver/assets/characters/telescope.png",
+        "image_url": "https://testserver/assets/characters/telescope.png",
         "tags": [],
     }
     assert body["unboxing_kit"]["axis_scores"] == {
@@ -797,7 +811,7 @@ def test_serves_all_images_from_absolute_result_urls() -> None:
         *(friend["image_url"] for friend in body["compatible_friends"]),
     ]
 
-    assert all(image_url.startswith("http://testserver/assets/") for image_url in image_urls)
+    assert all(image_url.startswith("https://testserver/assets/") for image_url in image_urls)
     for image_url in image_urls:
         response = client.get(image_url)
         assert response.status_code == 200

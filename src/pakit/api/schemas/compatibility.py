@@ -2,6 +2,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from .image_urls import absolute_image_url
+
 COMPATIBILITY_RESPONSE_EXAMPLE: dict[str, Any] = {
     "mine": {
         "nickname": "지은",
@@ -168,13 +170,12 @@ class CompatibilityOutput(BaseModel):
         *,
         public_base_url: str,
     ) -> "CompatibilityOutput":
-        def absolute_url(path: str) -> str:
-            if path.startswith(("http://", "https://")):
-                return path
-            return f"{public_base_url.rstrip('/')}/{path.lstrip('/')}"
-
-        payload["mine"]["image_url"] = absolute_url(payload["mine"]["image_url"])
-        payload["friend"]["image_url"] = absolute_url(payload["friend"]["image_url"])
+        payload["mine"]["image_url"] = absolute_image_url(
+            payload["mine"]["image_url"], public_base_url=public_base_url
+        )
+        payload["friend"]["image_url"] = absolute_image_url(
+            payload["friend"]["image_url"], public_base_url=public_base_url
+        )
         for tip in payload["tips"]:
-            tip["image_url"] = absolute_url(tip["image_url"])
+            tip["image_url"] = absolute_image_url(tip["image_url"], public_base_url=public_base_url)
         return cls.model_validate(payload)
