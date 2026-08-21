@@ -21,9 +21,11 @@ from pakit.services.compatibility_service import (
     COMPATIBILITY_PROFILE_VERSION,
     COMPATIBLE_FRIEND_DESCRIPTION,
     MISMATCHED_FRIEND_DESCRIPTION,
+    PLAY_STYLE_TIP_COPY,
     RELATIONSHIP_ROLE_BY_ANSWERS,
     CompatibilityScores,
     CompatibilityUnavailableError,
+    _pace_tip,
     build_compatibility,
     build_compatibility_profile,
     build_compatible_friends,
@@ -453,6 +455,72 @@ def test_pace_score_uses_routine_and_ei_only() -> None:
     assert build_compatibility(mine, introverted_friend).details[3].score == 48
     assert result.details[3].description == result_with_other_profile.details[3].description
     assert "역할" not in result.details[3].description
+
+
+def test_pace_tips_cover_all_sixteen_directional_play_style_pairs() -> None:
+    expected = {
+        (("E", "explore"), ("E", "explore")): (
+            "둘 다 새로운 곳을 좋아하니, 다음에 가볼 장소를 번갈아 하나씩 골라보세요!"
+        ),
+        (("E", "explore"), ("E", "routine")): (
+            "가끔은 상대가 좋아하는 단골 코스를 함께 따라가보세요!"
+        ),
+        (("E", "explore"), ("I", "explore")): (
+            "가끔은 북적임을 벗어나, 둘만 조용히 놀 수 있는 곳으로 데려가보세요!"
+        ),
+        (("E", "explore"), ("I", "routine")): (
+            "가끔은 상대가 좋아하는 단골 코스에서 둘만 조용히 보내보세요!"
+        ),
+        (("E", "routine"), ("E", "explore")): ("가끔은 새로운 곳을 골라 상대를 데려가보세요!"),
+        (("E", "routine"), ("E", "routine")): (
+            "둘 다 익숙한 곳을 좋아하니, 함께 자주 갈 단골 코스를 하나 더 만들어보세요!"
+        ),
+        (("E", "routine"), ("I", "explore")): (
+            "가끔은 둘이 조용히 둘러볼 새로운 곳으로 데려가보세요!"
+        ),
+        (("E", "routine"), ("I", "routine")): (
+            "가끔은 북적임을 벗어나, 둘만 조용히 놀 수 있는 곳으로 데려가보세요!"
+        ),
+        (("I", "explore"), ("E", "explore")): (
+            "가보고 싶은 새로운 곳이 생기면 먼저 연락해 같이 가자고 해보세요!"
+        ),
+        (("I", "explore"), ("E", "routine")): (
+            "상대가 좋아하는 단골 코스가 생각나면 먼저 연락해 약속을 잡아보세요!"
+        ),
+        (("I", "explore"), ("I", "explore")): (
+            "둘 다 새로운 경험을 좋아하니, 함께 궁금했던 곳을 하나씩 골라 가보세요!"
+        ),
+        (("I", "explore"), ("I", "routine")): (
+            "가끔은 상대가 좋아하는 단골 코스를 함께 따라가보세요!"
+        ),
+        (("I", "routine"), ("E", "explore")): (
+            "가끔은 상대가 가보고 싶어 한 새로운 곳으로 먼저 연락해 불러내보세요!"
+        ),
+        (("I", "routine"), ("E", "routine")): (
+            "상대가 자주 가는 편한 곳에서 만나자고 먼저 연락해보세요!"
+        ),
+        (("I", "routine"), ("I", "explore")): ("가끔은 새로운 곳을 골라 상대를 데려가보세요!"),
+        (("I", "routine"), ("I", "routine")): (
+            "둘 다 익숙하고 조용한 시간을 좋아하니, 편한 단골 코스를 마음껏 즐겨보세요!"
+        ),
+    }
+
+    assert expected == PLAY_STYLE_TIP_COPY
+    for (mine_style, friend_style), copy in expected.items():
+        mine = _result(
+            code="mine0001",
+            nickname="지은",
+            mbti="ENTP" if mine_style[0] == "E" else "INTP",
+            scores=AxisScoresData(50, 50, 0 if mine_style[1] == "explore" else 100, 50),
+        )
+        friend = _result(
+            code="frnd0001",
+            nickname="선우",
+            mbti="ENFP" if friend_style[0] == "E" else "INFP",
+            scores=AxisScoresData(50, 50, 0 if friend_style[1] == "explore" else 100, 50),
+        )
+
+        assert _pace_tip(mine, friend) == copy
 
 
 def test_returns_four_detailed_conversation_topics() -> None:

@@ -859,10 +859,21 @@ Q06은 사용자가 고른 걸 그대로, 첫 슬롯은 MBTI T/F×표현방식, 
             ],
         ],
     )
+    play_tip_table = table(
+        ["나 → 상대", "실제 맞춤 팁"],
+        [
+            [
+                f"{mine_style[0]}·{'탐험' if mine_style[1] == 'explore' else '루틴'} → "
+                f"{friend_style[0]}·{'탐험' if friend_style[1] == 'explore' else '루틴'}",
+                esc(copy),
+            ]
+            for (mine_style, friend_style), copy in cs.PLAY_STYLE_TIP_COPY.items()
+        ],
+    )
     habit_table = table(["항목", "관계 습관 팁"], [[val(k), esc(v)] for k, v in cs.RELATIONSHIP_HABIT_COPY.items()])
     tip_table = table(["상대 support_preference", "맞춤 팁"], [[val(k), esc(v)] for k, v in cs.SUPPORT_TIPS.items()])
     compat_body = f"""
-<p class="lead">두 사람 결과를 비교해 5개 점수(거리감·대화복구력·챙김·호흡·MBTI)를 가중합해요.
+<p class="lead">두 사람 결과를 비교해 5개 점수(거리감·대화복구력·챙김·함께 놀기·MBTI)를 가중합해요.
 <span class="val">총점 = 거리 .25 + 갈등 .25 + 챙김 .20 + 함께 놀기 .20 + MBTI .10</span>.
 상세 문장은 성향 구간과 점수 차이를 함께 비교해요. 같은 구간의 차이는 정도 차이로, 거리감의
 거리조절 × 밀착은 15점 이하와 초과로 나누어 설명해요.</p>
@@ -883,7 +894,8 @@ Q06은 사용자가 고른 걸 그대로, 첫 슬롯은 MBTI T/F×표현방식, 
   한 방향의 전달 점수를 구해요. 두 사람의 방향을 각각 계산한 뒤 평균을 챙김 점수로 사용해요.</p>
   <h4>한 방향 판정표</h4>{care_match_table}
   <h4>양방향 실제 문구</h4>{care_case_table}</div>
-  <div><h4>04 함께 노는 방식 · routine × E/I</h4>{pace_case_table}</div>
+  <div><h4>04 함께 노는 방식 · routine × E/I</h4>{pace_case_table}
+  <h4>함께 있을 때 맞춤 팁 · 나 × 상대 16방향</h4>{play_tip_table}</div>
 </div>
 <div class="two-col">
   <div><h4>관계 습관 팁 · 4</h4>{habit_table}</div>
@@ -897,7 +909,7 @@ Q06은 사용자가 고른 걸 그대로, 첫 슬롯은 MBTI T/F×표현방식, 
             f"{qchip('step1.q12')}"
             f"{qchip('step2.q02')}{qchip('step2.q08')}{axchip('att')}{axchip('expr')}"
             f"{axchip('rout')}{mbtichip()}",
-            "구간 4 · 항목 4 · 상세 분기 26 · 팁 4+5",
+            "구간 4 · 항목 4 · 상세 분기 26 · 팁 4+5+16",
             compat_body,
         )
     )

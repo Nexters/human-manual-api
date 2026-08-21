@@ -349,6 +349,47 @@ SUPPORT_TIPS = {
     "make_me_laugh": "분위기가 무거워질 때 취향 맞는 웃음을 건네면 마음의 문이 빨리 열려요.",
 }
 
+PLAY_STYLE_TIP_COPY = {
+    (("E", "explore"), ("E", "explore")): (
+        "둘 다 새로운 곳을 좋아하니, 다음에 가볼 장소를 번갈아 하나씩 골라보세요!"
+    ),
+    (("E", "explore"), ("E", "routine")): ("가끔은 상대가 좋아하는 단골 코스를 함께 따라가보세요!"),
+    (("E", "explore"), ("I", "explore")): (
+        "가끔은 북적임을 벗어나, 둘만 조용히 놀 수 있는 곳으로 데려가보세요!"
+    ),
+    (("E", "explore"), ("I", "routine")): (
+        "가끔은 상대가 좋아하는 단골 코스에서 둘만 조용히 보내보세요!"
+    ),
+    (("E", "routine"), ("E", "explore")): ("가끔은 새로운 곳을 골라 상대를 데려가보세요!"),
+    (("E", "routine"), ("E", "routine")): (
+        "둘 다 익숙한 곳을 좋아하니, 함께 자주 갈 단골 코스를 하나 더 만들어보세요!"
+    ),
+    (("E", "routine"), ("I", "explore")): ("가끔은 둘이 조용히 둘러볼 새로운 곳으로 데려가보세요!"),
+    (("E", "routine"), ("I", "routine")): (
+        "가끔은 북적임을 벗어나, 둘만 조용히 놀 수 있는 곳으로 데려가보세요!"
+    ),
+    (("I", "explore"), ("E", "explore")): (
+        "가보고 싶은 새로운 곳이 생기면 먼저 연락해 같이 가자고 해보세요!"
+    ),
+    (("I", "explore"), ("E", "routine")): (
+        "상대가 좋아하는 단골 코스가 생각나면 먼저 연락해 약속을 잡아보세요!"
+    ),
+    (("I", "explore"), ("I", "explore")): (
+        "둘 다 새로운 경험을 좋아하니, 함께 궁금했던 곳을 하나씩 골라 가보세요!"
+    ),
+    (("I", "explore"), ("I", "routine")): ("가끔은 상대가 좋아하는 단골 코스를 함께 따라가보세요!"),
+    (("I", "routine"), ("E", "explore")): (
+        "가끔은 상대가 가보고 싶어 한 새로운 곳으로 먼저 연락해 불러내보세요!"
+    ),
+    (("I", "routine"), ("E", "routine")): (
+        "상대가 자주 가는 편한 곳에서 만나자고 먼저 연락해보세요!"
+    ),
+    (("I", "routine"), ("I", "explore")): ("가끔은 새로운 곳을 골라 상대를 데려가보세요!"),
+    (("I", "routine"), ("I", "routine")): (
+        "둘 다 익숙하고 조용한 시간을 좋아하니, 편한 단골 코스를 마음껏 즐겨보세요!"
+    ),
+}
+
 SUPPORT_NEED_COPY = {
     "listen_to_me": "이야기를 충분히 들어줄 때",
     "take_me_out": "밖으로 불러내 함께 움직일 때",
@@ -509,12 +550,20 @@ def _conflict_tip(target: SubmissionResultData, other: SubmissionResultData) -> 
     return "혼자 정리하는 동안 다시 이야기할 시간을 먼저 알려주면 상대가 답답해하지 않아요."
 
 
+def _play_style(
+    result: SubmissionResultData,
+) -> tuple[Literal["E", "I"], Literal["explore", "routine"]]:
+    profile = result.compatibility_profile
+    assert profile is not None
+    energy: Literal["E", "I"] = "E" if profile.mbti.startswith("E") else "I"
+    novelty: Literal["explore", "routine"] = (
+        "routine" if result.unboxing_kit.axis_scores.routine >= 50 else "explore"
+    )
+    return energy, novelty
+
+
 def _pace_tip(target: SubmissionResultData, other: SubmissionResultData) -> str:
-    target_routine = target.unboxing_kit.axis_scores.routine
-    other_routine = other.unboxing_kit.axis_scores.routine
-    if target_routine > other_routine:
-        return "상대의 새로운 제안을 부담스럽다고 바로 닫지 않고 한 번쯤 열어두면 더 즐거워져요."
-    return "새로운 걸 제안할 때 익숙한 선택지도 함께 건네면 상대가 더 편하게 받아들여요."
+    return PLAY_STYLE_TIP_COPY[(_play_style(target), _play_style(other))]
 
 
 def _tip_for(
@@ -755,16 +804,13 @@ def _pace_detail(
     score: int,
 ) -> CompatibilityDetailData:
     assert mine.participant is not None and friend.participant is not None
-    mine_profile = mine.compatibility_profile
-    friend_profile = friend.compatibility_profile
-    assert mine_profile is not None and friend_profile is not None
     mine_name = mine.participant.nickname
     friend_name = friend.participant.nickname
     mine_routine = mine.unboxing_kit.axis_scores.routine
     friend_routine = friend.unboxing_kit.axis_scores.routine
     routine_gap = abs(mine_routine - friend_routine)
-    mine_style = (mine_profile.mbti[0], "routine" if mine_routine >= 50 else "explore")
-    friend_style = (friend_profile.mbti[0], "routine" if friend_routine >= 50 else "explore")
+    mine_style = _play_style(mine)
+    friend_style = _play_style(friend)
 
     if mine_style[1] != friend_style[1] and routine_gap <= 15:
         description = (
