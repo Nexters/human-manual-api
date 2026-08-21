@@ -364,3 +364,9 @@ def test_builds_one_matching_and_one_mismatched_card_from_the_fixed_table(
 def test_defines_friend_descriptions_for_every_mbti() -> None:
     assert set(COMPATIBLE_FRIEND_DESCRIPTION) == set(MbtiType)
     assert set(MISMATCHED_FRIEND_DESCRIPTION) == set(MbtiType)
+    descriptions = (
+        *COMPATIBLE_FRIEND_DESCRIPTION.values(),
+        *MISMATCHED_FRIEND_DESCRIPTION.values(),
+    )
+    assert all("당신" in description for description in descriptions)
+    assert all(description.endswith("요.") for description in descriptions)

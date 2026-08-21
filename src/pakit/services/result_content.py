@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-21.8"
+RESULT_CONTENT_VERSION = "2026-08-21.9"
 
 FEATURE_TAGS = ("동력", "관계", "마음", "강점")
 

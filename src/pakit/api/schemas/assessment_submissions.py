@@ -150,14 +150,20 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
             "noun": "비밀상자",
             "character_id": "secret_box",
             "image_url": "https://api.pakit.kr/assets/characters/secret_box.png",
-            "description": "깊이 있는 대화와 아이디어 교류",
+            "description": (
+                "새로운 생각을 끝없이 펼치는 당신 곁에서, 그 안의 의미를 알아보고 "
+                "더 깊은 방향으로 이어줘요."
+            ),
         },
         {
             "badge": "환장의 장난감",
             "noun": "테디베어",
             "character_id": "teddy_bear",
             "image_url": "https://api.pakit.kr/assets/characters/teddy_bear.png",
-            "description": "세부적·보수적 성향으로 마찰",
+            "description": (
+                "새로운 방식을 자유롭게 시험하고 싶은 당신에게, 익숙한 기준과 안전한 순서를 "
+                "먼저 지키는 모습은 답답하게 느껴져요."
+            ),
         },
     ],
 }
