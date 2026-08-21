@@ -3,7 +3,6 @@ from typing import Literal
 
 from pakit.domain.assessment import MbtiType
 from pakit.domain.assessment_submission import (
-    AxisScoresData,
     CompatibilityProfileData,
     CompatibleFriendData,
     SubmissionResultData,
@@ -13,33 +12,80 @@ from pakit.services.result_repository import ResultRepository
 
 COMPATIBILITY_PROFILE_VERSION = "2026-08-19.1"
 
-PRIMARY_COMPATIBLE_MBTI: dict[MbtiType, MbtiType] = {
-    MbtiType.INTJ: MbtiType.ENFP,
-    MbtiType.ENFP: MbtiType.INTJ,
-    MbtiType.ISTJ: MbtiType.ESFP,
-    MbtiType.ESFP: MbtiType.ISTJ,
-    MbtiType.ENTJ: MbtiType.INFP,
-    MbtiType.INFP: MbtiType.ENTJ,
-    MbtiType.ESTJ: MbtiType.ISFP,
-    MbtiType.ISFP: MbtiType.ESTJ,
-    MbtiType.INFJ: MbtiType.ENTP,
-    MbtiType.ENTP: MbtiType.INFJ,
-    MbtiType.ISFJ: MbtiType.ESTP,
-    MbtiType.ESTP: MbtiType.ISFJ,
-    MbtiType.ENFJ: MbtiType.INTP,
-    MbtiType.INTP: MbtiType.ENFJ,
-    MbtiType.ESFJ: MbtiType.ISTP,
-    MbtiType.ISTP: MbtiType.ESFJ,
+COMPATIBLE_MBTI_CANDIDATES: dict[MbtiType, tuple[MbtiType, MbtiType]] = {
+    MbtiType.INTJ: (MbtiType.ENFP, MbtiType.ENTP),
+    MbtiType.INTP: (MbtiType.ENTJ, MbtiType.ENFJ),
+    MbtiType.ENTJ: (MbtiType.INTP, MbtiType.INFP),
+    MbtiType.ENTP: (MbtiType.INFJ, MbtiType.INTJ),
+    MbtiType.INFJ: (MbtiType.ENTP, MbtiType.ENFP),
+    MbtiType.INFP: (MbtiType.ENFJ, MbtiType.ENTJ),
+    MbtiType.ENFJ: (MbtiType.INFP, MbtiType.ISFP),
+    MbtiType.ENFP: (MbtiType.INTJ, MbtiType.INFJ),
+    MbtiType.ISTJ: (MbtiType.ESFP, MbtiType.ESTP),
+    MbtiType.ISFJ: (MbtiType.ESFP, MbtiType.ESTP),
+    MbtiType.ESTJ: (MbtiType.ISFP, MbtiType.ISTP),
+    MbtiType.ESFJ: (MbtiType.ISFP, MbtiType.ISTP),
+    MbtiType.ISTP: (MbtiType.ESFJ, MbtiType.ESTJ),
+    MbtiType.ISFP: (MbtiType.ESTJ, MbtiType.ESFJ),
+    MbtiType.ESTP: (MbtiType.ISFJ, MbtiType.ISTJ),
+    MbtiType.ESFP: (MbtiType.ISTJ, MbtiType.ISFJ),
 }
 
-OPPOSITE_MBTI: dict[MbtiType, MbtiType] = {
-    mbti: MbtiType(
-        "".join(
-            {"E": "I", "I": "E", "S": "N", "N": "S", "T": "F", "F": "T", "J": "P", "P": "J"}[letter]
-            for letter in mbti.value
-        )
-    )
-    for mbti in MbtiType
+MISMATCHED_MBTI_CANDIDATES: dict[MbtiType, tuple[MbtiType, MbtiType]] = {
+    MbtiType.INTJ: (MbtiType.ESFP, MbtiType.ISFP),
+    MbtiType.INTP: (MbtiType.ESFJ, MbtiType.ISFJ),
+    MbtiType.ENTJ: (MbtiType.ISFP, MbtiType.ESFP),
+    MbtiType.ENTP: (MbtiType.ISFJ, MbtiType.ESFJ),
+    MbtiType.INFJ: (MbtiType.ESTP, MbtiType.ESTJ),
+    MbtiType.INFP: (MbtiType.ESTJ, MbtiType.ESTP),
+    MbtiType.ENFJ: (MbtiType.ISTP, MbtiType.ESTP),
+    MbtiType.ENFP: (MbtiType.ISTJ, MbtiType.ESTJ),
+    MbtiType.ISTJ: (MbtiType.ENFP, MbtiType.ENFJ),
+    MbtiType.ISFJ: (MbtiType.ENTP, MbtiType.ENTJ),
+    MbtiType.ESTJ: (MbtiType.INFP, MbtiType.INFJ),
+    MbtiType.ESFJ: (MbtiType.INTP, MbtiType.ENTP),
+    MbtiType.ISTP: (MbtiType.ENFJ, MbtiType.ENFP),
+    MbtiType.ISFP: (MbtiType.ENTJ, MbtiType.INTJ),
+    MbtiType.ESTP: (MbtiType.INFJ, MbtiType.INFP),
+    MbtiType.ESFP: (MbtiType.INTJ, MbtiType.INTP),
+}
+
+COMPATIBLE_FRIEND_DESCRIPTION: dict[MbtiType, str] = {
+    MbtiType.INTJ: "새로운 아이디어와 영감을 주고받음",
+    MbtiType.INTP: "논리와 계획, 비전을 함께 실현",
+    MbtiType.ENTJ: "전략적 사고와 따뜻한 공감의 조화",
+    MbtiType.ENTP: "깊이 있는 대화와 아이디어 교류",
+    MbtiType.INFJ: "이해와 영감, 이상을 함께 추구",
+    MbtiType.INFP: "따뜻한 이상과 추진력의 만남",
+    MbtiType.ENFJ: "공감과 따뜻함이 통한 관계",
+    MbtiType.ENFP: "상상력과 통찰력의 시너지",
+    MbtiType.ISTJ: "실용적이고 활기찬 에너지 보완",
+    MbtiType.ISFJ: "따뜻함과 현실 감각의 조화",
+    MbtiType.ESTJ: "실용성·책임감으로 안정적 관계",
+    MbtiType.ESFJ: "배려와 현실 감각의 균형",
+    MbtiType.ISTP: "현실 감각으로 든든한 관계",
+    MbtiType.ISFP: "안정감과 배려로 편안한 관계",
+    MbtiType.ESTP: "현실적·실용적 재미가 좋은 편",
+    MbtiType.ESFP: "따뜻함과 안정감으로 시너지",
+}
+
+MISMATCHED_FRIEND_DESCRIPTION: dict[MbtiType, str] = {
+    MbtiType.INTJ: "즉흥적이고 감각적 성향 차이 큼",
+    MbtiType.INTP: "현실적·보수적 성향으로 충돌",
+    MbtiType.ENTJ: "계획 vs 즉흥, 가치관 충돌 가능",
+    MbtiType.ENTP: "세부적·보수적 성향으로 마찰",
+    MbtiType.INFJ: "현실적·직설적 성향 차이 큼",
+    MbtiType.INFP: "현실 중심, 감정 표현 방식 달라 충돌",
+    MbtiType.ENFJ: "개인주의·현실 중심 성향 차이",
+    MbtiType.ENFP: "규칙·현실 중심으로 자유로움 제한",
+    MbtiType.ISTJ: "즉흥 vs 계획, 우선순위 충돌",
+    MbtiType.ISFJ: "논리·변화 중심으로 피로감 높음",
+    MbtiType.ESTJ: "감성·이상 추구 방식 차이 큼",
+    MbtiType.ESFJ: "논리적·독립적 성향으로 거리감",
+    MbtiType.ISTP: "외향·이상 중심으로 에너지 소모",
+    MbtiType.ISFP: "목표·방식의 차이로 압박감",
+    MbtiType.ESTP: "감성·이상 추구 방식 차이 큼",
+    MbtiType.ESFP: "내향·논리 중심으로 거리감",
 }
 
 
@@ -249,42 +295,29 @@ MOTIVATION_COPY = {
 }
 
 
-def _primary_friend_description(mbti: MbtiType) -> str:
-    return {
-        "NT": "당신이 꺼낸 아이디어를 깊이 이해하고, 생각의 다음 방향을 함께 찾아줘요.",
-        "NF": "당신의 상상과 감정선을 알아보고, 떠오른 가능성에 선명한 방향을 더해줘요.",
-        "ST": "당신의 현실적인 판단을 존중하면서, 놓치기 쉬운 마음까지 살펴줘요.",
-        "SF": "당신의 세심한 마음을 알아보고, 망설이는 순간엔 다음 행동을 잡아줘요.",
-    }[mbti.value[1:3]]
-
-
-def _opposite_friend_description(scores: AxisScoresData) -> str:
-    if scores.routine < 50 and scores.attachment < 50:
-        return "새로운 곳으로 먼저 달리는 당신 곁에서, 필요한 순간에 차분히 중심을 잡아줘요."
-    if scores.routine < 50:
-        return "신나는 속도를 함께 타면서, 미처 놓친 약속과 사람을 챙겨줘요."
-    if scores.attachment < 50:
-        return "익숙한 흐름을 지키는 당신에게, 부담스럽지 않은 새 선택지를 열어줘요."
-    return "꾸준히 관계를 챙기는 당신에게, 다른 리듬과 새로운 재미를 더해줘요."
-
-
-def build_compatible_friends(
-    mbti: MbtiType,
-    scores: AxisScoresData,
-) -> tuple[CompatibleFriendData, ...]:
-    recommended = (
-        (PRIMARY_COMPATIBLE_MBTI[mbti], _primary_friend_description(mbti)),
-        (OPPOSITE_MBTI[mbti], _opposite_friend_description(scores)),
+def build_compatible_friends(mbti: MbtiType) -> tuple[CompatibleFriendData, ...]:
+    groups = (
+        (
+            "환상의 장난감",
+            COMPATIBLE_MBTI_CANDIDATES[mbti],
+            COMPATIBLE_FRIEND_DESCRIPTION[mbti],
+        ),
+        (
+            "환장의 장난감",
+            MISMATCHED_MBTI_CANDIDATES[mbti],
+            MISMATCHED_FRIEND_DESCRIPTION[mbti],
+        ),
     )
     return tuple(
         CompatibleFriendData(
-            badge="환상의 장난감",
-            noun=CHARACTERS[recommended_mbti].noun,
-            character_id=CHARACTERS[recommended_mbti].code,
-            image_url=f"/assets/{CHARACTERS[recommended_mbti].asset_key}",
+            badge=badge,
+            noun=CHARACTERS[friend_mbti].noun,
+            character_id=CHARACTERS[friend_mbti].code,
+            image_url=f"/assets/{CHARACTERS[friend_mbti].asset_key}",
             description=description,
         )
-        for recommended_mbti, description in recommended
+        for badge, candidates, description in groups
+        for friend_mbti in candidates
     )
 
 

@@ -199,10 +199,7 @@ def _build_result(
         can_do=handling_guide,
         warnings=warnings,
         charging=charging,
-        compatible_friends=build_compatible_friends(
-            submission.mbti,
-            classification.axis_scores,
-        ),
+        compatible_friends=build_compatible_friends(submission.mbti),
         compatibility_profile=build_compatibility_profile(
             mbti=submission.mbti,
             relationship_moment=answers["step1.q01"],

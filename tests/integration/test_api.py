@@ -51,8 +51,12 @@ def _testserver_response_example() -> dict[str, Any]:
     expected["compatible_friends"][0]["image_url"] = (
         "http://testserver/assets/characters/secret_box.png"
     )
-    expected["compatible_friends"][1]["image_url"] = (
+    expected["compatible_friends"][1]["image_url"] = "http://testserver/assets/characters/cube.png"
+    expected["compatible_friends"][2]["image_url"] = (
         "http://testserver/assets/characters/teddy_bear.png"
+    )
+    expected["compatible_friends"][3]["image_url"] = (
+        "http://testserver/assets/characters/teapot.png"
     )
     return expected
 
@@ -452,8 +456,13 @@ def test_submits_complete_assessment_and_returns_mixed_result() -> None:
         "type": "INTP",
         "label": "외부와 단절",
     }
-    assert len(body["compatible_friends"]) == 2
-    assert all(friend["badge"] == "환상의 장난감" for friend in body["compatible_friends"])
+    assert len(body["compatible_friends"]) == 4
+    assert [friend["badge"] for friend in body["compatible_friends"]] == [
+        "환상의 장난감",
+        "환상의 장난감",
+        "환장의 장난감",
+        "환장의 장난감",
+    ]
 
 
 def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> None:

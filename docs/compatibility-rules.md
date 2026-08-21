@@ -23,11 +23,12 @@
 ## 개인 결과의 추천 친구 카드
 
 `POST /api/tests/submissions`와 `GET /api/results/{result_code}`는 상세 궁합으로 들어가기 전에
-보여줄 `compatible_friends` 카드 2개를 반환한다.
+보여줄 `compatible_friends` 카드 4개를 반환한다.
 
-- 첫 카드는 MBTI별 주 추천 유형을 사용한다. 설명은 사용자의 `NT/NF/ST/SF`에 따라 정한다.
-- 두 번째 카드는 MBTI 네 글자가 모두 반대인 유형을 사용한다. 설명은 사용자의 실제
-  `routine × attachment` 사분면에 따라 정한다.
+- 첫 두 카드는 MBTI별 고정 궁합표의 `환상의 장난감` 후보 2개를 표의 순서대로 사용한다.
+- 다음 두 카드는 같은 표의 `환장의 장난감` 후보 2개를 표의 순서대로 사용한다.
+- 각 두 카드는 해당 MBTI 행에 확정된 동일한 환상 또는 환장 설명을 사용한다.
+- 성향 축은 카드 선택이나 설명에 사용하지 않는다.
 - 각 카드에는 `badge`, `noun`, `character_id`, `image_url`, `description`을 제공한다.
 - 궁합 기능 도입 전 스냅샷에는 카드가 없으므로 조회 시 빈 배열을 반환한다.
 

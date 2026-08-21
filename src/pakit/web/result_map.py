@@ -11,7 +11,6 @@ from functools import lru_cache
 from html import escape as _escape
 
 from pakit.domain.assessment import MbtiType
-from pakit.domain.assessment_submission import AxisScoresData
 from pakit.domain.characters import CHARACTERS
 from pakit.services import assessment_classifier as ac
 from pakit.services import charging_service as ch
@@ -21,14 +20,6 @@ from pakit.services import result_content as rc
 from pakit.services.result_content import UnboxingItemCopy
 
 MBTI = list(CHARACTERS.keys())  # INTJ, ISTJ, ... 유형군 순서
-
-# 각 중간축군(NT/ST/NF/SF)을 대표하는 실제 MBTI (value[1:3] 이 축군과 일치)
-_MIDDLE_GROUP_MBTI = {
-    "NT": MbtiType.INTJ,
-    "NF": MbtiType.INFJ,
-    "ST": MbtiType.ISTJ,
-    "SF": MbtiType.ISFJ,
-}
 
 
 def esc(value: object) -> str:
@@ -122,13 +113,6 @@ CHOICE = {
         "express_with_words": "말·리액션·표현으로 채운다",
         "express_with_actions": "말없이 행동으로 보여준다",
     },
-}
-
-MIDDLE_GROUP_LABEL = {
-    "NT": "NT · 논리탐구",
-    "ST": "ST · 현실실용",
-    "NF": "NF · 의미공감",
-    "SF": "SF · 배려조화",
 }
 
 AXES = [
@@ -609,46 +593,47 @@ Q06은 사용자가 고른 걸 그대로, 첫 슬롯은 MBTI T/F×표현방식, 
 
     # ── 8. 함께하면 좋은 친구 ────────────────────────────────────────────
     friend_map_table = table(
-        ["내 MBTI", "추천 친구(잘 맞음)", "반대 친구"],
-        [[code_chip(m.value),
-          f"{esc(cs.PRIMARY_COMPATIBLE_MBTI[m].value)} · {esc(noun(cs.PRIMARY_COMPATIBLE_MBTI[m]))}",
-          f"{esc(cs.OPPOSITE_MBTI[m].value)} · {esc(noun(cs.OPPOSITE_MBTI[m]))}"] for m in MBTI],
-    )
-    prim_desc_table = table(
-        ["MBTI 중간 2축", "추천 친구 설명"],
-        [[esc(MIDDLE_GROUP_LABEL[g]), esc(cs._primary_friend_description(_MIDDLE_GROUP_MBTI[g]))]
-         for g in ["NT", "NF", "ST", "SF"]],
-    )
-
-    def opp(routine: int, attachment: int) -> str:
-        scores = AxisScoresData(attachment=attachment, expression=0, routine=routine, egen=0)
-        return esc(cs._opposite_friend_description(scores))
-
-    opp_desc_table = table(
-        ["자극 · 애착 사분면", "반대 친구 설명"],
+        ["내 MBTI", "환상의 장난감 2개", "환장의 장난감 2개"],
         [
-            ["탐험 · 거리조절", opp(0, 0)],
-            ["탐험 · 밀착", opp(0, 100)],
-            ["루틴 · 거리조절", opp(100, 0)],
-            ["루틴 · 밀착", opp(100, 100)],
+            [
+                code_chip(m.value),
+                " · ".join(
+                    f"{esc(friend.value)} {esc(noun(friend))}"
+                    for friend in cs.COMPATIBLE_MBTI_CANDIDATES[m]
+                ),
+                " · ".join(
+                    f"{esc(friend.value)} {esc(noun(friend))}"
+                    for friend in cs.MISMATCHED_MBTI_CANDIDATES[m]
+                ),
+            ]
+            for m in MBTI
+        ],
+    )
+    friend_desc_table = table(
+        ["내 MBTI", "환상의 장난감 설명", "환장의 장난감 설명"],
+        [
+            [
+                code_chip(m.value),
+                esc(cs.COMPATIBLE_FRIEND_DESCRIPTION[m]),
+                esc(cs.MISMATCHED_FRIEND_DESCRIPTION[m]),
+            ]
+            for m in MBTI
         ],
     )
     friend_body = f"""
-<p class="lead">개인 결과에 카드 2장. 추천 장난감은 MBTI로 고르고(잘 맞는 유형 / 반대 유형),
-설명 문구는 축을 보조로 써요.</p>
-<h4>추천/반대 MBTI 매핑 · 16</h4>
+<p class="lead">개인 결과에 카드 4장. MBTI별 고정표에서 환상의 장난감 2개와
+환장의 장난감 2개를 표의 순서대로 반환해요.</p>
+<h4>환상/환장 MBTI 매핑 · 유형별 2+2</h4>
 {friend_map_table}
-<div class="two-col">
-  <div><h4>추천 친구 설명 · 4 (MBTI 중간축)</h4>{prim_desc_table}</div>
-  <div><h4>반대 친구 설명 · 4 (자극×애착)</h4>{opp_desc_table}</div>
-</div>"""
+<h4>MBTI별 환상/환장 설명 · 16+16</h4>
+{friend_desc_table}"""
     sections.append(
         (
             "friends",
             "결과 · compatible_friends",
-            "함께하면 좋은 친구",
-            f"{mbtichip()}{axchip('rout')}{axchip('att')}",
-            "매핑 16 · 설명 4+4",
+            "환상과 환장의 장난감",
+            mbtichip(),
+            "후보 32+32 · 설명 16+16",
             friend_body,
         )
     )

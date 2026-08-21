@@ -14,8 +14,11 @@ from pakit.domain.assessment_submission import (
     UnboxingItemData,
     UnboxingKitData,
 )
+from pakit.domain.characters import CHARACTERS
 from pakit.services.compatibility_service import (
     COMPATIBILITY_PROFILE_VERSION,
+    COMPATIBLE_FRIEND_DESCRIPTION,
+    MISMATCHED_FRIEND_DESCRIPTION,
     RELATIONSHIP_ROLE_BY_ANSWERS,
     CompatibilityUnavailableError,
     build_compatibility,
@@ -314,29 +317,53 @@ def test_low_compatibility_headline_explains_the_difference_without_judging_the_
     )
 
 
-@pytest.mark.parametrize("mbti", list(MbtiType))
-def test_builds_two_distinct_compatible_friend_cards_for_every_mbti(mbti: MbtiType) -> None:
-    friends = build_compatible_friends(mbti, AxisScoresData(50, 50, 50, 50))
+@pytest.mark.parametrize(
+    ("mbti", "compatible", "mismatched"),
+    [
+        (MbtiType.INTJ, (MbtiType.ENFP, MbtiType.ENTP), (MbtiType.ESFP, MbtiType.ISFP)),
+        (MbtiType.INTP, (MbtiType.ENTJ, MbtiType.ENFJ), (MbtiType.ESFJ, MbtiType.ISFJ)),
+        (MbtiType.ENTJ, (MbtiType.INTP, MbtiType.INFP), (MbtiType.ISFP, MbtiType.ESFP)),
+        (MbtiType.ENTP, (MbtiType.INFJ, MbtiType.INTJ), (MbtiType.ISFJ, MbtiType.ESFJ)),
+        (MbtiType.INFJ, (MbtiType.ENTP, MbtiType.ENFP), (MbtiType.ESTP, MbtiType.ESTJ)),
+        (MbtiType.INFP, (MbtiType.ENFJ, MbtiType.ENTJ), (MbtiType.ESTJ, MbtiType.ESTP)),
+        (MbtiType.ENFJ, (MbtiType.INFP, MbtiType.ISFP), (MbtiType.ISTP, MbtiType.ESTP)),
+        (MbtiType.ENFP, (MbtiType.INTJ, MbtiType.INFJ), (MbtiType.ISTJ, MbtiType.ESTJ)),
+        (MbtiType.ISTJ, (MbtiType.ESFP, MbtiType.ESTP), (MbtiType.ENFP, MbtiType.ENFJ)),
+        (MbtiType.ISFJ, (MbtiType.ESFP, MbtiType.ESTP), (MbtiType.ENTP, MbtiType.ENTJ)),
+        (MbtiType.ESTJ, (MbtiType.ISFP, MbtiType.ISTP), (MbtiType.INFP, MbtiType.INFJ)),
+        (MbtiType.ESFJ, (MbtiType.ISFP, MbtiType.ISTP), (MbtiType.INTP, MbtiType.ENTP)),
+        (MbtiType.ISTP, (MbtiType.ESFJ, MbtiType.ESTJ), (MbtiType.ENFJ, MbtiType.ENFP)),
+        (MbtiType.ISFP, (MbtiType.ESTJ, MbtiType.ESFJ), (MbtiType.ENTJ, MbtiType.INTJ)),
+        (MbtiType.ESTP, (MbtiType.ISFJ, MbtiType.ISTJ), (MbtiType.INFJ, MbtiType.INFP)),
+        (MbtiType.ESFP, (MbtiType.ISTJ, MbtiType.ISFJ), (MbtiType.INTJ, MbtiType.INTP)),
+    ],
+)
+def test_builds_two_matching_and_two_mismatched_cards_from_the_fixed_table(
+    mbti: MbtiType,
+    compatible: tuple[MbtiType, MbtiType],
+    mismatched: tuple[MbtiType, MbtiType],
+) -> None:
+    friends = build_compatible_friends(mbti)
 
-    assert len(friends) == 2
-    assert friends[0].character_id != friends[1].character_id
-    assert all(friend.badge == "환상의 장난감" for friend in friends)
+    assert len(friends) == 4
+    assert [friend.character_id for friend in friends] == [
+        CHARACTERS[friend_mbti].code for friend_mbti in (*compatible, *mismatched)
+    ]
+    assert [friend.badge for friend in friends] == [
+        "환상의 장난감",
+        "환상의 장난감",
+        "환장의 장난감",
+        "환장의 장난감",
+    ]
+    assert [friend.description for friend in friends] == [
+        COMPATIBLE_FRIEND_DESCRIPTION[mbti],
+        COMPATIBLE_FRIEND_DESCRIPTION[mbti],
+        MISMATCHED_FRIEND_DESCRIPTION[mbti],
+        MISMATCHED_FRIEND_DESCRIPTION[mbti],
+    ]
     assert all(friend.image_url.startswith("/assets/characters/") for friend in friends)
 
 
-@pytest.mark.parametrize(
-    ("scores", "expected_phrase"),
-    [
-        (AxisScoresData(0, 50, 0, 50), "먼저 달리는"),
-        (AxisScoresData(100, 50, 0, 50), "놓친 약속과 사람"),
-        (AxisScoresData(0, 50, 100, 50), "새 선택지"),
-        (AxisScoresData(100, 50, 100, 50), "새로운 재미"),
-    ],
-)
-def test_personalizes_the_second_friend_card_with_axis_quadrants(
-    scores: AxisScoresData,
-    expected_phrase: str,
-) -> None:
-    friends = build_compatible_friends(MbtiType.ENTP, scores)
-
-    assert expected_phrase in friends[1].description
+def test_defines_friend_descriptions_for_every_mbti() -> None:
+    assert set(COMPATIBLE_FRIEND_DESCRIPTION) == set(MbtiType)
+    assert set(MISMATCHED_FRIEND_DESCRIPTION) == set(MbtiType)

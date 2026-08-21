@@ -48,7 +48,7 @@
 | 사용 방법 | `can_do` | 사용자가 좋아하는 행동 4개 |
 | 주의사항 | `warnings` | 사용자에게 피해야 할 행동 4개 |
 | 충전 방법 | `charging` | 설명, 충전 활동 3개 |
-| 친구 궁합 미리보기 | `compatible_friends` | 잘 맞는 친구 장난감 카드 2개 |
+| 친구 궁합 미리보기 | `compatible_friends` | MBTI별 환상의 장난감 2개와 환장의 장난감 2개 |
 
 ### `overview` 장난감 소개
 
