@@ -695,12 +695,24 @@ Q06은 사용자가 고른 걸 그대로, 첫 슬롯은 MBTI T/F×표현방식, 
         ],
     )
     dim_rows = []
-    for key in ["distance", "conflict", "care", "pace"]:
-        title, desc, _short = cs.DIMENSION_COPY[key]
-        dim_rows.append(
-            [val(key), f"<b>{esc(title)}</b>", esc(desc), esc(cs.RELATIONSHIP_STRENGTH_COPY[key])]
-        )
-    dim_table = table(["항목", "이름", "설명", "강점 문구"], dim_rows)
+    for key in cs.DIMENSION_LABEL:
+        for band, score_range in cs.STRENGTH_BAND_RANGES.items():
+            desc, tag = cs.SYNERGY_COPY[(key, band)]
+            dim_rows.append(
+                [
+                    val(key),
+                    esc(cs.DIMENSION_LABEL[key]),
+                    score_range,
+                    "<b>케미 게이지</b>",
+                    esc(desc),
+                    esc(tag),
+                    esc(cs.RELATIONSHIP_STRENGTH_COPY[(key, band)]),
+                ]
+            )
+    dim_table = table(
+        ["최고 항목", "화면 항목", "항목 점수", "고정 제목", "설명", "첫 태그", "하단 첫 문장"],
+        dim_rows,
+    )
     score_table = table(
         ["점수", "계산식", "총점 비중"],
         [
@@ -941,7 +953,7 @@ Q06은 사용자가 고른 걸 그대로, 첫 슬롯은 MBTI T/F×표현방식, 
 {score_table}
 <h4>총점 → 헤드라인 · 4구간</h4>
 {head_table}
-<h4>4개 세부 항목</h4>
+<h4>케미 게이지 · 최고 항목 4개 × 점수 구간 3개</h4>
 {dim_table}
 <h4>상세 문구 분기 · 케이스 지도</h4>
 <div class="two-col">

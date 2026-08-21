@@ -19,9 +19,9 @@ COMPATIBILITY_RESPONSE_EXAMPLE: dict[str, Any] = {
     "description": "닮은 부분은 편안하고 다른 부분은 서로의 빈틈을 채워줘요.",
     "synergy": {
         "score": 80,
-        "title": "함께 노는 방식",
-        "description": "새로움에 대한 취향과 함께 있을 때 편한 분위기가 비슷해요.",
-        "tags": ["노는 결이 잘 맞아요", "아이디어가 통해요"],
+        "title": "케미 게이지",
+        "description": "둘이 놀러 갈 때 고르는 장소와 분위기가 잘 맞아요.",
+        "tags": ["함께 놀 때 잘 맞아요", "아이디어가 통해요"],
     },
     "details": [
         {
@@ -105,7 +105,7 @@ class SynergyOutput(BaseModel):
     """두 사람이 함께 있을 때의 시너지입니다."""
 
     score: int = Field(ge=0, le=100, description="궁합 점수")
-    title: str = Field(description="시너지 제목")
+    title: str = Field(description="고정 시너지 제목 '케미 게이지'")
     description: str = Field(description="시너지 설명")
     tags: list[str] = Field(min_length=2, max_length=2, description="시너지 태그 2개")
 

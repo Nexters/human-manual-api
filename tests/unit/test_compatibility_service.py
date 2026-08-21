@@ -20,9 +20,13 @@ from pakit.services.compatibility_service import (
     CARE_MATCH,
     COMPATIBILITY_PROFILE_VERSION,
     COMPATIBLE_FRIEND_DESCRIPTION,
+    DIMENSION_LABEL,
     EXTREME_AXIS_TIP_COPY,
     MISMATCHED_FRIEND_DESCRIPTION,
     RELATIONSHIP_ROLE_BY_ANSWERS,
+    RELATIONSHIP_STRENGTH_COPY,
+    STRENGTH_BAND_RANGES,
+    SYNERGY_COPY,
     TIP_AXIS_PRIORITY,
     AxisKey,
     AxisPole,
@@ -30,6 +34,7 @@ from pakit.services.compatibility_service import (
     CompatibilityUnavailableError,
     _most_extreme_axis,
     _personal_tip,
+    _strength_band,
     build_compatibility,
     build_compatibility_profile,
     build_compatible_friends,
@@ -42,6 +47,23 @@ def test_weights_relationship_answers_at_ninety_percent_and_mbti_at_ten_percent(
     scores = CompatibilityScores(distance=100, conflict=80, care=60, pace=40, mbti=20)
 
     assert scores.total == 67
+
+
+@pytest.mark.parametrize(
+    ("score", "expected"),
+    [(59, "learning"), (60, "adjusting"), (73, "adjusting"), (74, "strong")],
+)
+def test_strength_band_boundaries(score: int, expected: str) -> None:
+    assert _strength_band(score) == expected
+
+
+def test_synergy_and_relationship_copy_cover_all_dimension_score_bands() -> None:
+    expected_keys = {
+        (dimension, band) for dimension in DIMENSION_LABEL for band in STRENGTH_BAND_RANGES
+    }
+
+    assert set(SYNERGY_COPY) == expected_keys
+    assert set(RELATIONSHIP_STRENGTH_COPY) == expected_keys
 
 
 def _result(
@@ -185,6 +207,7 @@ def test_compatibility_score_is_symmetric_and_keeps_each_person_target() -> None
     reverse = build_compatibility(friend, mine)
 
     assert forward.synergy.score == reverse.synergy.score
+    assert forward.synergy.title == reverse.synergy.title == "케미 게이지"
     assert 0 <= forward.synergy.score <= 100
     assert forward.tips[0].target == "mine"
     assert forward.tips[0].title == "지은님에게"
@@ -192,6 +215,40 @@ def test_compatibility_score_is_symmetric_and_keeps_each_person_target() -> None
     assert forward.tips[1].target == "friend"
     assert forward.tips[1].title == "선우님에게"
     assert forward.tips[1].image_url == friend.overview.image_url
+
+
+def test_synergy_and_relationship_tip_soften_a_low_strongest_score(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    mine = _result(
+        code="mine0001",
+        nickname="지은",
+        mbti="ENTP",
+        scores=AxisScoresData(50, 50, 50, 50),
+    )
+    friend = _result(
+        code="frnd0001",
+        nickname="선우",
+        mbti="INFP",
+        scores=AxisScoresData(50, 50, 50, 50),
+    )
+    scores = CompatibilityScores(distance=20, conflict=30, care=37, pace=25, mbti=76)
+    monkeypatch.setattr(
+        "pakit.services.compatibility_service.calculate_scores",
+        lambda _mine, _friend: scores,
+    )
+
+    result = build_compatibility(mine, friend)
+
+    assert result.synergy.score == scores.total
+    assert result.synergy.title == "케미 게이지"
+    assert result.synergy.description == (
+        "서로 원하는 위로가 바로 닿지 않을 수 있어요. 힘든 날 필요한 방식을 먼저 알려주세요."
+    )
+    assert result.synergy.tags[0] == "위로법을 알아가요"
+    assert result.relationship_tip.description.startswith(
+        "지은님과 선우님은 서로 원하는 위로법을 알아가는 중이에요."
+    )
 
 
 def test_personal_tips_use_the_other_persons_extreme_attachment_direction() -> None:

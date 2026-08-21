@@ -300,34 +300,94 @@ CARE_DELIVERY_MATCH = {
     "make_me_laugh": {"express_with_words"},
 }
 
-DIMENSION_COPY = {
-    "distance": (
-        "편안한 거리감",
-        "가까이 있고 싶은 순간과 각자의 시간이 필요한 순간을 비슷하게 알아봐요.",
+DimensionKey = Literal["distance", "conflict", "care", "pace"]
+StrengthBand = Literal["strong", "adjusting", "learning"]
+
+STRENGTH_BAND_RANGES: dict[StrengthBand, str] = {
+    "strong": "74~100",
+    "adjusting": "60~73",
+    "learning": "0~59",
+}
+
+DIMENSION_LABEL: dict[DimensionKey, str] = {
+    "distance": "거리감",
+    "conflict": "대화 복구력",
+    "care": "챙김",
+    "pace": "함께 노는 방식",
+}
+
+SYNERGY_COPY: dict[tuple[DimensionKey, StrengthBand], tuple[str, str]] = {
+    ("distance", "strong"): (
+        "서로 가까이 지내는 시간과 각자 쉬는 시간의 균형이 잘 맞아요.",
         "거리감이 잘 맞아요",
     ),
-    "conflict": (
-        "대화 복구력",
+    ("distance", "adjusting"): (
+        "서로 원하는 연락과 만남의 빈도가 조금 달라요.",
+        "편한 간격을 찾아가요",
+    ),
+    ("distance", "learning"): (
+        "한 사람은 자주 연락하고 함께할 때, 다른 사람은 각자의 시간이 있을 때 편해요.",
+        "서로의 간격을 알아가요",
+    ),
+    ("conflict", "strong"): (
         "마음이 걸렸을 때 대화를 풀어가는 속도가 비슷해 오래 묵히지 않아요.",
         "대화가 잘 통해요",
     ),
-    "care": (
-        "챙김 번역기",
+    ("conflict", "adjusting"): (
+        "서운함을 푸는 속도가 조금 달라도, 바로 말할지 시간을 둘지 알려주면 "
+        "대화를 이어갈 수 있어요.",
+        "대화 속도를 맞춰가요",
+    ),
+    ("conflict", "learning"): (
+        "서운함을 푸는 타이밍이 달라 대화가 엇갈릴 수 있어요. "
+        "바로 말할지 시간을 둘지 먼저 알려주세요.",
+        "대화 타이밍을 알아가요",
+    ),
+    ("care", "strong"): (
         "한 사람이 필요로 하는 위로를 다른 사람이 알아들을 방식으로 건넬 수 있어요.",
         "챙김이 잘 통해요",
     ),
-    "pace": (
-        "함께 노는 방식",
-        "새로움에 대한 취향과 함께 있을 때 편한 분위기가 비슷해요.",
-        "노는 결이 잘 맞아요",
+    ("care", "adjusting"): (
+        "힘들 때 원하는 위로와 서로 챙겨주는 방식이 조금 달라요.",
+        "챙김을 맞춰가요",
+    ),
+    ("care", "learning"): (
+        "서로 원하는 위로가 바로 닿지 않을 수 있어요. 힘든 날 필요한 방식을 먼저 알려주세요.",
+        "위로법을 알아가요",
+    ),
+    ("pace", "strong"): (
+        "둘이 놀러 갈 때 고르는 장소와 분위기가 잘 맞아요.",
+        "함께 놀 때 잘 맞아요",
+    ),
+    ("pace", "adjusting"): (
+        "가고 싶은 곳과 편하게 느끼는 분위기가 조금 달라요.",
+        "노는 방식을 맞춰가요",
+    ),
+    ("pace", "learning"): (
+        "한 사람에게 즐거운 약속이 다른 사람에게는 조금 버거울 수 있어요.",
+        "서로 편한 약속을 찾아가요",
     ),
 }
 
-RELATIONSHIP_STRENGTH_COPY = {
-    "distance": "서로 편한 간격을 알아보는 감각이 좋아요.",
-    "conflict": "서운한 일이 생겨도 대화를 다시 이어가는 힘이 있어요.",
-    "care": "필요한 순간에 서로의 마음을 챙기는 감각이 잘 통해요.",
-    "pace": "함께할 장소와 분위기를 고르는 감각이 잘 맞아요.",
+RELATIONSHIP_STRENGTH_COPY: dict[tuple[DimensionKey, StrengthBand], str] = {
+    ("distance", "strong"): "서로 편한 간격을 알아보는 감각이 좋아요.",
+    ("distance", "adjusting"): ("서로 편한 간격이 완전히 같지는 않지만, 조금씩 맞춰갈 수 있어요."),
+    ("distance", "learning"): "연락과 혼자 있는 시간에서 서로 편한 간격을 알아가는 중이에요.",
+    ("conflict", "strong"): "서운한 일이 생겨도 대화를 다시 이어가는 힘이 있어요.",
+    ("conflict", "adjusting"): (
+        "대화를 푸는 속도가 조금 다르지만, 타이밍을 알려주면 다시 이어갈 수 있어요."
+    ),
+    ("conflict", "learning"): "서운함을 푸는 타이밍을 서로 알아가는 중이에요.",
+    ("care", "strong"): "필요한 순간에 서로의 마음을 챙기는 감각이 잘 통해요.",
+    ("care", "adjusting"): (
+        "원하는 위로가 조금 다르지만, 필요한 방식을 알려주면 마음이 더 잘 전해져요."
+    ),
+    ("care", "learning"): "서로 원하는 위로법을 알아가는 중이에요.",
+    ("pace", "strong"): "함께할 장소와 분위기를 고르는 감각이 잘 맞아요.",
+    ("pace", "adjusting"): (
+        "좋아하는 장소와 분위기가 조금 다르지만, 번갈아 고르면 함께 즐길 수 있어요."
+    ),
+    ("pace", "learning"): "함께할 장소와 분위기의 취향을 알아가는 중이에요.",
 }
 
 RELATIONSHIP_HABIT_COPY = {
@@ -579,6 +639,14 @@ def _detail_label(score: int) -> str:
     if score >= 60:
         return "조금 맞춰가면 돼요"
     return "서로의 설명서가 필요해요"
+
+
+def _strength_band(score: int) -> StrengthBand:
+    if score >= 74:
+        return "strong"
+    if score >= 60:
+        return "adjusting"
+    return "learning"
 
 
 def _distance_detail(
@@ -899,9 +967,9 @@ def _person(result: SubmissionResultData) -> CompatibilityPersonData:
 def _relationship_tip_description(
     mine: CompatibilityPersonData,
     friend: CompatibilityPersonData,
-    strongest: str,
-    weakest: str,
-    dimensions: dict[str, int],
+    strongest: DimensionKey,
+    weakest: DimensionKey,
+    dimensions: dict[DimensionKey, int],
 ) -> str:
     names = f"{mine.nickname}님과 {friend.nickname}님은"
     if strongest == weakest:
@@ -914,7 +982,8 @@ def _relationship_tip_description(
             f"{names} 한 가지보다 여러 관계 리듬을 천천히 알아가는 것이 중요한 사이예요. "
             "연락·대화·위로 중 그날 가장 필요한 것부터 한마디로 알려주세요."
         )
-    return f"{names} {RELATIONSHIP_STRENGTH_COPY[strongest]} {RELATIONSHIP_HABIT_COPY[weakest]}"
+    strength_copy = RELATIONSHIP_STRENGTH_COPY[(strongest, _strength_band(dimensions[strongest]))]
+    return f"{names} {strength_copy} {RELATIONSHIP_HABIT_COPY[weakest]}"
 
 
 def build_compatibility(
@@ -924,7 +993,7 @@ def build_compatibility(
     mine_person = _person(mine)
     friend_person = _person(friend)
     scores = calculate_scores(mine, friend)
-    dimensions = {
+    dimensions: dict[DimensionKey, int] = {
         "distance": scores.distance,
         "conflict": scores.conflict,
         "care": scores.care,
@@ -935,7 +1004,9 @@ def build_compatibility(
     mine_profile = mine.compatibility_profile
     friend_profile = friend.compatibility_profile
     assert mine_profile is not None and friend_profile is not None
-    synergy_title, synergy_description, synergy_tag = DIMENSION_COPY[strongest]
+    synergy_description, synergy_tag = SYNERGY_COPY[
+        (strongest, _strength_band(dimensions[strongest]))
+    ]
     headline, description = compatibility_headline(scores.total)
     mine_tip = _personal_tip(mine, friend)
     friend_tip = _personal_tip(friend, mine)
@@ -947,7 +1018,7 @@ def build_compatibility(
         description=description,
         synergy=SynergyData(
             score=scores.total,
-            title=synergy_title,
+            title="케미 게이지",
             description=synergy_description,
             tags=(synergy_tag, _mbti_tag(mine_profile.mbti, friend_profile.mbti)),
         ),
