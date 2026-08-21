@@ -16,10 +16,13 @@ from pakit.domain.assessment_submission import (
 )
 from pakit.domain.characters import CHARACTERS
 from pakit.services.compatibility_service import (
+    CARE_DELIVERY_MATCH,
+    CARE_MATCH,
     COMPATIBILITY_PROFILE_VERSION,
     COMPATIBLE_FRIEND_DESCRIPTION,
     MISMATCHED_FRIEND_DESCRIPTION,
     RELATIONSHIP_ROLE_BY_ANSWERS,
+    CompatibilityScores,
     CompatibilityUnavailableError,
     build_compatibility,
     build_compatibility_profile,
@@ -27,6 +30,12 @@ from pakit.services.compatibility_service import (
     calculate_scores,
     compatibility_headline,
 )
+
+
+def test_weights_relationship_answers_at_ninety_percent_and_mbti_at_ten_percent() -> None:
+    scores = CompatibilityScores(distance=100, conflict=80, care=60, pace=40, mbti=20)
+
+    assert scores.total == 67
 
 
 def _result(
@@ -207,6 +216,161 @@ def test_distance_tip_names_the_person_whose_contact_may_slow_down() -> None:
     )
 
 
+def test_distance_detail_keeps_two_independent_people_in_the_same_type() -> None:
+    mine = _result(
+        code="mine0001",
+        nickname="박종하",
+        mbti="ENTP",
+        scores=AxisScoresData(45, 50, 50, 50),
+    )
+    friend = _result(
+        code="frnd0001",
+        nickname="이해선",
+        mbti="ENTP",
+        scores=AxisScoresData(0, 50, 50, 50),
+    )
+
+    distance = build_compatibility(mine, friend).details[0]
+
+    assert distance.description == (
+        "박종하님과 이해선님은 모두 각자의 시간을 중요하게 생각해요. 다만 "
+        "박종하님은 이해선님보다 조금 더 자주 안부를 나눌 때 관계가 편해져요."
+    )
+
+
+def test_distance_detail_keeps_two_close_people_in_the_same_type() -> None:
+    mine = _result(
+        code="mine0001",
+        nickname="지은",
+        mbti="ENTP",
+        scores=AxisScoresData(100, 50, 50, 50),
+    )
+    friend = _result(
+        code="frnd0001",
+        nickname="선우",
+        mbti="ENTP",
+        scores=AxisScoresData(55, 50, 50, 50),
+    )
+
+    distance = build_compatibility(mine, friend).details[0]
+
+    assert "모두 자주 연결될 때 관계가 편해져요" in distance.description
+    assert "선우님은 가까운 사이에서도 잠깐의 여유가 필요해요" in distance.description
+
+
+@pytest.mark.parametrize(("independent_score", "close_score"), [(48, 50), (35, 50)])
+def test_distance_detail_treats_a_cross_boundary_gap_up_to_fifteen_as_naturally_close(
+    independent_score: int,
+    close_score: int,
+) -> None:
+    mine = _result(
+        code="mine0001",
+        nickname="거리조절",
+        mbti="ENTP",
+        scores=AxisScoresData(independent_score, 50, 50, 50),
+    )
+    friend = _result(
+        code="frnd0001",
+        nickname="밀착",
+        mbti="ENTP",
+        scores=AxisScoresData(close_score, 50, 50, 50),
+    )
+
+    distance = build_compatibility(mine, friend).details[0]
+
+    assert distance.description == (
+        "원하는 간격의 차이가 크지 않아 자연스럽게 맞는 사이예요. 다만 상대적으로 "
+        "밀착님은 안부를 조금 더 자주 나누는 게 편하고, 거리조절님은 혼자 쉬는 틈이 "
+        "조금 더 필요해요."
+    )
+
+
+def test_distance_detail_explains_a_cross_boundary_gap_over_fifteen_as_needing_adjustment() -> None:
+    mine = _result(
+        code="mine0001",
+        nickname="거리조절",
+        mbti="ENTP",
+        scores=AxisScoresData(32, 50, 50, 50),
+    )
+    friend = _result(
+        code="frnd0001",
+        nickname="밀착",
+        mbti="ENTP",
+        scores=AxisScoresData(50, 50, 50, 50),
+    )
+
+    distance = build_compatibility(mine, friend).details[0]
+
+    assert distance.description == (
+        "서로 원하는 관계의 간격이 달라 조금씩 맞춰갈 필요가 있는 사이예요. 밀착님은 "
+        "자주 연락하고 함께 있을 때 안정감을 느끼고, 거리조절님은 가까운 사이에서도 혼자 "
+        "보내는 시간이 필요해요."
+    )
+
+
+@pytest.mark.parametrize(
+    ("conflict_style", "mine_expression", "friend_expression", "shared_copy"),
+    [
+        ("resolve_immediately", 100, 33, "모두 서운한 일을 바로 풀고 싶어 해요"),
+        ("hint_and_wait", 67, 0, "모두 마음을 먼저 정리할 시간이 필요해요"),
+    ],
+)
+def test_conflict_detail_explains_degree_within_the_shared_conflict_type(
+    conflict_style: str,
+    mine_expression: int,
+    friend_expression: int,
+    shared_copy: str,
+) -> None:
+    mine = _result(
+        code="mine0001",
+        nickname="지은",
+        mbti="ENTP",
+        scores=AxisScoresData(50, mine_expression, 50, 50),
+        conflict=conflict_style,
+    )
+    friend = _result(
+        code="frnd0001",
+        nickname="선우",
+        mbti="ENTP",
+        scores=AxisScoresData(50, friend_expression, 50, 50),
+        conflict=conflict_style,
+    )
+
+    conflict = build_compatibility(mine, friend).details[1]
+
+    assert shared_copy in conflict.description
+
+
+@pytest.mark.parametrize(
+    ("mine_routine", "friend_routine", "shared_copy"),
+    [
+        (33, 0, "모두 새로운 변화를 즐겨요"),
+        (100, 67, "모두 계획이 있을 때 편해요"),
+    ],
+)
+def test_pace_detail_explains_degree_within_the_shared_routine_type(
+    mine_routine: int,
+    friend_routine: int,
+    shared_copy: str,
+) -> None:
+    mine = _result(
+        code="mine0001",
+        nickname="지은",
+        mbti="ENTP",
+        scores=AxisScoresData(50, 50, mine_routine, 50),
+    )
+    friend = _result(
+        code="frnd0001",
+        nickname="선우",
+        mbti="ENTP",
+        scores=AxisScoresData(50, 50, friend_routine, 50),
+    )
+
+    pace = build_compatibility(mine, friend).details[3]
+
+    assert shared_copy in pace.description
+
+
 def test_returns_four_detailed_conversation_topics() -> None:
     mine = _result(
         code="mine0001",
@@ -236,11 +400,12 @@ def test_returns_four_detailed_conversation_topics() -> None:
     assert all(0 <= detail.score <= 100 for detail in details)
     assert all("지은" in detail.description for detail in details)
     assert all("선우" in detail.description for detail in details)
-    assert "애정의 크기보다 편한 간격" in details[0].description
+    assert "서로 원하는 관계의 간격이 달라" in details[0].description
     assert "질문은 공격이 아니고" in details[1].description
     assert details[2].title == "마음을 주고받는 방식"
     assert "같이 웃으며 분위기를 바꿀 때" in details[2].description
     assert details[3].title == "함께 움직이는 방식"
+    assert "지은님은 새로운 제안과 즉흥적인 변화가 있을 때 힘이 나요" in details[3].description
     assert "재밌는 일이 생겨야" in details[3].description
 
 
@@ -265,11 +430,12 @@ def test_summarizes_a_shared_support_need_without_repeating_each_person() -> Non
 
     care = build_compatibility(mine, friend).details[2]
 
-    assert care.label == "원하는 위로는 같아요"
+    assert care.label == "한쪽에는 바로 닿아요"
     assert care.description == (
-        "잉뿌삐님과 이해선님은 모두 이야기를 충분히 들어줄 때 마음이 풀려요. 다만 "
+        "잉뿌삐님과 이해선님은 모두 이야기를 충분히 들어줄 때 마음이 풀려요. "
         "잉뿌삐님은 말과 반응으로 마음을 보여주는 편이에요. 이해선님은 말보다 행동으로 "
-        "마음을 보여주는 편이에요. 원하는 위로는 같지만 애정이 보이는 모양은 달라요."
+        "마음을 보여주는 편이에요. 이해선님에게는 상대의 챙김이 잘 닿지만, 잉뿌삐님에게는 "
+        "원하는 위로가 바로 전달되지 않을 수 있어요."
     )
 
 
@@ -280,8 +446,125 @@ def test_recognizes_when_support_and_affection_are_both_shared() -> None:
 
     care = build_compatibility(mine, friend).details[2]
 
-    assert care.label == "위로도 표현도 닮았어요"
-    assert "서로의 챙김을 비교적 쉽게 알아보는 조합" in care.description
+    assert care.label == "서로의 챙김이 잘 닿아요"
+    assert "각자가 원하는 위로로 자연스럽게 닿아요" in care.description
+
+
+@pytest.mark.parametrize(
+    ("mine_affection", "friend_affection", "expected_label", "expected_copy"),
+    [
+        (
+            "express_with_words",
+            "express_with_words",
+            "서로의 챙김이 잘 닿아요",
+            "각자가 원하는 위로로 자연스럽게 닿아요",
+        ),
+        (
+            "express_with_actions",
+            "express_with_words",
+            "한쪽에는 바로 닿아요",
+            "지은님에게는 상대의 챙김이 잘 닿지만",
+        ),
+        (
+            "express_with_words",
+            "express_with_actions",
+            "한쪽에는 바로 닿아요",
+            "선우님에게는 상대의 챙김이 잘 닿지만",
+        ),
+        (
+            "express_with_actions",
+            "express_with_actions",
+            "챙김에 번역이 필요해요",
+            "서로 챙기고도 원하는 위로가 바로 전달되지 않을 수 있어요",
+        ),
+    ],
+)
+def test_describes_whether_care_reaches_each_person(
+    mine_affection: str,
+    friend_affection: str,
+    expected_label: str,
+    expected_copy: str,
+) -> None:
+    axes = AxisScoresData(50, 50, 50, 50)
+    mine = _result(
+        code="mine0001",
+        nickname="지은",
+        mbti="ENTP",
+        scores=axes,
+        support="listen_to_me",
+        affection=mine_affection,
+    )
+    friend = _result(
+        code="frnd0001",
+        nickname="선우",
+        mbti="ENTP",
+        scores=axes,
+        support="listen_to_me",
+        affection=friend_affection,
+    )
+
+    care = build_compatibility(mine, friend).details[2]
+
+    assert care.label == expected_label
+    assert expected_copy in care.description
+
+
+def test_covers_every_support_and_affection_pair_in_both_directions() -> None:
+    axes = AxisScoresData(50, 50, 50, 50)
+    labels_seen: set[str] = set()
+
+    for mine_support in CARE_MATCH:
+        for mine_affection in ("express_with_words", "express_with_actions"):
+            for friend_support in CARE_MATCH:
+                for friend_affection in ("express_with_words", "express_with_actions"):
+                    mine = _result(
+                        code="mine0001",
+                        nickname="지은",
+                        mbti="ENTP",
+                        scores=axes,
+                        support=mine_support,
+                        affection=mine_affection,
+                    )
+                    friend = _result(
+                        code="frnd0001",
+                        nickname="선우",
+                        mbti="ISFJ",
+                        scores=axes,
+                        support=friend_support,
+                        affection=friend_affection,
+                    )
+
+                    care = build_compatibility(mine, friend).details[2]
+                    reverse_care = build_compatibility(friend, mine).details[2]
+                    mine_receives = friend_affection in CARE_DELIVERY_MATCH[mine_support]
+                    friend_receives = mine_affection in CARE_DELIVERY_MATCH[friend_support]
+                    expected_label = (
+                        "서로의 챙김이 잘 닿아요"
+                        if mine_receives and friend_receives
+                        else "한쪽에는 바로 닿아요"
+                        if mine_receives or friend_receives
+                        else "챙김에 번역이 필요해요"
+                    )
+                    expected_score = round(
+                        (
+                            CARE_MATCH[mine_support][friend_affection]
+                            + CARE_MATCH[friend_support][mine_affection]
+                        )
+                        / 2
+                    )
+
+                    assert care.score == expected_score
+                    assert care.label == expected_label
+                    assert reverse_care.score == expected_score
+                    assert reverse_care.label == expected_label
+                    assert "지은" in care.description and "선우" in care.description
+                    labels_seen.add(care.label)
+
+    assert labels_seen == {
+        "서로의 챙김이 잘 닿아요",
+        "한쪽에는 바로 닿아요",
+        "챙김에 번역이 필요해요",
+    }
 
 
 def test_rejects_a_legacy_result_without_a_compatibility_profile() -> None:

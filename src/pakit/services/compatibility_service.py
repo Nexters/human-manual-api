@@ -248,11 +248,11 @@ class CompatibilityScores:
     @property
     def total(self) -> int:
         return round(
-            self.distance * 0.20
-            + self.conflict * 0.20
-            + self.care * 0.15
-            + self.pace * 0.15
-            + self.mbti * 0.30
+            self.distance * 0.25
+            + self.conflict * 0.25
+            + self.care * 0.20
+            + self.pace * 0.20
+            + self.mbti * 0.10
         )
 
 
@@ -290,6 +290,14 @@ CARE_MATCH: dict[str, dict[str, int]] = {
     "give_me_space": {"express_with_words": 82, "express_with_actions": 82},
     "solve_together": {"express_with_words": 75, "express_with_actions": 95},
     "make_me_laugh": {"express_with_words": 92, "express_with_actions": 76},
+}
+
+CARE_DELIVERY_MATCH = {
+    "listen_to_me": {"express_with_words"},
+    "take_me_out": {"express_with_actions"},
+    "give_me_space": {"express_with_words", "express_with_actions"},
+    "solve_together": {"express_with_actions"},
+    "make_me_laugh": {"express_with_words"},
 }
 
 ROLE_COMPLEMENTS = {
@@ -593,16 +601,42 @@ def _distance_detail(
     friend_name = friend.participant.nickname
     mine_attachment = mine.unboxing_kit.axis_scores.attachment
     friend_attachment = friend.unboxing_kit.axis_scores.attachment
-    if abs(mine_attachment - friend_attachment) <= 15:
-        if (mine_attachment + friend_attachment) / 2 >= 50:
+    attachment_gap = abs(mine_attachment - friend_attachment)
+    both_close = mine_attachment >= 50 and friend_attachment >= 50
+    both_independent = mine_attachment < 50 and friend_attachment < 50
+    if both_close:
+        if attachment_gap <= 15:
             description = (
                 f"{mine_name}님과 {friend_name}님은 모두 자주 안부를 나누고 가까이 있을 때 "
                 "관계가 단단하다고 느껴요."
             )
         else:
+            more_connected_name, more_spacious_name = (
+                (mine_name, friend_name)
+                if mine_attachment > friend_attachment
+                else (friend_name, mine_name)
+            )
+            description = (
+                f"{mine_name}님과 {friend_name}님은 모두 자주 연결될 때 관계가 편해져요. 다만 "
+                f"{more_connected_name}님은 안부를 더 자주 나누고 싶어 하고, "
+                f"{more_spacious_name}님은 가까운 사이에서도 잠깐의 여유가 필요해요."
+            )
+    elif both_independent:
+        if attachment_gap <= 15:
             description = (
                 f"{mine_name}님과 {friend_name}님은 연락이 잠시 뜸해도 각자의 시간을 "
                 "편하게 믿을 수 있어요."
+            )
+        else:
+            more_connected_name, more_independent_name = (
+                (mine_name, friend_name)
+                if mine_attachment > friend_attachment
+                else (friend_name, mine_name)
+            )
+            description = (
+                f"{mine_name}님과 {friend_name}님은 모두 각자의 시간을 중요하게 생각해요. 다만 "
+                f"{more_connected_name}님은 {more_independent_name}님보다 조금 더 자주 안부를 "
+                "나눌 때 관계가 편해져요."
             )
     else:
         closer_name, independent_name = (
@@ -610,10 +644,18 @@ def _distance_detail(
             if mine_attachment > friend_attachment
             else (friend_name, mine_name)
         )
-        description = (
-            f"{closer_name}님은 자주 연결될수록 안심하고, {independent_name}님은 각자의 시간을 "
-            "보장받을수록 편해져요. 애정의 크기보다 편한 간격이 다른 사이예요."
-        )
+        if attachment_gap <= 15:
+            description = (
+                "원하는 간격의 차이가 크지 않아 자연스럽게 맞는 사이예요. 다만 상대적으로 "
+                f"{closer_name}님은 안부를 조금 더 자주 나누는 게 편하고, {independent_name}님은 "
+                "혼자 쉬는 틈이 조금 더 필요해요."
+            )
+        else:
+            description = (
+                "서로 원하는 관계의 간격이 달라 조금씩 맞춰갈 필요가 있는 사이예요. "
+                f"{closer_name}님은 자주 연락하고 함께 있을 때 안정감을 느끼고, "
+                f"{independent_name}님은 가까운 사이에서도 혼자 보내는 시간이 필요해요."
+            )
     return CompatibilityDetailData(
         key="distance",
         score=score,
@@ -635,16 +677,43 @@ def _conflict_detail(
     mine_name = mine.participant.nickname
     friend_name = friend.participant.nickname
     if mine_profile.conflict_style == friend_profile.conflict_style:
+        mine_expression = mine.unboxing_kit.axis_scores.expression
+        friend_expression = friend.unboxing_kit.axis_scores.expression
+        expression_gap = abs(mine_expression - friend_expression)
         if mine_profile.conflict_style == "resolve_immediately":
-            description = (
-                f"{mine_name}님과 {friend_name}님은 서운한 일을 오래 묵히기보다 바로 확인해야 "
-                "마음이 풀려요. 솔직한 대신 말의 온도만 챙기면 회복이 빠른 조합이에요."
-            )
+            if expression_gap <= 15:
+                description = (
+                    f"{mine_name}님과 {friend_name}님은 서운한 일을 오래 묵히기보다 바로 확인해야 "
+                    "마음이 풀려요. 솔직한 대신 말의 온도만 챙기면 회복이 빠른 조합이에요."
+                )
+            else:
+                more_direct_name, more_deliberate_name = (
+                    (mine_name, friend_name)
+                    if mine_expression > friend_expression
+                    else (friend_name, mine_name)
+                )
+                description = (
+                    f"{mine_name}님과 {friend_name}님은 모두 서운한 일을 바로 풀고 싶어 해요. 다만 "
+                    f"{more_direct_name}님은 생각난 말을 먼저 꺼내고, {more_deliberate_name}님은 "
+                    "표현을 한 번 정리한 뒤 이야기하는 편이에요."
+                )
         else:
-            description = (
-                f"{mine_name}님과 {friend_name}님은 마음을 먼저 정리한 뒤 이야기하는 편이에요. "
-                "침묵이 길어질 때 다시 대화할 시점만 알려주면 오해가 줄어요."
-            )
+            if expression_gap <= 15:
+                description = (
+                    f"{mine_name}님과 {friend_name}님은 마음을 먼저 정리한 뒤 이야기하는 편이에요. "
+                    "침묵이 길어질 때 다시 대화할 시점만 알려주면 오해가 줄어요."
+                )
+            else:
+                earlier_name, more_deliberate_name = (
+                    (mine_name, friend_name)
+                    if mine_expression > friend_expression
+                    else (friend_name, mine_name)
+                )
+                description = (
+                    f"{mine_name}님과 {friend_name}님은 모두 마음을 먼저 정리할 시간이 필요해요. "
+                    f"다만 {earlier_name}님은 정리되면 비교적 먼저 말을 꺼내고, "
+                    f"{more_deliberate_name}님은 할 말을 충분히 고른 뒤 이야기하는 편이에요."
+                )
     else:
         direct_name, pause_name = (
             (mine_name, friend_name)
@@ -677,32 +746,48 @@ def _care_detail(
     friend_name = friend.participant.nickname
     same_support = mine_profile.support_preference == friend_profile.support_preference
     same_affection = mine_profile.affection_style == friend_profile.affection_style
+
     if same_support:
         shared_need = SUPPORT_NEED_COPY[mine_profile.support_preference]
-        if same_affection:
-            description = (
-                f"{mine_name}님과 {friend_name}님은 모두 {shared_need} 마음이 풀려요. 애정을 "
-                f"표현할 때도 둘 다 {AFFECTION_STYLE_COPY[mine_profile.affection_style]} "
-                "서로의 챙김을 비교적 쉽게 알아보는 조합이에요."
-            )
-            label = "위로도 표현도 닮았어요"
-        else:
-            description = (
-                f"{mine_name}님과 {friend_name}님은 모두 {shared_need} 마음이 풀려요. 다만 "
-                f"{mine_name}님은 {AFFECTION_STYLE_COPY[mine_profile.affection_style]} "
-                f"{friend_name}님은 {AFFECTION_STYLE_COPY[friend_profile.affection_style]} "
-                "원하는 위로는 같지만 애정이 보이는 모양은 달라요."
-            )
-            label = "원하는 위로는 같아요"
+        need_copy = f"{mine_name}님과 {friend_name}님은 모두 {shared_need} 마음이 풀려요."
     else:
-        description = (
+        need_copy = (
             f"{mine_name}님은 {SUPPORT_NEED_COPY[mine_profile.support_preference]} 마음이 풀리고, "
             f"{friend_name}님은 {SUPPORT_NEED_COPY[friend_profile.support_preference]} 마음이 "
-            f"풀려요. {mine_name}님은 {AFFECTION_STYLE_COPY[mine_profile.affection_style]} "
-            f"{friend_name}님은 {AFFECTION_STYLE_COPY[friend_profile.affection_style]} 서로 원하는 "
-            "위로를 미리 말해두면 애정이 엇갈리지 않아요."
+            "풀려요."
         )
-        label = "서로의 위로법을 알아가요"
+
+    if same_affection:
+        affection_copy = f"두 사람 모두 {AFFECTION_STYLE_COPY[mine_profile.affection_style]}"
+    else:
+        affection_copy = (
+            f"{mine_name}님은 {AFFECTION_STYLE_COPY[mine_profile.affection_style]} "
+            f"{friend_name}님은 {AFFECTION_STYLE_COPY[friend_profile.affection_style]}"
+        )
+
+    mine_receives_care = (
+        friend_profile.affection_style in CARE_DELIVERY_MATCH[mine_profile.support_preference]
+    )
+    friend_receives_care = (
+        mine_profile.affection_style in CARE_DELIVERY_MATCH[friend_profile.support_preference]
+    )
+    if mine_receives_care and friend_receives_care:
+        label = "서로의 챙김이 잘 닿아요"
+        delivery_copy = "서로 건네는 애정이 각자가 원하는 위로로 자연스럽게 닿아요."
+    elif mine_receives_care or friend_receives_care:
+        matched_name, unmatched_name = (
+            (mine_name, friend_name) if mine_receives_care else (friend_name, mine_name)
+        )
+        label = "한쪽에는 바로 닿아요"
+        delivery_copy = (
+            f"{matched_name}님에게는 상대의 챙김이 잘 닿지만, {unmatched_name}님에게는 원하는 "
+            "위로가 바로 전달되지 않을 수 있어요."
+        )
+    else:
+        label = "챙김에 번역이 필요해요"
+        delivery_copy = "서로 챙기고도 원하는 위로가 바로 전달되지 않을 수 있어요."
+
+    description = f"{need_copy} {affection_copy} {delivery_copy}"
     return CompatibilityDetailData(
         key="care",
         score=score,
@@ -723,7 +808,54 @@ def _pace_detail(
     assert mine_profile is not None and friend_profile is not None
     mine_name = mine.participant.nickname
     friend_name = friend.participant.nickname
-    description = (
+    mine_routine = mine.unboxing_kit.axis_scores.routine
+    friend_routine = friend.unboxing_kit.axis_scores.routine
+    routine_gap = abs(mine_routine - friend_routine)
+    both_routine = mine_routine >= 50 and friend_routine >= 50
+    both_exploratory = mine_routine < 50 and friend_routine < 50
+    if both_routine:
+        if routine_gap <= 15:
+            rhythm_description = (
+                f"{mine_name}님과 {friend_name}님은 모두 약속을 미리 정하고 익숙한 흐름대로 "
+                "움직일 때 편해요."
+            )
+        else:
+            more_planned_name, more_flexible_name = (
+                (mine_name, friend_name)
+                if mine_routine > friend_routine
+                else (friend_name, mine_name)
+            )
+            rhythm_description = (
+                f"{mine_name}님과 {friend_name}님은 모두 계획이 있을 때 편해요. 다만 "
+                f"{more_planned_name}님은 정해진 순서를 더 중요하게 여기고, "
+                f"{more_flexible_name}님은 계획 안에서도 약간의 변화를 받아들이는 편이에요."
+            )
+    elif both_exploratory:
+        if routine_gap <= 15:
+            rhythm_description = (
+                f"{mine_name}님과 {friend_name}님은 모두 새로운 제안과 즉흥적인 변화를 "
+                "즐기는 편이에요."
+            )
+        else:
+            more_exploratory_name, more_planned_name = (
+                (mine_name, friend_name)
+                if mine_routine < friend_routine
+                else (friend_name, mine_name)
+            )
+            rhythm_description = (
+                f"{mine_name}님과 {friend_name}님은 모두 새로운 변화를 즐겨요. 다만 "
+                f"{more_exploratory_name}님은 재미가 보이면 바로 움직이고, {more_planned_name}님은 "
+                "대략적인 흐름이 보일 때 더 편하게 함께해요."
+            )
+    else:
+        routine_name, exploratory_name = (
+            (mine_name, friend_name) if mine_routine > friend_routine else (friend_name, mine_name)
+        )
+        rhythm_description = (
+            f"{routine_name}님은 계획과 익숙한 흐름이 있을 때 편하고, {exploratory_name}님은 "
+            "새로운 제안과 즉흥적인 변화가 있을 때 힘이 나요."
+        )
+    role_description = (
         f"{mine_name}님은 관계에서 {RELATIONSHIP_ROLE_COPY[mine_profile.relationship_role]} 역할을 "
         f"맡고, {MOTIVATION_COPY[mine_profile.motivation]} 잘 움직여요. {friend_name}님은 "
         f"{RELATIONSHIP_ROLE_COPY[friend_profile.relationship_role]} 역할을 맡고, "
@@ -734,7 +866,7 @@ def _pace_detail(
         score=score,
         title="함께 움직이는 방식",
         label=_detail_label(score),
-        description=description,
+        description=f"{rhythm_description} {role_description}",
     )
 
 
