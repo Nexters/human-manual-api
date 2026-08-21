@@ -306,11 +306,6 @@ ROLE_COMPLEMENTS = {
     frozenset(("energizer", "supporter")),
 }
 
-MOTIVATION_COMPLEMENTS = {
-    frozenset(("novelty", "fun")),
-    frozenset(("people_duty", "achievement")),
-}
-
 DIMENSION_COPY = {
     "distance": (
         "편안한 거리감",
@@ -383,13 +378,6 @@ RELATIONSHIP_ROLE_COPY = {
     "energizer": "분위기를 끌어올리는",
 }
 
-MOTIVATION_COPY = {
-    "novelty": "새로운 게 보여야",
-    "fun": "재밌는 일이 생겨야",
-    "people_duty": "필요로 하는 사람이나 지킬 약속이 있어야",
-    "achievement": "끝낼 목표가 보여야",
-}
-
 
 def build_compatible_friends(mbti: MbtiType) -> tuple[CompatibleFriendData, ...]:
     recommendations = (
@@ -447,14 +435,6 @@ def _role_score(left: str, right: str) -> int:
     return 82
 
 
-def _motivation_score(left: str, right: str) -> int:
-    if left == right:
-        return 92
-    if frozenset((left, right)) in MOTIVATION_COMPLEMENTS:
-        return 95
-    return 80
-
-
 def _mbti_score(left: str, right: str) -> int:
     return 76 + sum(
         6 for left_axis, right_axis in zip(left, right, strict=True) if left_axis == right_axis
@@ -485,9 +465,8 @@ def calculate_scores(
     )
     routine_alignment = 100 - abs(mine_scores.routine - friend_scores.routine)
     pace = round(
-        routine_alignment * 0.6
-        + _role_score(mine_profile.relationship_role, friend_profile.relationship_role) * 0.2
-        + _motivation_score(mine_profile.motivation, friend_profile.motivation) * 0.2
+        routine_alignment * 0.75
+        + _role_score(mine_profile.relationship_role, friend_profile.relationship_role) * 0.25
     )
     return CompatibilityScores(
         distance=distance,
@@ -851,16 +830,37 @@ def _pace_detail(
         routine_name, exploratory_name = (
             (mine_name, friend_name) if mine_routine > friend_routine else (friend_name, mine_name)
         )
-        rhythm_description = (
-            f"{routine_name}님은 계획과 익숙한 흐름이 있을 때 편하고, {exploratory_name}님은 "
-            "새로운 제안과 즉흥적인 변화가 있을 때 힘이 나요."
+        if routine_gap <= 15:
+            rhythm_description = (
+                "선호하는 방식은 조금 다르지만 실제 속도 차이는 크지 않아 자연스럽게 맞출 수 "
+                f"있어요. {routine_name}님은 익숙한 흐름이 조금 더 편하고, "
+                f"{exploratory_name}님은 새로운 변화를 조금 더 즐기는 편이에요."
+            )
+        else:
+            rhythm_description = (
+                f"{routine_name}님은 계획과 익숙한 흐름이 있을 때 편하고, {exploratory_name}님은 "
+                "새로운 제안과 즉흥적인 변화가 있을 때 힘이 나요."
+            )
+    mine_role = mine_profile.relationship_role
+    friend_role = friend_profile.relationship_role
+    if mine_role == friend_role:
+        role_description = (
+            f"{mine_name}님과 {friend_name}님은 모두 관계에서 "
+            f"{RELATIONSHIP_ROLE_COPY[mine_role]} 역할에 먼저 손이 가는 편이에요. 서로 할 일을 "
+            "나누면 더 편하게 움직일 수 있어요."
         )
-    role_description = (
-        f"{mine_name}님은 관계에서 {RELATIONSHIP_ROLE_COPY[mine_profile.relationship_role]} 역할을 "
-        f"맡고, {MOTIVATION_COPY[mine_profile.motivation]} 잘 움직여요. {friend_name}님은 "
-        f"{RELATIONSHIP_ROLE_COPY[friend_profile.relationship_role]} 역할을 맡고, "
-        f"{MOTIVATION_COPY[friend_profile.motivation]} 힘이 나요."
-    )
+    elif frozenset((mine_role, friend_role)) in ROLE_COMPLEMENTS:
+        role_description = (
+            f"{mine_name}님은 관계에서 {RELATIONSHIP_ROLE_COPY[mine_role]} 역할을 맡고, "
+            f"{friend_name}님은 {RELATIONSHIP_ROLE_COPY[friend_role]} 역할을 맡아 함께할 때 역할이 "
+            "자연스럽게 나뉘어요."
+        )
+    else:
+        role_description = (
+            f"{mine_name}님은 관계에서 {RELATIONSHIP_ROLE_COPY[mine_role]} 역할을 맡고, "
+            f"{friend_name}님은 {RELATIONSHIP_ROLE_COPY[friend_role]} 역할을 맡는 편이에요. 서로 "
+            "잘하는 일을 미리 나누면 함께 움직이기 편해요."
+        )
     return CompatibilityDetailData(
         key="pace",
         score=score,

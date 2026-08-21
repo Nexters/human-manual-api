@@ -114,6 +114,12 @@ def test_result_map_includes_copy_from_every_section() -> None:
         "서로 챙기고도 원하는 위로가 바로 전달되지 않을 수 있어요",
         "둘 다 탐험 (0~49)",  # 궁합 상세 · 함께 움직임 같은 구간
         "박종하님과 이해선님은 모두 새로운 변화를 즐겨요",
+        "04 함께 움직임 · routine \N{MULTIPLICATION SIGN} 관계 역할",
+        "routine 유사도 75%",
+        "관계 역할 25%",
+        "함께할 때 역할이 자연스럽게 나뉘어요",
+        "최종 점수 구간이 아니라 routine 상세 문장을",
+        "선호하는 방식은 조금 다르지만 실제 속도 차이는 크지 않아",
         "15점 이하와 초과로 나누어 설명",  # 궁합 상세 · 거리감 경계
     ]
     for phrase in expected:

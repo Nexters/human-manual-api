@@ -371,6 +371,101 @@ def test_pace_detail_explains_degree_within_the_shared_routine_type(
     assert shared_copy in pace.description
 
 
+@pytest.mark.parametrize(
+    ("mine_routine", "friend_routine", "expected_copy"),
+    [
+        (35, 50, "실제 속도 차이는 크지 않아 자연스럽게 맞출 수 있어요"),
+        (34, 50, "계획과 익숙한 흐름이 있을 때 편하고"),
+    ],
+)
+def test_pace_detail_uses_the_fifteen_point_boundary_across_routine_types(
+    mine_routine: int,
+    friend_routine: int,
+    expected_copy: str,
+) -> None:
+    mine = _result(
+        code="mine0001",
+        nickname="지은",
+        mbti="ENTP",
+        scores=AxisScoresData(50, 50, mine_routine, 50),
+    )
+    friend = _result(
+        code="frnd0001",
+        nickname="선우",
+        mbti="ENTP",
+        scores=AxisScoresData(50, 50, friend_routine, 50),
+    )
+
+    pace = build_compatibility(mine, friend).details[3]
+
+    assert expected_copy in pace.description
+
+
+@pytest.mark.parametrize(
+    ("mine_role", "friend_role", "expected_copy"),
+    [
+        ("guide", "guide", "모두 관계에서 방향을 잡는 역할에 먼저 손이 가는 편이에요"),
+        ("guide", "supporter", "함께할 때 역할이 자연스럽게 나뉘어요"),
+        ("guide", "energizer", "잘하는 일을 미리 나누면 함께 움직이기 편해요"),
+    ],
+)
+def test_pace_detail_describes_each_relationship_role_pair(
+    mine_role: str,
+    friend_role: str,
+    expected_copy: str,
+) -> None:
+    axes = AxisScoresData(50, 50, 50, 50)
+    mine = _result(
+        code="mine0001",
+        nickname="지은",
+        mbti="ENTP",
+        scores=axes,
+        role=mine_role,
+    )
+    friend = _result(
+        code="frnd0001",
+        nickname="선우",
+        mbti="ENTP",
+        scores=axes,
+        role=friend_role,
+    )
+
+    pace = build_compatibility(mine, friend).details[3]
+
+    assert expected_copy in pace.description
+
+
+def test_pace_score_uses_routine_and_relationship_role_only() -> None:
+    axes = AxisScoresData(50, 50, 50, 50)
+    mine = _result(
+        code="mine0001",
+        nickname="지은",
+        mbti="ENTP",
+        scores=axes,
+        role="guide",
+        motivation="fun",
+    )
+    friend = _result(
+        code="frnd0001",
+        nickname="선우",
+        mbti="ENTP",
+        scores=axes,
+        role="supporter",
+        motivation="achievement",
+    )
+    friend_with_other_motivation = _result(
+        code="frnd0002",
+        nickname="선우",
+        mbti="ENTP",
+        scores=axes,
+        role="supporter",
+        motivation="novelty",
+    )
+
+    assert calculate_scores(mine, friend).pace == 99
+    assert calculate_scores(mine, friend_with_other_motivation).pace == 99
+
+
 def test_returns_four_detailed_conversation_topics() -> None:
     mine = _result(
         code="mine0001",
@@ -406,7 +501,8 @@ def test_returns_four_detailed_conversation_topics() -> None:
     assert "같이 웃으며 분위기를 바꿀 때" in details[2].description
     assert details[3].title == "함께 움직이는 방식"
     assert "지은님은 새로운 제안과 즉흥적인 변화가 있을 때 힘이 나요" in details[3].description
-    assert "재밌는 일이 생겨야" in details[3].description
+    assert "함께할 때 역할이 자연스럽게 나뉘어요" in details[3].description
+    assert "재밌는 일이 생겨야" not in details[3].description
 
 
 def test_summarizes_a_shared_support_need_without_repeating_each_person() -> None:
