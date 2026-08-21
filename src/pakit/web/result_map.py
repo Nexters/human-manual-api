@@ -181,7 +181,9 @@ def val(value: str) -> str:
     return f'<span class="val">{esc(value)}</span>'
 
 
-def section(sid: str, kicker: str, title: str, inputs: str, count: str, body: str, note: str = "") -> str:
+def section(
+    sid: str, kicker: str, title: str, inputs: str, count: str, body: str, note: str = ""
+) -> str:
     note_html = f'<p class="note">{note}</p>' if note else ""
     return f"""
 <section id="{sid}" class="card">
@@ -207,7 +209,7 @@ def table(headers: Sequence[str], rows: Sequence[Sequence[str]], cls: str = "spe
     return (
         f'<div class="table-wrap"><table class="{cls}">'
         f"<thead><tr>{head}</tr></thead>"
-        f'<tbody>{"".join(body_rows)}</tbody></table></div>'
+        f"<tbody>{''.join(body_rows)}</tbody></table></div>"
     )
 
 
@@ -228,11 +230,15 @@ def _build_sections() -> list[tuple[str, str, str, str, str, str]]:
         )
     axis_table = table(["축", "양극 (내부점수)", "판정 질문 3개", "분류 규칙"], axis_rows)
 
-    a_rows = [[code_chip(c), esc(n), f"표현 {esc(p1)}", f"애착 {esc(p2)}"]
-              for c, (p1, p2, n) in A_CODES.items()]
+    a_rows = [
+        [code_chip(c), esc(n), f"표현 {esc(p1)}", f"애착 {esc(p2)}"]
+        for c, (p1, p2, n) in A_CODES.items()
+    ]
     a_table = table(["코드", "포장 상자", "표현방식", "애착유형"], a_rows)
-    b_rows = [[code_chip(c), esc(n), f"자극 {esc(p1)}", f"에겐테토 {esc(p2)}"]
-              for c, (p1, p2, n) in B_CODES.items()]
+    b_rows = [
+        [code_chip(c), esc(n), f"자극 {esc(p1)}", f"에겐테토 {esc(p2)}"]
+        for c, (p1, p2, n) in B_CODES.items()
+    ]
     b_table = table(["코드", "개봉 도구", "자극추구", "에겐테토"], b_rows)
 
     legend_body = f"""
@@ -257,7 +263,7 @@ def _build_sections() -> list[tuple[str, str, str, str, str, str]]:
     adj_matrix = (
         '<div class="table-wrap"><table class="spec matrix">'
         f'<thead><tr><th class="corner">형용사 A×B</th>{adj_head}</tr></thead>'
-        f'<tbody>{"".join(adj_body)}</tbody></table></div>'
+        f"<tbody>{''.join(adj_body)}</tbody></table></div>"
     )
     noun_table = table(["MBTI", "명사(캐릭터)"], [[code_chip(m.value), esc(noun(m))] for m in MBTI])
     rarity_table = table(
@@ -327,7 +333,9 @@ def _build_sections() -> list[tuple[str, str, str, str, str, str]]:
     for a in A_CODES:
         for b in B_CODES:
             c = rc.COMBINATION_COPY[(a, b)]
-            combo_rows.append([f"{code_chip(a)}{code_chip(b)}", f"<b>{esc(c.title)}</b>", esc(c.description)])
+            combo_rows.append(
+                [f"{code_chip(a)}{code_chip(b)}", f"<b>{esc(c.title)}</b>", esc(c.description)]
+            )
     combo_table = table(["코드", "조합 제목", "설명"], combo_rows)
 
     def unboxing_cards(copy_map: Mapping[str, UnboxingItemCopy], codes: Sequence[str]) -> str:
@@ -365,8 +373,10 @@ A×B 조합 제목·설명은 기존 결과 스냅샷 복원용 내부 데이터
     # ── 3. 핵심 특징 (4슬롯) ─────────────────────────────────────────────
     mot_title_table = table(
         ["value", "제목", "step1.q11 선택지"],
-        [[val(k), f"<b>{esc(v.title)}</b>", esc(CHOICE["step1.q11"][k])]
-         for k, v in rc.MOTIVATION_COPY.items()],
+        [
+            [val(k), f"<b>{esc(v.title)}</b>", esc(CHOICE["step1.q11"][k])]
+            for k, v in rc.MOTIVATION_COPY.items()
+        ],
     )
     mot_desc_rows = []
     for k in rc.MOTIVATION_COPY:
@@ -378,7 +388,9 @@ A×B 조합 제목·설명은 기존 결과 스냅샷 복원용 내부 데이터
     for q1 in CHOICE["step1.q01"]:
         for q2 in CHOICE["step1.q02"]:
             fc = rc.RELATIONSHIP_ROLE_COPY[(q1, q2)]
-            rel_rows.append([f"{val(q1)} × {val(q2)}", f"<b>{esc(fc.title)}</b>", esc(fc.description)])
+            rel_rows.append(
+                [f"{val(q1)} × {val(q2)}", f"<b>{esc(fc.title)}</b>", esc(fc.description)]
+            )
     rel_table = table(["q01(상황) × q02(역할)", "제목", "설명"], rel_rows)
 
     emo_label = {
@@ -387,15 +399,26 @@ A×B 조합 제목·설명은 기존 결과 스냅샷 복원용 내부 데이터
         ("explore", "egen"): "탐색 · 에겐",
         ("explore", "teto"): "탐색 · 테토",
     }
-    emo_rows = [[esc(lab), f"<b>{esc(rc.EMOTIONAL_PROCESSING_COPY[key].title)}</b>",
-                 esc(rc.EMOTIONAL_PROCESSING_COPY[key].description)]
-                for key, lab in emo_label.items()]
+    emo_rows = [
+        [
+            esc(lab),
+            f"<b>{esc(rc.EMOTIONAL_PROCESSING_COPY[key].title)}</b>",
+            esc(rc.EMOTIONAL_PROCESSING_COPY[key].description),
+        ]
+        for key, lab in emo_label.items()
+    ]
     emo_table = table(["표현축 × 에겐테토축", "제목", "설명"], emo_rows)
 
     str_table = table(
         ["MBTI", "제목", "설명"],
-        [[code_chip(m.value), f"<b>{esc(rc.MBTI_STRENGTH_COPY[m].title)}</b>",
-          esc(rc.MBTI_STRENGTH_COPY[m].description)] for m in MBTI],
+        [
+            [
+                code_chip(m.value),
+                f"<b>{esc(rc.MBTI_STRENGTH_COPY[m].title)}</b>",
+                esc(rc.MBTI_STRENGTH_COPY[m].description),
+            ]
+            for m in MBTI
+        ],
     )
     features_body = f"""
 <p class="lead">항상 <b>동원력 · 관계 속의 나 · 마음 정리법 · 타고난 무기</b> 4개를 이 순서로 반환하며,
@@ -420,8 +443,15 @@ A×B 조합 제목·설명은 기존 결과 스냅샷 복원용 내부 데이터
     # ── 4. 캐릭터 소개 ───────────────────────────────────────────────────
     story_table = table(
         ["MBTI", "명사", "소제목", "스토리"],
-        [[code_chip(m.value), esc(noun(m)), f"<b>{esc(rc.CHARACTER_STORY_COPY[m].title)}</b>",
-          esc(rc.CHARACTER_STORY_COPY[m].description)] for m in MBTI],
+        [
+            [
+                code_chip(m.value),
+                esc(noun(m)),
+                f"<b>{esc(rc.CHARACTER_STORY_COPY[m].title)}</b>",
+                esc(rc.CHARACTER_STORY_COPY[m].description),
+            ]
+            for m in MBTI
+        ],
     )
     sections.append(
         (
@@ -533,8 +563,10 @@ A×B 조합 제목·설명은 기존 결과 스냅샷 복원용 내부 데이터
     )
     anger_table = table(
         ["step1.q06", "선택지", "문구"],
-        [[val(k), esc(CHOICE["step1.q06"][k]), esc(rc.ANGER_TRIGGER_WARNING_COPY[k])]
-         for k in CHOICE["step1.q06"]],
+        [
+            [val(k), esc(CHOICE["step1.q06"][k]), esc(rc.ANGER_TRIGGER_WARNING_COPY[k])]
+            for k in CHOICE["step1.q06"]
+        ],
     )
     mbti_trigger_table = table(
         ["MBTI", "문구"],
@@ -563,18 +595,34 @@ Q06은 사용자가 고른 걸 그대로, 첫 슬롯은 MBTI T/F×표현방식, 
     # ── 7. 충전 방법 ─────────────────────────────────────────────────────
     clause_table = table(
         ["step1.q07", "선택지", "메커니즘", "첫 문장"],
-        [[val(k), esc(CHOICE["step1.q07"][k]), esc(ch.BASE_CHARGING_MECHANISM[k]),
-          esc(ch.BASE_CHARGING_CLAUSE[k])]
-         for k in ch.BASE_CHARGING_CLAUSE],
+        [
+            [
+                val(k),
+                esc(CHOICE["step1.q07"][k]),
+                esc(ch.BASE_CHARGING_MECHANISM[k]),
+                esc(ch.BASE_CHARGING_CLAUSE[k]),
+            ]
+            for k in ch.BASE_CHARGING_CLAUSE
+        ],
     )
     trigger_table = table(
         ["step1.q11", "선택지", "두 번째 문장"],
-        [[val(k), esc(CHOICE["step1.q11"][k]), esc(ch.MOTIVATION_TRIGGER_DESCRIPTION[k])]
-         for k in ch.MOTIVATION_TRIGGER_DESCRIPTION],
+        [
+            [val(k), esc(CHOICE["step1.q11"][k]), esc(ch.MOTIVATION_TRIGGER_DESCRIPTION[k])]
+            for k in ch.MOTIVATION_TRIGGER_DESCRIPTION
+        ],
     )
-    kw1 = table(["step1.q07", "키워드"], [[val(k), esc(v)] for k, v in ch.BASE_CHARGING_KEYWORD.items()])
-    kw2 = table(["step1.q08", "키워드"], [[val(k), esc(v)] for k, v in ch.EMERGENCY_CHARGING_KEYWORD.items()])
-    kw3 = table(["MBTI", "키워드"], [[code_chip(k.value), esc(v)] for k, v in ch.MBTI_CHARGING_KEYWORD.items()])
+    kw1 = table(
+        ["step1.q07", "키워드"], [[val(k), esc(v)] for k, v in ch.BASE_CHARGING_KEYWORD.items()]
+    )
+    kw2 = table(
+        ["step1.q08", "키워드"],
+        [[val(k), esc(v)] for k, v in ch.EMERGENCY_CHARGING_KEYWORD.items()],
+    )
+    kw3 = table(
+        ["MBTI", "키워드"],
+        [[code_chip(k.value), esc(v)] for k, v in ch.MBTI_CHARGING_KEYWORD.items()],
+    )
     charge_body = f"""
 <p class="lead">메인 설명 = <b>[Q07 첫 문장] + [Q11 두 번째 문장]</b> → 6 × 6 = 36가지.
 키워드 3개는 Q07·Q08·MBTI에서 각각 만들어요. 충전 점수는 API에서 반환하지 않아요.</p>
@@ -636,18 +684,22 @@ Q06은 사용자가 고른 걸 그대로, 첫 슬롯은 MBTI T/F×표현방식, 
     # ── 9. 궁합 결과 (두 사람) ───────────────────────────────────────────
     head_table = table(
         ["총점 구간", "헤드라인", "설명"],
-        [[f"{lo}점~", f"<b>{esc(t)}</b>", esc(d)]
-         for lo, (t, d) in [
-             (88, cs.compatibility_headline(90)),
-             (76, cs.compatibility_headline(80)),
-             (64, cs.compatibility_headline(70)),
-             (0, cs.compatibility_headline(50)),
-         ]],
+        [
+            [f"{lo}점~", f"<b>{esc(t)}</b>", esc(d)]
+            for lo, (t, d) in [
+                (88, cs.compatibility_headline(90)),
+                (76, cs.compatibility_headline(80)),
+                (64, cs.compatibility_headline(70)),
+                (0, cs.compatibility_headline(50)),
+            ]
+        ],
     )
     dim_rows = []
     for key in ["distance", "conflict", "care", "pace"]:
         title, desc, _short = cs.DIMENSION_COPY[key]
-        dim_rows.append([val(key), f"<b>{esc(title)}</b>", esc(desc), esc(cs.RELATIONSHIP_STRENGTH_COPY[key])])
+        dim_rows.append(
+            [val(key), f"<b>{esc(title)}</b>", esc(desc), esc(cs.RELATIONSHIP_STRENGTH_COPY[key])]
+        )
     dim_table = table(["항목", "이름", "설명", "강점 문구"], dim_rows)
     score_table = table(
         ["점수", "계산식", "총점 비중"],
@@ -859,19 +911,27 @@ Q06은 사용자가 고른 걸 그대로, 첫 슬롯은 MBTI T/F×표현방식, 
             ],
         ],
     )
-    play_tip_table = table(
-        ["나 → 상대", "실제 맞춤 팁"],
+    tip_axis_labels = {
+        "attachment": ("애착유형", "거리조절", "밀착"),
+        "expression": ("표현방식", "탐색", "직진"),
+        "routine": ("자극추구", "탐험", "루틴"),
+        "egen": ("에겐테토", "테토", "에겐"),
+    }
+    extreme_tip_table = table(
+        ["선택 축", "나 → 상대", "실제 맞춤 팁"],
         [
             [
-                f"{mine_style[0]}·{'탐험' if mine_style[1] == 'explore' else '루틴'} → "
-                f"{friend_style[0]}·{'탐험' if friend_style[1] == 'explore' else '루틴'}",
+                tip_axis_labels[axis][0],
+                f"{tip_axis_labels[axis][1 if mine_pole == 'low' else 2]} → "
+                f"{tip_axis_labels[axis][1 if friend_pole == 'low' else 2]}",
                 esc(copy),
             ]
-            for (mine_style, friend_style), copy in cs.PLAY_STYLE_TIP_COPY.items()
+            for (axis, mine_pole, friend_pole), copy in cs.EXTREME_AXIS_TIP_COPY.items()
         ],
     )
-    habit_table = table(["항목", "관계 습관 팁"], [[val(k), esc(v)] for k, v in cs.RELATIONSHIP_HABIT_COPY.items()])
-    tip_table = table(["상대 support_preference", "맞춤 팁"], [[val(k), esc(v)] for k, v in cs.SUPPORT_TIPS.items()])
+    habit_table = table(
+        ["항목", "관계 습관 팁"], [[val(k), esc(v)] for k, v in cs.RELATIONSHIP_HABIT_COPY.items()]
+    )
     compat_body = f"""
 <p class="lead">두 사람 결과를 비교해 5개 점수(거리감·대화복구력·챙김·함께 놀기·MBTI)를 가중합해요.
 <span class="val">총점 = 거리 .25 + 갈등 .25 + 챙김 .20 + 함께 놀기 .20 + MBTI .10</span>.
@@ -894,12 +954,16 @@ Q06은 사용자가 고른 걸 그대로, 첫 슬롯은 MBTI T/F×표현방식, 
   한 방향의 전달 점수를 구해요. 두 사람의 방향을 각각 계산한 뒤 평균을 챙김 점수로 사용해요.</p>
   <h4>한 방향 판정표</h4>{care_match_table}
   <h4>양방향 실제 문구</h4>{care_case_table}</div>
-  <div><h4>04 함께 노는 방식 · routine × E/I</h4>{pace_case_table}
-  <h4>함께 있을 때 맞춤 팁 · 나 × 상대 16방향</h4>{play_tip_table}</div>
+  <div><h4>04 함께 노는 방식 · routine × E/I</h4>{pace_case_table}</div>
 </div>
+<h4>함께 있을 때 맞춤 팁 · 상대의 극단 축 4개 × 방향 4개</h4>
+<p class="lead">각 카드마다 상대 점수에서 <span class="val">|점수 − 50|</span>가 가장 큰 축을
+고릅니다. 동률이면 두 사람의 점수 차이가 더 큰 축, 그래도 같으면
+<span class="val">애착 → 표현 → 루틴 → 에겐테토</span> 순으로 선택해요. 선택된 축의
+<span class="val">나의 방향 × 상대의 방향</span>에 해당하는 실제 팁을 내려줘요.</p>
+{extreme_tip_table}
 <div class="two-col">
   <div><h4>관계 습관 팁 · 4</h4>{habit_table}</div>
-  <div><h4>약한 항목별 맞춤 팁 (support 기준) · 5</h4>{tip_table}</div>
 </div>"""
     sections.append(
         (
@@ -908,8 +972,8 @@ Q06은 사용자가 고른 걸 그대로, 첫 슬롯은 MBTI T/F×표현방식, 
             "궁합 (compatibility)",
             f"{qchip('step1.q12')}"
             f"{qchip('step2.q02')}{qchip('step2.q08')}{axchip('att')}{axchip('expr')}"
-            f"{axchip('rout')}{mbtichip()}",
-            "구간 4 · 항목 4 · 상세 분기 26 · 팁 4+5+16",
+            f"{axchip('rout')}{axchip('egen')}{mbtichip()}",
+            "구간 4 · 항목 4 · 상세 분기 26 · 팁 4+16",
             compat_body,
         )
     )

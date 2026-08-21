@@ -341,52 +341,53 @@ RELATIONSHIP_HABIT_COPY = {
     "pace": ("새로운 곳과 익숙한 곳, 북적이는 자리와 조용한 시간을 번갈아 고르면 더 즐거워져요."),
 }
 
-SUPPORT_TIPS = {
-    "listen_to_me": "해결책부터 꺼내기보다 이야기를 끝까지 들어주면 마음이 먼저 풀려요.",
-    "take_me_out": "기분이 가라앉을 때는 밖으로 불러내 함께 움직여주면 금방 살아나요.",
-    "give_me_space": "바로 답을 재촉하지 않고 혼자 정리할 시간을 주면 다시 편하게 돌아와요.",
-    "solve_together": "공감만 하고 끝내기보다 지금 할 수 있는 일을 함께 찾으면 든든해해요.",
-    "make_me_laugh": "분위기가 무거워질 때 취향 맞는 웃음을 건네면 마음의 문이 빨리 열려요.",
-}
+AxisKey = Literal["attachment", "expression", "routine", "egen"]
+AxisPole = Literal["low", "high"]
 
-PLAY_STYLE_TIP_COPY = {
-    (("E", "explore"), ("E", "explore")): (
-        "둘 다 새로운 곳을 좋아하니, 다음에 가볼 장소를 번갈아 하나씩 골라보세요!"
+TIP_AXIS_PRIORITY: tuple[AxisKey, ...] = ("attachment", "expression", "routine", "egen")
+
+EXTREME_AXIS_TIP_COPY: dict[tuple[AxisKey, AxisPole, AxisPole], str] = {
+    ("attachment", "low", "low"): (
+        "서로 혼자 쉬는 시간이 필요한 사이니, 연락이 뜸한 순간도 편하게 기다려주세요!"
     ),
-    (("E", "explore"), ("E", "routine")): ("가끔은 상대가 좋아하는 단골 코스를 함께 따라가보세요!"),
-    (("E", "explore"), ("I", "explore")): (
-        "가끔은 북적임을 벗어나, 둘만 조용히 놀 수 있는 곳으로 데려가보세요!"
+    ("attachment", "low", "high"): (
+        "혼자 있고 싶은 날에도 짧게 안부를 남겨 상대가 안심할 틈을 주세요!"
     ),
-    (("E", "explore"), ("I", "routine")): (
-        "가끔은 상대가 좋아하는 단골 코스에서 둘만 조용히 보내보세요!"
+    ("attachment", "high", "low"): (
+        "연락이 뜸한 순간을 마음이 멀어진 신호로 단정하지 말고, 혼자 쉴 시간을 주세요!"
     ),
-    (("E", "routine"), ("E", "explore")): ("가끔은 새로운 곳을 골라 상대를 데려가보세요!"),
-    (("E", "routine"), ("E", "routine")): (
-        "둘 다 익숙한 곳을 좋아하니, 함께 자주 갈 단골 코스를 하나 더 만들어보세요!"
+    ("attachment", "high", "high"): (
+        "서로 자주 연결될수록 편한 사이니, 먼저 안부를 건네는 걸 아끼지 마세요!"
     ),
-    (("E", "routine"), ("I", "explore")): ("가끔은 둘이 조용히 둘러볼 새로운 곳으로 데려가보세요!"),
-    (("E", "routine"), ("I", "routine")): (
-        "가끔은 북적임을 벗어나, 둘만 조용히 놀 수 있는 곳으로 데려가보세요!"
+    ("expression", "low", "low"): (
+        "둘 다 생각을 정리한 뒤 말하는 편이니, 대답을 서두르지 말고 기다려주세요!"
     ),
-    (("I", "explore"), ("E", "explore")): (
-        "가보고 싶은 새로운 곳이 생기면 먼저 연락해 같이 가자고 해보세요!"
+    ("expression", "low", "high"): (
+        "상대가 바로 꺼낸 말을 재촉으로 받아들이기보다, 답할 시간을 먼저 알려주세요!"
     ),
-    (("I", "explore"), ("E", "routine")): (
-        "상대가 좋아하는 단골 코스가 생각나면 먼저 연락해 약속을 잡아보세요!"
+    ("expression", "high", "low"): (
+        "바로 답을 듣고 싶어도 상대가 생각을 정리해 말할 시간을 조금 주세요!"
     ),
-    (("I", "explore"), ("I", "explore")): (
-        "둘 다 새로운 경험을 좋아하니, 함께 궁금했던 곳을 하나씩 골라 가보세요!"
+    ("expression", "high", "high"): (
+        "둘 다 바로 말하는 편이니, 결론보다 말의 온도를 한 번 더 챙겨주세요!"
     ),
-    (("I", "explore"), ("I", "routine")): ("가끔은 상대가 좋아하는 단골 코스를 함께 따라가보세요!"),
-    (("I", "routine"), ("E", "explore")): (
+    ("routine", "low", "low"): (
+        "둘 다 새로운 경험을 좋아하니, 다음에 가볼 곳을 번갈아 하나씩 골라보세요!"
+    ),
+    ("routine", "low", "high"): ("가끔은 상대가 좋아하는 단골 코스를 함께 따라가보세요!"),
+    ("routine", "high", "low"): (
         "가끔은 상대가 가보고 싶어 한 새로운 곳으로 먼저 연락해 불러내보세요!"
     ),
-    (("I", "routine"), ("E", "routine")): (
-        "상대가 자주 가는 편한 곳에서 만나자고 먼저 연락해보세요!"
+    ("routine", "high", "high"): (
+        "둘 다 익숙한 곳을 좋아하니, 함께 자주 갈 단골 코스를 하나 더 만들어보세요!"
     ),
-    (("I", "routine"), ("I", "explore")): ("가끔은 새로운 곳을 골라 상대를 데려가보세요!"),
-    (("I", "routine"), ("I", "routine")): (
-        "둘 다 익숙하고 조용한 시간을 좋아하니, 편한 단골 코스를 마음껏 즐겨보세요!"
+    ("egen", "low", "low"): (
+        "둘 다 편하게 툭 말하는 사이여도, 중요한 순간에는 말의 온도를 한 번 더 챙겨주세요!"
+    ),
+    ("egen", "low", "high"): ("솔직하게 말할 때도 표현을 한 번 부드럽게 다듬어 건네보세요!"),
+    ("egen", "high", "low"): ("상대의 무뚝뚝한 표현보다 직접 챙겨주는 행동을 먼저 봐주세요!"),
+    ("egen", "high", "high"): (
+        "서로 마음을 살피느라 원하는 걸 숨기지 말고, 필요한 건 편하게 말해주세요!"
     ),
 }
 
@@ -526,30 +527,6 @@ def _mbti_tag(left: str, right: str) -> str:
     return "상상과 현실의 조합"
 
 
-def _distance_tip(target: SubmissionResultData, other: SubmissionResultData) -> str:
-    target_attachment = target.unboxing_kit.axis_scores.attachment
-    other_attachment = other.unboxing_kit.axis_scores.attachment
-    assert other.participant is not None
-    if target_attachment > other_attachment:
-        return (
-            f"{other.participant.nickname}님이 연락이 뜸한 순간을 마음이 멀어진 신호로 "
-            "단정하지 않으면 훨씬 편해져요."
-        )
-    return (
-        f"혼자만의 시간이 필요해도 {other.participant.nickname}님에게 짧게 안부를 남기면 "
-        "관계를 더 편하게 믿을 수 있어요."
-    )
-
-
-def _conflict_tip(target: SubmissionResultData, other: SubmissionResultData) -> str:
-    profile = target.compatibility_profile
-    other_profile = other.compatibility_profile
-    assert profile is not None and other_profile is not None
-    if profile.conflict_style == "resolve_immediately":
-        return "바로 풀고 싶어도 상대가 생각을 정리할 시간을 조금 주면 대화가 덜 엇갈려요."
-    return "혼자 정리하는 동안 다시 이야기할 시간을 먼저 알려주면 상대가 답답해하지 않아요."
-
-
 def _play_style(
     result: SubmissionResultData,
 ) -> tuple[Literal["E", "I"], Literal["explore", "routine"]]:
@@ -562,24 +539,36 @@ def _play_style(
     return energy, novelty
 
 
-def _pace_tip(target: SubmissionResultData, other: SubmissionResultData) -> str:
-    return PLAY_STYLE_TIP_COPY[(_play_style(target), _play_style(other))]
+def _axis_score(result: SubmissionResultData, axis: AxisKey) -> int:
+    scores = result.unboxing_kit.axis_scores
+    return {
+        "attachment": scores.attachment,
+        "expression": scores.expression,
+        "routine": scores.routine,
+        "egen": scores.egen,
+    }[axis]
 
 
-def _tip_for(
-    weakest: str,
+def _axis_pole(result: SubmissionResultData, axis: AxisKey) -> AxisPole:
+    return "high" if _axis_score(result, axis) >= 50 else "low"
+
+
+def _most_extreme_axis(
     target: SubmissionResultData,
     other: SubmissionResultData,
-) -> str:
-    if weakest == "distance":
-        return _distance_tip(target, other)
-    if weakest == "conflict":
-        return _conflict_tip(target, other)
-    if weakest == "pace":
-        return _pace_tip(target, other)
-    other_profile = other.compatibility_profile
-    assert other_profile is not None
-    return SUPPORT_TIPS[other_profile.support_preference]
+) -> AxisKey:
+    return max(
+        TIP_AXIS_PRIORITY,
+        key=lambda axis: (
+            abs(_axis_score(other, axis) - 50),
+            abs(_axis_score(target, axis) - _axis_score(other, axis)),
+        ),
+    )
+
+
+def _personal_tip(target: SubmissionResultData, other: SubmissionResultData) -> str:
+    axis = _most_extreme_axis(target, other)
+    return EXTREME_AXIS_TIP_COPY[(axis, _axis_pole(target, axis), _axis_pole(other, axis))]
 
 
 def _detail_label(score: int) -> str:
@@ -948,8 +937,8 @@ def build_compatibility(
     assert mine_profile is not None and friend_profile is not None
     synergy_title, synergy_description, synergy_tag = DIMENSION_COPY[strongest]
     headline, description = compatibility_headline(scores.total)
-    mine_tip = _tip_for(weakest, mine, friend)
-    friend_tip = _tip_for(weakest, friend, mine)
+    mine_tip = _personal_tip(mine, friend)
+    friend_tip = _personal_tip(friend, mine)
 
     return CompatibilityData(
         mine=mine_person,

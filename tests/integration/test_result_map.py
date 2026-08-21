@@ -119,10 +119,15 @@ def test_result_map_includes_copy_from_every_section() -> None:
         "04 함께 노는 방식 · routine \N{MULTIPLICATION SIGN} E/I",
         "routine 유사도 \N{MULTIPLICATION SIGN} .80 + E/I 적합도 \N{MULTIPLICATION SIGN} .20",
         "새로움에 대한 취향 차이가 크지 않아요",
-        "함께 있을 때 맞춤 팁 · 나 \N{MULTIPLICATION SIGN} 상대 16방향",
-        "E·탐험 → I·루틴",
-        "가끔은 상대가 좋아하는 단골 코스에서 둘만 조용히 보내보세요!",
-        "상대가 자주 가는 편한 곳에서 만나자고 먼저 연락해보세요!",
+        "함께 있을 때 맞춤 팁 · 상대의 극단 축 4개 \N{MULTIPLICATION SIGN} 방향 4개",
+        "|점수 \N{MINUS SIGN} 50|",
+        "애착 → 표현 → 루틴 → 에겐테토",
+        "거리조절 → 밀착",
+        "혼자 있고 싶은 날에도 짧게 안부를 남겨 상대가 안심할 틈을 주세요!",
+        "탐험 → 루틴",
+        "가끔은 상대가 좋아하는 단골 코스를 함께 따라가보세요!",
+        "에겐 → 테토",
+        "상대의 무뚝뚝한 표현보다 직접 챙겨주는 행동을 먼저 봐주세요!",
         "15점 이하와 초과로 나누어 설명",  # 궁합 상세 · 거리감 경계
     ]
     for phrase in expected:

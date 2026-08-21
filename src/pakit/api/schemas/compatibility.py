@@ -157,7 +157,7 @@ class CompatibilityOutput(BaseModel):
     tips: list[CompatibilityTipOutput] = Field(
         min_length=2,
         max_length=2,
-        description="각 사람에게 전달할 팁 2개",
+        description="상대의 가장 극단적인 성향 축을 기준으로 각 사람에게 전달할 팁 2개",
     )
     relationship_tip: RelationshipTipOutput = Field(description="오래 지내기 위한 공통 팁")
 
