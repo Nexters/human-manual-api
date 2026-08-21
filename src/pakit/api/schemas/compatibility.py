@@ -19,9 +19,9 @@ COMPATIBILITY_RESPONSE_EXAMPLE: dict[str, Any] = {
     "description": "닮은 부분은 편안하고 다른 부분은 서로의 빈틈을 채워줘요.",
     "synergy": {
         "score": 80,
-        "title": "함께 굴러가는 힘",
-        "description": ("계획을 세우고 움직이는 속도가 맞아 함께할 때 일이 자연스럽게 이어져요."),
-        "tags": ["함께 잘 움직여요", "아이디어가 통해요"],
+        "title": "함께 노는 방식",
+        "description": "새로움에 대한 취향과 함께 있을 때 편한 분위기가 비슷해요.",
+        "tags": ["노는 결이 잘 맞아요", "아이디어가 통해요"],
     },
     "details": [
         {
@@ -58,11 +58,11 @@ COMPATIBILITY_RESPONSE_EXAMPLE: dict[str, Any] = {
         {
             "key": "pace",
             "score": 91,
-            "title": "함께 움직이는 방식",
+            "title": "함께 노는 방식",
             "label": "자연스럽게 맞아요",
             "description": (
-                "지은님은 분위기를 끌어올리고 재밌는 일이 생기면 움직여요. 선우님은 "
-                "사람을 챙기고 지킬 약속이 있을 때 힘이 나요."
+                "지은님은 새로운 곳에서 사람들과 어울릴 때 신나고, 선우님은 익숙한 곳에서 "
+                "조용히 보내야 편해요. 장소와 분위기를 하나씩 번갈아 맞춰주세요."
             ),
         },
     ],
@@ -73,7 +73,7 @@ COMPATIBILITY_RESPONSE_EXAMPLE: dict[str, Any] = {
             "image_url": "https://api.pakit.kr/assets/characters/spinning_top.png",
             "title": "지은님에게",
             "description": (
-                "갑작스러운 제안은 짧게라도 미리 알려주면 상대도 마음 편히 함께 움직여요."
+                "새로운 걸 제안할 때 익숙한 선택지도 함께 건네면 상대가 더 편하게 받아들여요."
             ),
         },
         {
@@ -82,14 +82,14 @@ COMPATIBILITY_RESPONSE_EXAMPLE: dict[str, Any] = {
             "image_url": "https://api.pakit.kr/assets/characters/teddy_bear.png",
             "title": "선우님에게",
             "description": (
-                "계획 밖의 제안을 무책임함으로 단정하지 않고 작은 여지를 남겨두면 더 즐거워져요."
+                "상대의 새로운 제안을 부담스럽다고 바로 닫지 않고 한 번쯤 열어두면 더 즐거워져요."
             ),
         },
     ],
     "relationship_tip": {
         "title": "더 오래 잘 지내려면",
         "description": (
-            "지은님과 선우님은 함께 무언가를 시작하고 이어가는 호흡이 좋아요. 연락이 "
+            "지은님과 선우님은 함께할 장소와 분위기를 고르는 감각이 잘 맞아요. 연락이 "
             "뜸해질 때 쓸 짧은 신호 하나를 정해두면 각자의 시간도 더 편하게 믿을 수 있어요."
         ),
     },

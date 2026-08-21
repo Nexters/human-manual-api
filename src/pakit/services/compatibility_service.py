@@ -300,12 +300,6 @@ CARE_DELIVERY_MATCH = {
     "make_me_laugh": {"express_with_words"},
 }
 
-ROLE_COMPLEMENTS = {
-    frozenset(("guide", "supporter")),
-    frozenset(("organizer", "connector")),
-    frozenset(("energizer", "supporter")),
-}
-
 DIMENSION_COPY = {
     "distance": (
         "편안한 거리감",
@@ -323,9 +317,9 @@ DIMENSION_COPY = {
         "챙김이 잘 통해요",
     ),
     "pace": (
-        "함께 굴러가는 힘",
-        "계획을 세우고 움직이는 속도가 맞아 함께할 때 일이 자연스럽게 이어져요.",
-        "함께 잘 움직여요",
+        "함께 노는 방식",
+        "새로움에 대한 취향과 함께 있을 때 편한 분위기가 비슷해요.",
+        "노는 결이 잘 맞아요",
     ),
 }
 
@@ -333,7 +327,7 @@ RELATIONSHIP_STRENGTH_COPY = {
     "distance": "서로 편한 간격을 알아보는 감각이 좋아요.",
     "conflict": "서운한 일이 생겨도 대화를 다시 이어가는 힘이 있어요.",
     "care": "필요한 순간에 서로의 마음을 챙기는 감각이 잘 통해요.",
-    "pace": "함께 무언가를 시작하고 이어가는 호흡이 좋아요.",
+    "pace": "함께할 장소와 분위기를 고르는 감각이 잘 맞아요.",
 }
 
 RELATIONSHIP_HABIT_COPY = {
@@ -344,9 +338,7 @@ RELATIONSHIP_HABIT_COPY = {
         "서운한 날에는 바로 말할지 시간을 둘지만 먼저 알려주면 좋은 호흡을 오래 지킬 수 있어요."
     ),
     "care": ("힘든 날 원하는 위로를 한마디로 알려주는 습관을 만들면 서로의 마음을 놓치지 않아요."),
-    "pace": (
-        "약속을 잡을 때 즉흥 제안인지 미리 정할 계획인지만 맞추면 함께하는 일이 더 즐거워져요."
-    ),
+    "pace": ("새로운 곳과 익숙한 곳, 북적이는 자리와 조용한 시간을 번갈아 고르면 더 즐거워져요."),
 }
 
 SUPPORT_TIPS = {
@@ -368,14 +360,6 @@ SUPPORT_NEED_COPY = {
 AFFECTION_STYLE_COPY = {
     "express_with_words": "말과 반응으로 마음을 보여주는 편이에요.",
     "express_with_actions": "말보다 행동으로 마음을 보여주는 편이에요.",
-}
-
-RELATIONSHIP_ROLE_COPY = {
-    "guide": "방향을 잡는",
-    "connector": "사람과 이야기를 이어주는",
-    "organizer": "말 나온 일을 실제로 만드는",
-    "supporter": "주변 사람을 살피고 챙기는",
-    "energizer": "분위기를 끌어올리는",
 }
 
 
@@ -427,14 +411,6 @@ def build_compatibility_profile(
     )
 
 
-def _role_score(left: str, right: str) -> int:
-    if left == right:
-        return 88
-    if frozenset((left, right)) in ROLE_COMPLEMENTS:
-        return 96
-    return 82
-
-
 def _mbti_score(left: str, right: str) -> int:
     return 76 + sum(
         6 for left_axis, right_axis in zip(left, right, strict=True) if left_axis == right_axis
@@ -464,15 +440,12 @@ def calculate_scores(
         / 2
     )
     routine_alignment = 100 - abs(mine_scores.routine - friend_scores.routine)
-    pace = round(
-        routine_alignment * 0.75
-        + _role_score(mine_profile.relationship_role, friend_profile.relationship_role) * 0.25
-    )
+    ei_alignment = 100 if mine_profile.mbti[0] == friend_profile.mbti[0] else 80
     return CompatibilityScores(
         distance=distance,
         conflict=conflict,
         care=care,
-        pace=pace,
+        pace=round(routine_alignment * 0.80 + ei_alignment * 0.20),
         mbti=_mbti_score(mine_profile.mbti, friend_profile.mbti),
     )
 
@@ -540,8 +513,8 @@ def _pace_tip(target: SubmissionResultData, other: SubmissionResultData) -> str:
     target_routine = target.unboxing_kit.axis_scores.routine
     other_routine = other.unboxing_kit.axis_scores.routine
     if target_routine > other_routine:
-        return "계획 밖의 제안을 무책임함으로 단정하지 않고 작은 여지를 남겨두면 더 즐거워져요."
-    return "갑작스러운 제안은 짧게라도 미리 알려주면 상대도 마음 편히 함께 움직여요."
+        return "상대의 새로운 제안을 부담스럽다고 바로 닫지 않고 한 번쯤 열어두면 더 즐거워져요."
+    return "새로운 걸 제안할 때 익숙한 선택지도 함께 건네면 상대가 더 편하게 받아들여요."
 
 
 def _tip_for(
@@ -790,83 +763,77 @@ def _pace_detail(
     mine_routine = mine.unboxing_kit.axis_scores.routine
     friend_routine = friend.unboxing_kit.axis_scores.routine
     routine_gap = abs(mine_routine - friend_routine)
-    both_routine = mine_routine >= 50 and friend_routine >= 50
-    both_exploratory = mine_routine < 50 and friend_routine < 50
-    if both_routine:
-        if routine_gap <= 15:
-            rhythm_description = (
-                f"{mine_name}님과 {friend_name}님은 모두 약속을 미리 정하고 익숙한 흐름대로 "
-                "움직일 때 편해요."
-            )
-        else:
-            more_planned_name, more_flexible_name = (
-                (mine_name, friend_name)
-                if mine_routine > friend_routine
-                else (friend_name, mine_name)
-            )
-            rhythm_description = (
-                f"{mine_name}님과 {friend_name}님은 모두 계획이 있을 때 편해요. 다만 "
-                f"{more_planned_name}님은 정해진 순서를 더 중요하게 여기고, "
-                f"{more_flexible_name}님은 계획 안에서도 약간의 변화를 받아들이는 편이에요."
-            )
-    elif both_exploratory:
-        if routine_gap <= 15:
-            rhythm_description = (
-                f"{mine_name}님과 {friend_name}님은 모두 새로운 제안과 즉흥적인 변화를 "
-                "즐기는 편이에요."
-            )
-        else:
-            more_exploratory_name, more_planned_name = (
-                (mine_name, friend_name)
-                if mine_routine < friend_routine
-                else (friend_name, mine_name)
-            )
-            rhythm_description = (
-                f"{mine_name}님과 {friend_name}님은 모두 새로운 변화를 즐겨요. 다만 "
-                f"{more_exploratory_name}님은 재미가 보이면 바로 움직이고, {more_planned_name}님은 "
-                "대략적인 흐름이 보일 때 더 편하게 함께해요."
-            )
+    mine_style = (mine_profile.mbti[0], "routine" if mine_routine >= 50 else "explore")
+    friend_style = (friend_profile.mbti[0], "routine" if friend_routine >= 50 else "explore")
+
+    if mine_style[1] != friend_style[1] and routine_gap <= 15:
+        description = (
+            f"{mine_name}님과 {friend_name}님은 새로움에 대한 취향 차이가 크지 않아요. "
+            "함께할 장소보다 편한 분위기만 맞추면 자연스럽게 잘 놀 수 있어요."
+        )
+    elif mine_style == friend_style:
+        same_style_copy = {
+            ("E", "explore"): (
+                "새로운 곳과 활동을 사람들과 함께 즐길 때 신나요. 처음 해보는 약속도 쉽게 "
+                "맞는 사이예요."
+            ),
+            ("E", "routine"): (
+                "익숙한 장소에서 좋아하는 사람들과 어울릴 때 편해요. 단골 코스가 생길수록 더 "
+                "잘 놀아요."
+            ),
+            ("I", "explore"): "낯선 경험을 좋아하지만, 북적이기보다 둘만의 속도로 즐길 때 편해요.",
+            ("I", "routine"): (
+                "익숙한 장소에서 조용히 보내는 시간을 좋아해요. 자주 가던 곳에서도 충분히 "
+                "즐거운 사이예요."
+            ),
+        }
+        description = f"{mine_name}님과 {friend_name}님은 둘 다 {same_style_copy[mine_style]}"
     else:
-        routine_name, exploratory_name = (
-            (mine_name, friend_name) if mine_routine > friend_routine else (friend_name, mine_name)
-        )
-        if routine_gap <= 15:
-            rhythm_description = (
-                "선호하는 방식은 조금 다르지만 실제 속도 차이는 크지 않아 자연스럽게 맞출 수 "
-                f"있어요. {routine_name}님은 익숙한 흐름이 조금 더 편하고, "
-                f"{exploratory_name}님은 새로운 변화를 조금 더 즐기는 편이에요."
+        style_names = {mine_style: mine_name, friend_style: friend_name}
+        style_pair = frozenset((mine_style, friend_style))
+        if style_pair == frozenset((("E", "explore"), ("E", "routine"))):
+            description = (
+                "둘 다 사람들과 어울리는 걸 좋아하지만, "
+                f"{style_names[('E', 'explore')]}님은 새로운 곳에 끌리고 "
+                f"{style_names[('E', 'routine')]}님은 익숙한 곳이 편해요. 장소만 번갈아 "
+                "고르면 잘 맞아요."
+            )
+        elif style_pair == frozenset((("I", "explore"), ("I", "routine"))):
+            description = (
+                "둘 다 차분하게 노는 걸 좋아하지만, "
+                f"{style_names[('I', 'explore')]}님은 낯선 경험을 원하고 "
+                f"{style_names[('I', 'routine')]}님은 익숙한 선택이 편해요."
+            )
+        elif style_pair == frozenset((("E", "explore"), ("I", "explore"))):
+            description = (
+                "둘 다 새로운 경험을 좋아해요. "
+                f"{style_names[('E', 'explore')]}님은 여럿이 신나게, "
+                f"{style_names[('I', 'explore')]}님은 소수로 여유롭게 즐길 때 편해요."
+            )
+        elif style_pair == frozenset((("E", "routine"), ("I", "routine"))):
+            description = (
+                "둘 다 익숙한 장소를 좋아해요. "
+                f"{style_names[('E', 'routine')]}님은 사람들과 어울릴 때, "
+                f"{style_names[('I', 'routine')]}님은 조용히 머물 때 더 충전돼요."
+            )
+        elif style_pair == frozenset((("E", "explore"), ("I", "routine"))):
+            description = (
+                f"{style_names[('E', 'explore')]}님은 새로운 곳에서 사람들과 어울릴 때 신나고, "
+                f"{style_names[('I', 'routine')]}님은 익숙한 곳에서 조용히 보내야 편해요. "
+                "장소와 분위기를 하나씩 번갈아 맞춰주세요."
             )
         else:
-            rhythm_description = (
-                f"{routine_name}님은 계획과 익숙한 흐름이 있을 때 편하고, {exploratory_name}님은 "
-                "새로운 제안과 즉흥적인 변화가 있을 때 힘이 나요."
+            description = (
+                f"{style_names[('E', 'routine')]}님은 익숙한 장소에서 사람들과 어울리는 걸 "
+                f"좋아하고, {style_names[('I', 'explore')]}님은 낯선 곳을 조용히 탐색하는 걸 "
+                "좋아해요. 새로운 곳을 한적한 시간에 가면 둘 다 편해요."
             )
-    mine_role = mine_profile.relationship_role
-    friend_role = friend_profile.relationship_role
-    if mine_role == friend_role:
-        role_description = (
-            f"{mine_name}님과 {friend_name}님은 모두 관계에서 "
-            f"{RELATIONSHIP_ROLE_COPY[mine_role]} 역할에 먼저 손이 가는 편이에요. 서로 할 일을 "
-            "나누면 더 편하게 움직일 수 있어요."
-        )
-    elif frozenset((mine_role, friend_role)) in ROLE_COMPLEMENTS:
-        role_description = (
-            f"{mine_name}님은 관계에서 {RELATIONSHIP_ROLE_COPY[mine_role]} 역할을 맡고, "
-            f"{friend_name}님은 {RELATIONSHIP_ROLE_COPY[friend_role]} 역할을 맡아 함께할 때 역할이 "
-            "자연스럽게 나뉘어요."
-        )
-    else:
-        role_description = (
-            f"{mine_name}님은 관계에서 {RELATIONSHIP_ROLE_COPY[mine_role]} 역할을 맡고, "
-            f"{friend_name}님은 {RELATIONSHIP_ROLE_COPY[friend_role]} 역할을 맡는 편이에요. 서로 "
-            "잘하는 일을 미리 나누면 함께 움직이기 편해요."
-        )
     return CompatibilityDetailData(
         key="pace",
         score=score,
-        title="함께 움직이는 방식",
+        title="함께 노는 방식",
         label=_detail_label(score),
-        description=f"{rhythm_description} {role_description}",
+        description=description,
     )
 
 
