@@ -13,7 +13,7 @@ def test_builds_four_warnings_in_fixed_order() -> None:
     ) == (
         "내 일처럼 해결책을 생각해줬는데 “너 T야?” 소리를 들으면, 그대로 멈춰요",
         "혼자 있는 시간이 길어지면 기운이 빠져서, 연락이 없으면 먼저 찾게 돼요",
-        "재촉받으면 하려던 마음도 사라져요",
+        "내 속도는 묻지도 않고 밀어붙이면, 의욕이 비상구로 탈출해요",
         '내 아이디어에 "그건 원래 안 돼"라고 하면, 끝까지 뒤집어 보여주고 싶어져요',
     )
 
@@ -94,12 +94,27 @@ def test_maps_every_mbti_trigger(mbti: MbtiType, expected: str) -> None:
 @pytest.mark.parametrize(
     ("anger_trigger", "expected"),
     [
-        ("rush", "재촉받으면 하려던 마음도 사라져요"),
-        ("interrupt", "말을 끊으면 남은 이야기도 삼켜버려요"),
-        ("take_food", "음식을 허락 없이 가져가면 한입보다 큰 서운함이 남아요"),
-        ("arrive_late", "늦고도 태연하면 기다린 만큼 신뢰가 깎여요"),
-        ("nag", "잔소리가 반복되면 귀부터 닫아요"),
-        ("change_plan", "계획이 갑자기 바뀌면 기분부터 틀어져요"),
+        ("rush", "내 속도는 묻지도 않고 밀어붙이면, 의욕이 비상구로 탈출해요"),
+        (
+            "interrupt",
+            "내 말이 끝나기도 전에 결론 내리면, 남은 이야기는 자동 잠금 처리돼요",
+        ),
+        (
+            "take_food",
+            "내 것에 허락 없이 손대면, 물건보다 관계의 선부터 다시 그어요",
+        ),
+        (
+            "arrive_late",
+            "내 시간을 당연하게 써도 된다는 태도가 보이면, 다음 약속 버튼이 비활성화돼요",
+        ),
+        (
+            "nag",
+            "나를 못 믿겠다는 듯 계속 확인하면, 협조 모드가 반항 모드로 바뀌어요",
+        ),
+        (
+            "change_plan",
+            "내 의견 없이 정해둔 판을 뒤집으면, 일정과 함께 마음도 로그아웃해요",
+        ),
     ],
 )
 def test_maps_every_anger_trigger(anger_trigger: str, expected: str) -> None:

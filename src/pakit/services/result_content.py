@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-21.6"
+RESULT_CONTENT_VERSION = "2026-08-21.7"
 
 FEATURE_TAGS = ("동력", "관계", "마음", "강점")
 
@@ -294,12 +294,12 @@ MBTI_TRIGGER_WARNING_COPY: dict[MbtiType, str] = {
 
 
 ANGER_TRIGGER_WARNING_COPY: dict[str, str] = {
-    "rush": "재촉받으면 하려던 마음도 사라져요",
-    "interrupt": "말을 끊으면 남은 이야기도 삼켜버려요",
-    "take_food": "음식을 허락 없이 가져가면 한입보다 큰 서운함이 남아요",
-    "arrive_late": "늦고도 태연하면 기다린 만큼 신뢰가 깎여요",
-    "nag": "잔소리가 반복되면 귀부터 닫아요",
-    "change_plan": "계획이 갑자기 바뀌면 기분부터 틀어져요",
+    "rush": "내 속도는 묻지도 않고 밀어붙이면, 의욕이 비상구로 탈출해요",
+    "interrupt": "내 말이 끝나기도 전에 결론 내리면, 남은 이야기는 자동 잠금 처리돼요",
+    "take_food": "내 것에 허락 없이 손대면, 물건보다 관계의 선부터 다시 그어요",
+    "arrive_late": "내 시간을 당연하게 써도 된다는 태도가 보이면, 다음 약속 버튼이 비활성화돼요",
+    "nag": "나를 못 믿겠다는 듯 계속 확인하면, 협조 모드가 반항 모드로 바뀌어요",
+    "change_plan": "내 의견 없이 정해둔 판을 뒤집으면, 일정과 함께 마음도 로그아웃해요",
 }
 
 
