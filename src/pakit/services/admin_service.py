@@ -24,16 +24,6 @@ def _nickname(result: StoredResult) -> str | None:
     return nickname if isinstance(nickname, str) else None
 
 
-def mask_nickname(nickname: str | None) -> str:
-    if not nickname:
-        return "-"
-    if len(nickname) == 1:
-        return f"{nickname}*"
-    if len(nickname) == 2:
-        return f"{nickname[0]}*"
-    return f"{nickname[0]}{'*' * (len(nickname) - 2)}{nickname[-1]}"
-
-
 def _overview(result: StoredResult) -> dict[str, Any]:
     value = result.snapshot.get("overview")
     return value if isinstance(value, dict) else {}
@@ -136,7 +126,7 @@ def result_summary(
     return {
         "created_at": _aware(result.created_at),
         "result_code": result.result_code,
-        "nickname": mask_nickname(_nickname(result)),
+        "nickname": _nickname(result) or "-",
         "mbti": _mbti(result),
         "result_name": overview.get("result_name"),
         "character_id": overview.get("character_id"),

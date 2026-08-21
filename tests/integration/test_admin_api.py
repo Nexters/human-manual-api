@@ -140,8 +140,8 @@ def test_admin_html_and_read_only_apis_show_results_and_conversion(
     assert dashboard.json()["counts"]["total_results"] == 2
     assert dashboard.json()["experience_ratio"] == 50.0
     assert dashboard.json()["view_to_compatibility_ratio"] == 100.0
-    assert results.json()["items"][0]["nickname"] == "선*"
-    assert results.json()["items"][1]["nickname"] == "해*니"
+    assert results.json()["items"][0]["nickname"] == "선우"
+    assert results.json()["items"][1]["nickname"] == "해서니"
     assert detail.json()["nickname"] == "해서니"
     assert detail.json()["usage"] == {
         "view_count": 1,

@@ -6,7 +6,6 @@ from pakit.services.admin_service import (
     build_dashboard,
     build_result_analytics,
     filter_results,
-    mask_nickname,
 )
 
 
@@ -132,7 +131,7 @@ def test_dashboard_uses_seoul_calendar_day_boundary() -> None:
     assert dashboard["trend"][-1]["results"] == 1
 
 
-def test_filters_results_and_masks_nicknames() -> None:
+def test_filters_results_by_nickname_and_mbti() -> None:
     now = datetime(2026, 8, 20, tzinfo=UTC)
     results = [
         _result("RESULT01", "ENTP", now, "해서니"),
@@ -143,9 +142,6 @@ def test_filters_results_and_masks_nicknames() -> None:
         "RESULT01"
     ]
     assert [result.result_code for result in filter_results(results, mbti="INTJ")] == ["RESULT02"]
-    assert mask_nickname("해서니") == "해*니"
-    assert mask_nickname("선우") == "선*"
-    assert mask_nickname("이") == "이*"
 
 
 def test_keyword_ratio_is_the_share_of_results_with_that_keyword() -> None:
