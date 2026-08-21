@@ -167,6 +167,8 @@ def test_restores_a_legacy_snapshot_without_a_participant() -> None:
         snapshot.pop("participant")
         snapshot.pop("compatibility_profile")
         snapshot.pop("compatible_friends")
+        for feature in snapshot["features"]:
+            feature.pop("tag")
         snapshot["unboxing_kit"]["packaging"].pop("image_url")
         snapshot["unboxing_kit"]["opening_tool"].pop("image_url")
         snapshot["result_code"] = "legacy01"
@@ -190,6 +192,12 @@ def test_restores_a_legacy_snapshot_without_a_participant() -> None:
         assert restored.participant is None
         assert restored.compatibility_profile is None
         assert restored.compatible_friends == ()
+        assert tuple(feature.tag for feature in restored.features) == (
+            "동력",
+            "관계",
+            "마음",
+            "강점",
+        )
         assert restored.unboxing_kit.packaging.image_url == (
             "/assets/packaging_boxes/minimal_box.png"
         )

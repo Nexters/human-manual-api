@@ -32,6 +32,7 @@ from pakit.services.overview_tag_service import build_overview_tags
 from pakit.services.result_content import (
     CHARACTER_STORY_COPY,
     COMBINATION_COPY,
+    FEATURE_TAGS,
     MBTI_RARITY_COPY,
     MBTI_STRENGTH_COPY,
     OPENING_TOOL_COPY,
@@ -115,8 +116,8 @@ def _unboxing_item(item: UnboxingItemCopy, asset_directory: str) -> UnboxingItem
     )
 
 
-def _feature(item: FeatureCopy) -> FeatureData:
-    return FeatureData(title=item.title, description=item.description)
+def _feature(tag: str, item: FeatureCopy) -> FeatureData:
+    return FeatureData(tag=tag, title=item.title, description=item.description)
 
 
 def _build_result(
@@ -184,12 +185,16 @@ def _build_result(
             ),
         ),
         features=tuple(
-            _feature(item)
-            for item in (
-                motivation_feature,
-                relationship_role,
-                emotional_processing_feature,
-                mbti_strength,
+            _feature(tag, item)
+            for tag, item in zip(
+                FEATURE_TAGS,
+                (
+                    motivation_feature,
+                    relationship_role,
+                    emotional_processing_feature,
+                    mbti_strength,
+                ),
+                strict=True,
             )
         ),
         character_story=CharacterStoryData(

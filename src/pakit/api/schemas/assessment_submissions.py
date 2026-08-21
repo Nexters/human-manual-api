@@ -84,12 +84,14 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
     },
     "features": [
         {
+            "tag": "동력",
             "title": "궁금한 건 못 참아요",
             "description": (
                 "궁금한 건 검색만으로 넘기지 않고, 원리와 다른 가능성까지 직접 확인해요."
             ),
         },
         {
+            "tag": "관계",
             "title": "결정 조율자",
             "description": (
                 "친구들 의견이 갈리면 기준과 공통점을 정리해 "
@@ -97,12 +99,14 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
             ),
         },
         {
+            "tag": "마음",
             "title": "혼자 곱씹어요",
             "description": (
                 "마음이 복잡하면 바로 꺼내기보다 충분히 들여다보고, 준비가 되면 차근차근 말해요."
             ),
         },
         {
+            "tag": "강점",
             "title": "다르게 봐요",
             "description": "모두가 당연하다고 넘긴 곳에서 다른 가능성을 발견해요.",
         },
@@ -259,6 +263,7 @@ class UnboxingKitOutput(BaseModel):
 class FeatureOutput(BaseModel):
     """장난감의 핵심 특징 한 개입니다."""
 
+    tag: str = Field(min_length=2, max_length=2, description="특징 슬롯을 나타내는 고정 태그")
     title: str = Field(max_length=11, description="공백 포함 11자 이하의 특징 제목")
     description: str = Field(description="특징 보조 설명")
 

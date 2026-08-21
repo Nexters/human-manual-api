@@ -20,6 +20,7 @@ from pakit.domain.assessment_submission import (
     UnboxingItemData,
     UnboxingKitData,
 )
+from pakit.services.result_content import FEATURE_TAGS
 from pakit.services.result_repository import ResultCodeConflictError
 
 
@@ -74,8 +75,12 @@ def _result_from_snapshot(snapshot: dict[str, Any]) -> SubmissionResultData:
             opening_tool=_unboxing_item(unboxing["opening_tool"], "opening_tools"),
         ),
         features=tuple(
-            FeatureData(title=feature["title"], description=feature["description"])
-            for feature in snapshot["features"]
+            FeatureData(
+                tag=feature.get("tag", FEATURE_TAGS[index]),
+                title=feature["title"],
+                description=feature["description"],
+            )
+            for index, feature in enumerate(snapshot["features"])
         ),
         character_story=CharacterStoryData(
             title=story["title"],

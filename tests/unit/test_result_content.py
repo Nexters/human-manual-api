@@ -7,6 +7,7 @@ from pakit.services.result_content import (
     COMMUNICATION_WARNING_COPY,
     CONFLICT_SUPPORT_COPY,
     EMOTIONAL_PROCESSING_COPY,
+    FEATURE_TAGS,
     MBTI_MIDDLE_GROUP,
     MBTI_RARITY_COPY,
     MBTI_STRENGTH_COPY,
@@ -289,7 +290,11 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-21.5"
+    assert RESULT_CONTENT_VERSION == "2026-08-21.6"
+
+
+def test_defines_fixed_feature_tags_in_slot_order() -> None:
+    assert FEATURE_TAGS == ("동력", "관계", "마음", "강점")
 
 
 def test_defines_all_warning_copy_variants() -> None:

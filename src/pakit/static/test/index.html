@@ -31,6 +31,7 @@
     .section-title { margin: 28px 0 12px; }
     .feature-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .feature-card { padding: 16px; border-radius: 10px; background: white; }
+    .feature-tag { display: inline-block; margin-bottom: 8px; color: #4255d4; font-weight: 700; }
     .feature-card h4 { margin: 0 0 6px; font-size: 17px; }
     .feature-card p { margin: 0; color: #666; line-height: 1.5; }
     .friend-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
@@ -223,11 +224,14 @@
         features.replaceChildren(...data.features.map((feature) => {
           const card = document.createElement("article");
           card.className = "feature-card";
+          const tag = document.createElement("span");
+          tag.className = "feature-tag";
+          tag.textContent = feature.tag;
           const title = document.createElement("h4");
           title.textContent = feature.title;
           const description = document.createElement("p");
           description.textContent = feature.description;
-          card.append(title, description);
+          card.append(tag, title, description);
           return card;
         }));
         document.querySelector("#character-story-title").textContent = data.character_story.title;

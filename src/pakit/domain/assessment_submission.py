@@ -58,6 +58,7 @@ class UnboxingKitData:
 class FeatureData:
     title: str
     description: str
+    tag: str = ""
 
 
 @dataclass(frozen=True)

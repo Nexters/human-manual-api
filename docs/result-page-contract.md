@@ -115,10 +115,13 @@
 3. 마음 정리법: 생각과 감정을 내 안에서 정리하는 방식
 4. 타고난 무기: MBTI 16종 각각의 대표 특징
 
+각 슬롯은 같은 순서로 `동력`, `관계`, `마음`, `강점` 고정 태그를 사용한다.
+
 세부 기획은 [`key-feature-product-plan.md`](./key-feature-product-plan.md)를 따른다.
 
 | 필드 | 타입 | 설명 |
 |---|---|---|
+| `features[].tag` | string | 슬롯별 고정 태그 (`동력`, `관계`, `마음`, `강점`) |
 | `features[].title` | string | 특징 제목 |
 | `features[].description` | string | 특징 보조 설명 |
 

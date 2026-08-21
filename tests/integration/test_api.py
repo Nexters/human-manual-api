@@ -249,6 +249,9 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
     charging_activity_schema = document["components"]["schemas"]["ChargingActivityOutput"]
     assert charging_activity_schema["properties"]["label"]["maxLength"] == 10
     feature_schema = document["components"]["schemas"]["FeatureOutput"]
+    assert set(feature_schema["properties"]) == {"tag", "title", "description"}
+    assert feature_schema["properties"]["tag"]["minLength"] == 2
+    assert feature_schema["properties"]["tag"]["maxLength"] == 2
     assert feature_schema["properties"]["title"]["maxLength"] == 11
     unboxing_schema = document["components"]["schemas"]["UnboxingKitOutput"]
     assert set(unboxing_schema["properties"]) == {
@@ -508,12 +511,14 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
     assert body["unboxing_kit"]["opening_tool"]["type"] == "chainsaw"
     assert body["features"] == [
         {
+            "tag": "동력",
             "title": "궁금한 건 못 참아요",
             "description": (
                 "궁금한 건 검색만으로 넘기지 않고, 원리와 다른 가능성까지 직접 확인해요."
             ),
         },
         {
+            "tag": "관계",
             "title": "결정 조율자",
             "description": (
                 "친구들 의견이 갈리면 기준과 공통점을 정리해 "
@@ -521,10 +526,12 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
             ),
         },
         {
+            "tag": "마음",
             "title": "바로 해결해요",
             "description": "걸리는 건 바로 확인하고, 해결할 일을 끝낸 뒤 다음 행동으로 넘어가요.",
         },
         {
+            "tag": "강점",
             "title": "원리를 따져요",
             "description": "당연해 보이는 것도 작동 원리를 알 때까지 파고들어요.",
         },

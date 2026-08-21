@@ -398,12 +398,13 @@ A×B 조합 제목·설명은 기존 결과 스냅샷 복원용 내부 데이터
           esc(rc.MBTI_STRENGTH_COPY[m].description)] for m in MBTI],
     )
     features_body = f"""
-<p class="lead">항상 <b>동원력 · 관계 속의 나 · 마음 정리법 · 타고난 무기</b> 4개를 이 순서로 반환해요.</p>
-<div class="slot"><h4><span class="slot-n">1</span> 동원력 · <span class="src">step1.q11 × MBTI중간축(NT/ST/NF/SF)</span></h4>
+<p class="lead">항상 <b>동원력 · 관계 속의 나 · 마음 정리법 · 타고난 무기</b> 4개를 이 순서로 반환하며,
+각 슬롯의 고정 태그는 <b>동력 · 관계 · 마음 · 강점</b>이에요.</p>
+<div class="slot"><h4><span class="slot-n">1</span> 동원력 · <span class="val">동력</span> · <span class="src">step1.q11 × MBTI중간축(NT/ST/NF/SF)</span></h4>
 <div class="two-col"><div>{mot_title_table}</div><div>{mot_desc_table}</div></div></div>
-<div class="slot"><h4><span class="slot-n">2</span> 관계 속의 나 · <span class="src">step1.q01 × step1.q02</span></h4>{rel_table}</div>
-<div class="slot"><h4><span class="slot-n">3</span> 마음 정리법 · <span class="src">표현방식축 × 에겐테토축</span></h4>{emo_table}</div>
-<div class="slot"><h4><span class="slot-n">4</span> 타고난 무기 · <span class="src">MBTI 16종</span></h4>{str_table}</div>"""
+<div class="slot"><h4><span class="slot-n">2</span> 관계 속의 나 · <span class="val">관계</span> · <span class="src">step1.q01 × step1.q02</span></h4>{rel_table}</div>
+<div class="slot"><h4><span class="slot-n">3</span> 마음 정리법 · <span class="val">마음</span> · <span class="src">표현방식축 × 에겐테토축</span></h4>{emo_table}</div>
+<div class="slot"><h4><span class="slot-n">4</span> 타고난 무기 · <span class="val">강점</span> · <span class="src">MBTI 16종</span></h4>{str_table}</div>"""
     sections.append(
         (
             "features",

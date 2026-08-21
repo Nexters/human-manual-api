@@ -37,6 +37,7 @@
           "meaning": "MBTI 16종 각각의 대표 특징"
         }
       ],
+      "fixed_tags": ["동력", "관계", "마음", "강점"],
       "answer_based_slots": ["motivation", "role_in_relationships"],
       "axis_based_slots": ["emotional_processing"],
       "mbti_based_slots": ["innate_strength"],

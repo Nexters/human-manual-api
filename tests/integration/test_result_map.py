@@ -97,5 +97,8 @@ def test_result_map_includes_copy_from_every_section() -> None:
     for phrase in expected:
         assert phrase in body, f"누락된 문구: {phrase}"
 
+    for tag in ("동력", "관계", "마음", "강점"):
+        assert f'<span class="val">{tag}</span>' in body
+
     assert "충전 점수는 API에서 반환하지 않아요" in body
     assert '충전 점수는 <span class="val">90</span> 고정' not in body
