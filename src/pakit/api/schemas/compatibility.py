@@ -22,8 +22,8 @@ COMPATIBILITY_RESPONSE_EXAMPLE: dict[str, Any] = {
     "synergy": {
         "score": 80,
         "title": "케미 게이지",
-        "description": "둘이 놀러 갈 때 고르는 장소와 분위기가 잘 맞아요.",
-        "tags": ["함께 놀 때 잘 맞아요", "아이디어가 통해요"],
+        "description": "닮은 부분은 편안하고, 다른 부분은 서로의 빈틈을 채워줘요.",
+        "tags": ["달라도 잘 맞아요", "아이디어가 통해요"],
     },
     "details": [
         {
@@ -106,10 +106,14 @@ class CompatibilityPersonOutput(BaseModel):
 class SynergyOutput(BaseModel):
     """두 사람이 함께 있을 때의 시너지입니다."""
 
-    score: int = Field(ge=0, le=100, description="궁합 점수")
+    score: int = Field(ge=0, le=100, description="최종 궁합 점수")
     title: str = Field(description="고정 시너지 제목 '케미 게이지'")
-    description: str = Field(description="시너지 설명")
-    tags: list[str] = Field(min_length=2, max_length=2, description="시너지 태그 2개")
+    description: str = Field(description="최종 궁합 점수 구간별 설명")
+    tags: list[str] = Field(
+        min_length=2,
+        max_length=2,
+        description="최종 궁합 점수 태그와 MBTI 조합 태그",
+    )
 
 
 class CompatibilityTipOutput(BaseModel):

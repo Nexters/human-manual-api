@@ -302,6 +302,7 @@ CARE_DELIVERY_MATCH = {
 
 DimensionKey = Literal["distance", "conflict", "care", "pace"]
 StrengthBand = Literal["strong", "adjusting", "learning"]
+ChemistryGaugeBand = Literal["excellent", "complementary", "growing", "manual"]
 
 STRENGTH_BAND_RANGES: dict[StrengthBand, str] = {
     "strong": "74~100",
@@ -316,56 +317,29 @@ DIMENSION_LABEL: dict[DimensionKey, str] = {
     "pace": "함께 노는 방식",
 }
 
-SYNERGY_COPY: dict[tuple[DimensionKey, StrengthBand], tuple[str, str]] = {
-    ("distance", "strong"): (
-        "서로 가까이 지내는 시간과 각자 쉬는 시간의 균형이 잘 맞아요.",
-        "거리감이 잘 맞아요",
+CHEMISTRY_GAUGE_RANGES: dict[ChemistryGaugeBand, str] = {
+    "excellent": "88~100",
+    "complementary": "76~87",
+    "growing": "64~75",
+    "manual": "0~63",
+}
+
+CHEMISTRY_GAUGE_COPY: dict[ChemistryGaugeBand, tuple[str, str]] = {
+    "excellent": (
+        "설명하지 않아도 서로 편한 방식을 자연스럽게 알아봐요.",
+        "찰떡 케미",
     ),
-    ("distance", "adjusting"): (
-        "서로 원하는 연락과 만남의 빈도가 조금 달라요.",
-        "편한 간격을 찾아가요",
+    "complementary": (
+        "닮은 부분은 편안하고, 다른 부분은 서로의 빈틈을 채워줘요.",
+        "달라도 잘 맞아요",
     ),
-    ("distance", "learning"): (
-        "한 사람은 자주 연락하고 함께할 때, 다른 사람은 각자의 시간이 있을 때 편해요.",
-        "서로의 간격을 알아가요",
+    "growing": (
+        "서로의 사용법을 알아갈수록 점점 편해지는 사이예요.",
+        "맞춰갈수록 좋아요",
     ),
-    ("conflict", "strong"): (
-        "마음이 걸렸을 때 대화를 풀어가는 속도가 비슷해 오래 묵히지 않아요.",
-        "대화가 잘 통해요",
-    ),
-    ("conflict", "adjusting"): (
-        "서운함을 푸는 속도가 조금 달라도, 바로 말할지 시간을 둘지 알려주면 "
-        "대화를 이어갈 수 있어요.",
-        "대화 속도를 맞춰가요",
-    ),
-    ("conflict", "learning"): (
-        "서운함을 푸는 타이밍이 달라 대화가 엇갈릴 수 있어요. "
-        "바로 말할지 시간을 둘지 먼저 알려주세요.",
-        "대화 타이밍을 알아가요",
-    ),
-    ("care", "strong"): (
-        "한 사람이 필요로 하는 위로를 다른 사람이 알아들을 방식으로 건넬 수 있어요.",
-        "위로가 잘 닿아요",
-    ),
-    ("care", "adjusting"): (
-        "힘들 때 원하는 위로와 서로 챙겨주는 방식이 조금 달라요.",
-        "위로법을 맞춰가요",
-    ),
-    ("care", "learning"): (
-        "서로 원하는 위로가 바로 닿지 않을 수 있어요. 힘든 날 필요한 방식을 먼저 알려주세요.",
-        "위로법을 알아가요",
-    ),
-    ("pace", "strong"): (
-        "둘이 놀러 갈 때 고르는 장소와 분위기가 잘 맞아요.",
-        "함께 놀 때 잘 맞아요",
-    ),
-    ("pace", "adjusting"): (
-        "가고 싶은 곳과 편하게 느끼는 분위기가 조금 달라요.",
-        "노는 방식을 맞춰가요",
-    ),
-    ("pace", "learning"): (
-        "한 사람에게 즐거운 약속이 다른 사람에게는 조금 버거울 수 있어요.",
-        "서로 편한 약속을 찾아가요",
+    "manual": (
+        "서로 편한 방식이 달라, 각자의 사용법을 알아갈 시간이 필요해요.",
+        "설명서가 필요해요",
     ),
 }
 
@@ -647,6 +621,16 @@ def _strength_band(score: int) -> StrengthBand:
     if score >= 60:
         return "adjusting"
     return "learning"
+
+
+def _chemistry_gauge_band(score: int) -> ChemistryGaugeBand:
+    if score >= 88:
+        return "excellent"
+    if score >= 76:
+        return "complementary"
+    if score >= 64:
+        return "growing"
+    return "manual"
 
 
 def _distance_detail(
@@ -1004,9 +988,7 @@ def build_compatibility(
     mine_profile = mine.compatibility_profile
     friend_profile = friend.compatibility_profile
     assert mine_profile is not None and friend_profile is not None
-    synergy_description, synergy_tag = SYNERGY_COPY[
-        (strongest, _strength_band(dimensions[strongest]))
-    ]
+    synergy_description, synergy_tag = CHEMISTRY_GAUGE_COPY[_chemistry_gauge_band(scores.total)]
     headline, description = compatibility_headline(scores.total)
     mine_tip = _personal_tip(mine, friend)
     friend_tip = _personal_tip(friend, mine)

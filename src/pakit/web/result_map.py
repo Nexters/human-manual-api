@@ -694,24 +694,32 @@ Q06은 사용자가 고른 걸 그대로, 첫 슬롯은 MBTI T/F×표현방식, 
             ]
         ],
     )
-    dim_rows = []
+    gauge_table = table(
+        ["총점", "고정 제목", "설명", "첫 태그"],
+        [
+            [
+                score_range,
+                "<b>케미 게이지</b>",
+                esc(cs.CHEMISTRY_GAUGE_COPY[band][0]),
+                esc(cs.CHEMISTRY_GAUGE_COPY[band][1]),
+            ]
+            for band, score_range in cs.CHEMISTRY_GAUGE_RANGES.items()
+        ],
+    )
+    strength_rows = []
     for key in cs.DIMENSION_LABEL:
         for band, score_range in cs.STRENGTH_BAND_RANGES.items():
-            desc, tag = cs.SYNERGY_COPY[(key, band)]
-            dim_rows.append(
+            strength_rows.append(
                 [
                     val(key),
                     esc(cs.DIMENSION_LABEL[key]),
                     score_range,
-                    "<b>케미 게이지</b>",
-                    esc(desc),
-                    esc(tag),
                     esc(cs.RELATIONSHIP_STRENGTH_COPY[(key, band)]),
                 ]
             )
-    dim_table = table(
-        ["최고 항목", "화면 항목", "항목 점수", "고정 제목", "설명", "첫 태그", "하단 첫 문장"],
-        dim_rows,
+    strength_table = table(
+        ["최고 항목", "화면 항목", "항목 점수", "하단 첫 문장"],
+        strength_rows,
     )
     score_table = table(
         ["점수", "계산식", "총점 비중"],
@@ -953,8 +961,10 @@ Q06은 사용자가 고른 걸 그대로, 첫 슬롯은 MBTI T/F×표현방식, 
 {score_table}
 <h4>총점 → 헤드라인 · 4구간</h4>
 {head_table}
-<h4>케미 게이지 · 최고 항목 4개 × 점수 구간 3개</h4>
-{dim_table}
+<h4>케미 게이지 · 전체 점수 4구간</h4>
+{gauge_table}
+<h4>더 오래 잘 지내려면 · 최고 항목 4개 × 항목 점수 3개</h4>
+{strength_table}
 <h4>상세 문구 분기 · 케이스 지도</h4>
 <div class="two-col">
   <div><h4>01 거리감 · attachment</h4>{distance_case_table}</div>

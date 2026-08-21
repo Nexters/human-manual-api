@@ -18,6 +18,8 @@ from pakit.domain.characters import CHARACTERS
 from pakit.services.compatibility_service import (
     CARE_DELIVERY_MATCH,
     CARE_MATCH,
+    CHEMISTRY_GAUGE_COPY,
+    CHEMISTRY_GAUGE_RANGES,
     COMPATIBILITY_PROFILE_VERSION,
     COMPATIBLE_FRIEND_DESCRIPTION,
     DIMENSION_LABEL,
@@ -26,12 +28,12 @@ from pakit.services.compatibility_service import (
     RELATIONSHIP_ROLE_BY_ANSWERS,
     RELATIONSHIP_STRENGTH_COPY,
     STRENGTH_BAND_RANGES,
-    SYNERGY_COPY,
     TIP_AXIS_PRIORITY,
     AxisKey,
     AxisPole,
     CompatibilityScores,
     CompatibilityUnavailableError,
+    _chemistry_gauge_band,
     _most_extreme_axis,
     _personal_tip,
     _strength_band,
@@ -57,12 +59,27 @@ def test_strength_band_boundaries(score: int, expected: str) -> None:
     assert _strength_band(score) == expected
 
 
-def test_synergy_and_relationship_copy_cover_all_dimension_score_bands() -> None:
+@pytest.mark.parametrize(
+    ("score", "expected"),
+    [
+        (63, "manual"),
+        (64, "growing"),
+        (75, "growing"),
+        (76, "complementary"),
+        (87, "complementary"),
+        (88, "excellent"),
+    ],
+)
+def test_chemistry_gauge_band_boundaries(score: int, expected: str) -> None:
+    assert _chemistry_gauge_band(score) == expected
+
+
+def test_chemistry_gauge_and_relationship_copy_cover_all_score_bands() -> None:
     expected_keys = {
         (dimension, band) for dimension in DIMENSION_LABEL for band in STRENGTH_BAND_RANGES
     }
 
-    assert set(SYNERGY_COPY) == expected_keys
+    assert set(CHEMISTRY_GAUGE_COPY) == set(CHEMISTRY_GAUGE_RANGES)
     assert set(RELATIONSHIP_STRENGTH_COPY) == expected_keys
 
 
@@ -217,7 +234,7 @@ def test_compatibility_score_is_symmetric_and_keeps_each_person_target() -> None
     assert forward.tips[1].image_url == friend.overview.image_url
 
 
-def test_synergy_and_relationship_tip_soften_a_low_strongest_score(
+def test_synergy_uses_total_score_while_relationship_tip_uses_strongest_dimension(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     mine = _result(
@@ -242,13 +259,76 @@ def test_synergy_and_relationship_tip_soften_a_low_strongest_score(
 
     assert result.synergy.score == scores.total
     assert result.synergy.title == "케미 게이지"
-    assert result.synergy.description == (
-        "서로 원하는 위로가 바로 닿지 않을 수 있어요. 힘든 날 필요한 방식을 먼저 알려주세요."
+    assert (
+        result.synergy.description
+        == "서로 편한 방식이 달라, 각자의 사용법을 알아갈 시간이 필요해요."
     )
-    assert result.synergy.tags[0] == "위로법을 알아가요"
+    assert result.synergy.tags[0] == "설명서가 필요해요"
     assert result.relationship_tip.description.startswith(
         "지은님과 선우님은 서로 원하는 위로법을 알아가는 중이에요."
     )
+
+
+@pytest.mark.parametrize(
+    ("score", "description", "tag"),
+    [
+        (
+            88,
+            "설명하지 않아도 서로 편한 방식을 자연스럽게 알아봐요.",
+            "찰떡 케미",
+        ),
+        (
+            76,
+            "닮은 부분은 편안하고, 다른 부분은 서로의 빈틈을 채워줘요.",
+            "달라도 잘 맞아요",
+        ),
+        (
+            64,
+            "서로의 사용법을 알아갈수록 점점 편해지는 사이예요.",
+            "맞춰갈수록 좋아요",
+        ),
+        (
+            63,
+            "서로 편한 방식이 달라, 각자의 사용법을 알아갈 시간이 필요해요.",
+            "설명서가 필요해요",
+        ),
+    ],
+)
+def test_synergy_copy_follows_total_score_band(
+    monkeypatch: pytest.MonkeyPatch,
+    score: int,
+    description: str,
+    tag: str,
+) -> None:
+    mine = _result(
+        code="mine0001",
+        nickname="지은",
+        mbti="ENTP",
+        scores=AxisScoresData(50, 50, 50, 50),
+    )
+    friend = _result(
+        code="frnd0001",
+        nickname="선우",
+        mbti="INFP",
+        scores=AxisScoresData(50, 50, 50, 50),
+    )
+    scores = CompatibilityScores(
+        distance=score,
+        conflict=score,
+        care=score,
+        pace=score,
+        mbti=score,
+    )
+    monkeypatch.setattr(
+        "pakit.services.compatibility_service.calculate_scores",
+        lambda _mine, _friend: scores,
+    )
+
+    result = build_compatibility(mine, friend)
+
+    assert result.synergy.score == score
+    assert result.synergy.description == description
+    assert result.synergy.tags[0] == tag
 
 
 def test_personal_tips_use_the_other_persons_extreme_attachment_direction() -> None:
