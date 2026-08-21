@@ -149,24 +149,10 @@ ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE: dict[str, Any] = {
             "description": "깊이 있는 대화와 아이디어 교류",
         },
         {
-            "badge": "환상의 장난감",
-            "noun": "큐브",
-            "character_id": "cube",
-            "image_url": "https://api.pakit.kr/assets/characters/cube.png",
-            "description": "깊이 있는 대화와 아이디어 교류",
-        },
-        {
             "badge": "환장의 장난감",
             "noun": "테디베어",
             "character_id": "teddy_bear",
             "image_url": "https://api.pakit.kr/assets/characters/teddy_bear.png",
-            "description": "세부적·보수적 성향으로 마찰",
-        },
-        {
-            "badge": "환장의 장난감",
-            "noun": "티포트",
-            "character_id": "teapot",
-            "image_url": "https://api.pakit.kr/assets/characters/teapot.png",
             "description": "세부적·보수적 성향으로 마찰",
         },
     ],
@@ -340,9 +326,9 @@ class AssessmentSubmissionOutput(BaseModel):
     warnings: list[str] = Field(min_length=4, max_length=4, description="주의사항 4개")
     charging: ChargingOutput = Field(description="충전 방법")
     compatible_friends: list[CompatibleFriendOutput] = Field(
-        max_length=4,
+        max_length=2,
         description=(
-            "개인 결과 화면의 친구 궁합 미리보기. 새 결과는 환상 2개와 환장 2개, "
+            "개인 결과 화면의 친구 궁합 미리보기. 새 결과는 환상 1개와 환장 1개, "
             "기존 결과는 비어 있음"
         ),
     )

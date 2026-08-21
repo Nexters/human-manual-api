@@ -12,42 +12,42 @@ from pakit.services.result_repository import ResultRepository
 
 COMPATIBILITY_PROFILE_VERSION = "2026-08-19.1"
 
-COMPATIBLE_MBTI_CANDIDATES: dict[MbtiType, tuple[MbtiType, MbtiType]] = {
-    MbtiType.INTJ: (MbtiType.ENFP, MbtiType.ENTP),
-    MbtiType.INTP: (MbtiType.ENTJ, MbtiType.ENFJ),
-    MbtiType.ENTJ: (MbtiType.INTP, MbtiType.INFP),
-    MbtiType.ENTP: (MbtiType.INFJ, MbtiType.INTJ),
-    MbtiType.INFJ: (MbtiType.ENTP, MbtiType.ENFP),
-    MbtiType.INFP: (MbtiType.ENFJ, MbtiType.ENTJ),
-    MbtiType.ENFJ: (MbtiType.INFP, MbtiType.ISFP),
-    MbtiType.ENFP: (MbtiType.INTJ, MbtiType.INFJ),
-    MbtiType.ISTJ: (MbtiType.ESFP, MbtiType.ESTP),
-    MbtiType.ISFJ: (MbtiType.ESFP, MbtiType.ESTP),
-    MbtiType.ESTJ: (MbtiType.ISFP, MbtiType.ISTP),
-    MbtiType.ESFJ: (MbtiType.ISFP, MbtiType.ISTP),
-    MbtiType.ISTP: (MbtiType.ESFJ, MbtiType.ESTJ),
-    MbtiType.ISFP: (MbtiType.ESTJ, MbtiType.ESFJ),
-    MbtiType.ESTP: (MbtiType.ISFJ, MbtiType.ISTJ),
-    MbtiType.ESFP: (MbtiType.ISTJ, MbtiType.ISFJ),
+COMPATIBLE_MBTI: dict[MbtiType, MbtiType] = {
+    MbtiType.INTJ: MbtiType.ENFP,
+    MbtiType.INTP: MbtiType.ENTJ,
+    MbtiType.ENTJ: MbtiType.INTP,
+    MbtiType.ENTP: MbtiType.INFJ,
+    MbtiType.INFJ: MbtiType.ENTP,
+    MbtiType.INFP: MbtiType.ENFJ,
+    MbtiType.ENFJ: MbtiType.INFP,
+    MbtiType.ENFP: MbtiType.INTJ,
+    MbtiType.ISTJ: MbtiType.ESFP,
+    MbtiType.ISFJ: MbtiType.ESTP,
+    MbtiType.ESTJ: MbtiType.ISFP,
+    MbtiType.ESFJ: MbtiType.ISTP,
+    MbtiType.ISTP: MbtiType.ESFJ,
+    MbtiType.ISFP: MbtiType.ESTJ,
+    MbtiType.ESTP: MbtiType.ISFJ,
+    MbtiType.ESFP: MbtiType.ISTJ,
 }
 
-MISMATCHED_MBTI_CANDIDATES: dict[MbtiType, tuple[MbtiType, MbtiType]] = {
-    MbtiType.INTJ: (MbtiType.ESFP, MbtiType.ISFP),
-    MbtiType.INTP: (MbtiType.ESFJ, MbtiType.ISFJ),
-    MbtiType.ENTJ: (MbtiType.ISFP, MbtiType.ESFP),
-    MbtiType.ENTP: (MbtiType.ISFJ, MbtiType.ESFJ),
-    MbtiType.INFJ: (MbtiType.ESTP, MbtiType.ESTJ),
-    MbtiType.INFP: (MbtiType.ESTJ, MbtiType.ESTP),
-    MbtiType.ENFJ: (MbtiType.ISTP, MbtiType.ESTP),
-    MbtiType.ENFP: (MbtiType.ISTJ, MbtiType.ESTJ),
-    MbtiType.ISTJ: (MbtiType.ENFP, MbtiType.ENFJ),
-    MbtiType.ISFJ: (MbtiType.ENTP, MbtiType.ENTJ),
-    MbtiType.ESTJ: (MbtiType.INFP, MbtiType.INFJ),
-    MbtiType.ESFJ: (MbtiType.INTP, MbtiType.ENTP),
-    MbtiType.ISTP: (MbtiType.ENFJ, MbtiType.ENFP),
-    MbtiType.ISFP: (MbtiType.ENTJ, MbtiType.INTJ),
-    MbtiType.ESTP: (MbtiType.INFJ, MbtiType.INFP),
-    MbtiType.ESFP: (MbtiType.INTJ, MbtiType.INTP),
+MISMATCHED_MBTI: dict[MbtiType, MbtiType] = {
+    MbtiType.INTJ: MbtiType.ESFP,
+    MbtiType.INTP: MbtiType.ESFJ,
+    MbtiType.ENTJ: MbtiType.ISFP,
+    MbtiType.ENTP: MbtiType.ISFJ,
+    MbtiType.INFJ: MbtiType.ESTP,
+    MbtiType.INFP: MbtiType.ESTJ,
+    MbtiType.ENFJ: MbtiType.ISTP,
+    MbtiType.ENFP: MbtiType.ISTJ,
+    MbtiType.ISTJ: MbtiType.ENFP,
+    MbtiType.ISFJ: MbtiType.ENTP,
+    MbtiType.ESTJ: MbtiType.INFP,
+    MbtiType.ESFJ: MbtiType.INTP,
+    MbtiType.ISTP: MbtiType.ENFJ,
+    MbtiType.ISFP: MbtiType.ENTJ,
+    MbtiType.ESTP: MbtiType.INFJ,
+    MbtiType.ESFP: MbtiType.INTJ,
 }
 
 COMPATIBLE_FRIEND_DESCRIPTION: dict[MbtiType, str] = {
@@ -296,15 +296,15 @@ MOTIVATION_COPY = {
 
 
 def build_compatible_friends(mbti: MbtiType) -> tuple[CompatibleFriendData, ...]:
-    groups = (
+    recommendations = (
         (
             "환상의 장난감",
-            COMPATIBLE_MBTI_CANDIDATES[mbti],
+            COMPATIBLE_MBTI[mbti],
             COMPATIBLE_FRIEND_DESCRIPTION[mbti],
         ),
         (
             "환장의 장난감",
-            MISMATCHED_MBTI_CANDIDATES[mbti],
+            MISMATCHED_MBTI[mbti],
             MISMATCHED_FRIEND_DESCRIPTION[mbti],
         ),
     )
@@ -316,8 +316,7 @@ def build_compatible_friends(mbti: MbtiType) -> tuple[CompatibleFriendData, ...]
             image_url=f"/assets/{CHARACTERS[friend_mbti].asset_key}",
             description=description,
         )
-        for badge, candidates, description in groups
-        for friend_mbti in candidates
+        for badge, friend_mbti, description in recommendations
     )
 
 

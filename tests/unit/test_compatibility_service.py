@@ -320,45 +320,42 @@ def test_low_compatibility_headline_explains_the_difference_without_judging_the_
 @pytest.mark.parametrize(
     ("mbti", "compatible", "mismatched"),
     [
-        (MbtiType.INTJ, (MbtiType.ENFP, MbtiType.ENTP), (MbtiType.ESFP, MbtiType.ISFP)),
-        (MbtiType.INTP, (MbtiType.ENTJ, MbtiType.ENFJ), (MbtiType.ESFJ, MbtiType.ISFJ)),
-        (MbtiType.ENTJ, (MbtiType.INTP, MbtiType.INFP), (MbtiType.ISFP, MbtiType.ESFP)),
-        (MbtiType.ENTP, (MbtiType.INFJ, MbtiType.INTJ), (MbtiType.ISFJ, MbtiType.ESFJ)),
-        (MbtiType.INFJ, (MbtiType.ENTP, MbtiType.ENFP), (MbtiType.ESTP, MbtiType.ESTJ)),
-        (MbtiType.INFP, (MbtiType.ENFJ, MbtiType.ENTJ), (MbtiType.ESTJ, MbtiType.ESTP)),
-        (MbtiType.ENFJ, (MbtiType.INFP, MbtiType.ISFP), (MbtiType.ISTP, MbtiType.ESTP)),
-        (MbtiType.ENFP, (MbtiType.INTJ, MbtiType.INFJ), (MbtiType.ISTJ, MbtiType.ESTJ)),
-        (MbtiType.ISTJ, (MbtiType.ESFP, MbtiType.ESTP), (MbtiType.ENFP, MbtiType.ENFJ)),
-        (MbtiType.ISFJ, (MbtiType.ESFP, MbtiType.ESTP), (MbtiType.ENTP, MbtiType.ENTJ)),
-        (MbtiType.ESTJ, (MbtiType.ISFP, MbtiType.ISTP), (MbtiType.INFP, MbtiType.INFJ)),
-        (MbtiType.ESFJ, (MbtiType.ISFP, MbtiType.ISTP), (MbtiType.INTP, MbtiType.ENTP)),
-        (MbtiType.ISTP, (MbtiType.ESFJ, MbtiType.ESTJ), (MbtiType.ENFJ, MbtiType.ENFP)),
-        (MbtiType.ISFP, (MbtiType.ESTJ, MbtiType.ESFJ), (MbtiType.ENTJ, MbtiType.INTJ)),
-        (MbtiType.ESTP, (MbtiType.ISFJ, MbtiType.ISTJ), (MbtiType.INFJ, MbtiType.INFP)),
-        (MbtiType.ESFP, (MbtiType.ISTJ, MbtiType.ISFJ), (MbtiType.INTJ, MbtiType.INTP)),
+        (MbtiType.INTJ, MbtiType.ENFP, MbtiType.ESFP),
+        (MbtiType.INTP, MbtiType.ENTJ, MbtiType.ESFJ),
+        (MbtiType.ENTJ, MbtiType.INTP, MbtiType.ISFP),
+        (MbtiType.ENTP, MbtiType.INFJ, MbtiType.ISFJ),
+        (MbtiType.INFJ, MbtiType.ENTP, MbtiType.ESTP),
+        (MbtiType.INFP, MbtiType.ENFJ, MbtiType.ESTJ),
+        (MbtiType.ENFJ, MbtiType.INFP, MbtiType.ISTP),
+        (MbtiType.ENFP, MbtiType.INTJ, MbtiType.ISTJ),
+        (MbtiType.ISTJ, MbtiType.ESFP, MbtiType.ENFP),
+        (MbtiType.ISFJ, MbtiType.ESTP, MbtiType.ENTP),
+        (MbtiType.ESTJ, MbtiType.ISFP, MbtiType.INFP),
+        (MbtiType.ESFJ, MbtiType.ISTP, MbtiType.INTP),
+        (MbtiType.ISTP, MbtiType.ESFJ, MbtiType.ENFJ),
+        (MbtiType.ISFP, MbtiType.ESTJ, MbtiType.ENTJ),
+        (MbtiType.ESTP, MbtiType.ISFJ, MbtiType.INFJ),
+        (MbtiType.ESFP, MbtiType.ISTJ, MbtiType.INTJ),
     ],
 )
-def test_builds_two_matching_and_two_mismatched_cards_from_the_fixed_table(
+def test_builds_one_matching_and_one_mismatched_card_from_the_fixed_table(
     mbti: MbtiType,
-    compatible: tuple[MbtiType, MbtiType],
-    mismatched: tuple[MbtiType, MbtiType],
+    compatible: MbtiType,
+    mismatched: MbtiType,
 ) -> None:
     friends = build_compatible_friends(mbti)
 
-    assert len(friends) == 4
+    assert len(friends) == 2
     assert [friend.character_id for friend in friends] == [
-        CHARACTERS[friend_mbti].code for friend_mbti in (*compatible, *mismatched)
+        CHARACTERS[compatible].code,
+        CHARACTERS[mismatched].code,
     ]
     assert [friend.badge for friend in friends] == [
         "환상의 장난감",
-        "환상의 장난감",
-        "환장의 장난감",
         "환장의 장난감",
     ]
     assert [friend.description for friend in friends] == [
         COMPATIBLE_FRIEND_DESCRIPTION[mbti],
-        COMPATIBLE_FRIEND_DESCRIPTION[mbti],
-        MISMATCHED_FRIEND_DESCRIPTION[mbti],
         MISMATCHED_FRIEND_DESCRIPTION[mbti],
     ]
     assert all(friend.image_url.startswith("/assets/characters/") for friend in friends)

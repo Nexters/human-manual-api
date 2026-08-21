@@ -593,18 +593,12 @@ Q06은 사용자가 고른 걸 그대로, 첫 슬롯은 MBTI T/F×표현방식, 
 
     # ── 8. 함께하면 좋은 친구 ────────────────────────────────────────────
     friend_map_table = table(
-        ["내 MBTI", "환상의 장난감 2개", "환장의 장난감 2개"],
+        ["내 MBTI", "환상의 장난감", "환장의 장난감"],
         [
             [
                 code_chip(m.value),
-                " · ".join(
-                    f"{esc(friend.value)} {esc(noun(friend))}"
-                    for friend in cs.COMPATIBLE_MBTI_CANDIDATES[m]
-                ),
-                " · ".join(
-                    f"{esc(friend.value)} {esc(noun(friend))}"
-                    for friend in cs.MISMATCHED_MBTI_CANDIDATES[m]
-                ),
+                f"{esc(cs.COMPATIBLE_MBTI[m].value)} {esc(noun(cs.COMPATIBLE_MBTI[m]))}",
+                f"{esc(cs.MISMATCHED_MBTI[m].value)} {esc(noun(cs.MISMATCHED_MBTI[m]))}",
             ]
             for m in MBTI
         ],
@@ -621,9 +615,9 @@ Q06은 사용자가 고른 걸 그대로, 첫 슬롯은 MBTI T/F×표현방식, 
         ],
     )
     friend_body = f"""
-<p class="lead">개인 결과에 카드 4장. MBTI별 고정표에서 환상의 장난감 2개와
-환장의 장난감 2개를 표의 순서대로 반환해요.</p>
-<h4>환상/환장 MBTI 매핑 · 유형별 2+2</h4>
+<p class="lead">개인 결과에 카드 2장. MBTI별 고정표에서 환상의 장난감 1개와
+환장의 장난감 1개를 반환해요.</p>
+<h4>환상/환장 MBTI 매핑 · 유형별 1+1</h4>
 {friend_map_table}
 <h4>MBTI별 환상/환장 설명 · 16+16</h4>
 {friend_desc_table}"""
@@ -633,7 +627,7 @@ Q06은 사용자가 고른 걸 그대로, 첫 슬롯은 MBTI T/F×표현방식, 
             "결과 · compatible_friends",
             "환상과 환장의 장난감",
             mbtichip(),
-            "후보 32+32 · 설명 16+16",
+            "매핑 16+16 · 설명 16+16",
             friend_body,
         )
     )
