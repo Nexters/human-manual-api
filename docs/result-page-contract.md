@@ -249,7 +249,7 @@
   "charging": {
     "description": "잠이 충분히 채워져야 나머지가 돌아가는 사람이에요. 새로운 구경거리가 생기면 다시 기운이 올라와요.",
     "activities": [
-      {"type": "sleep_until_noon", "label": "방해 없는 늦잠"},
+      {"type": "sleep_until_noon", "label": "충분한 휴식"},
       {"type": "go_to_bed", "label": "혼자만의 시간"},
       {"type": "ENTP", "label": "호기심 충족"}
     ]

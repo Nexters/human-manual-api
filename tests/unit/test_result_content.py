@@ -290,7 +290,7 @@ def test_defines_copy_for_all_opening_tools() -> None:
 
 
 def test_result_content_has_explicit_version() -> None:
-    assert RESULT_CONTENT_VERSION == "2026-08-21.7"
+    assert RESULT_CONTENT_VERSION == "2026-08-21.8"
 
 
 def test_defines_fixed_feature_tags_in_slot_order() -> None:

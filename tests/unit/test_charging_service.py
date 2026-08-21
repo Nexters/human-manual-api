@@ -80,9 +80,20 @@ def test_defines_matching_base_description_and_keyword_inputs() -> None:
 
 
 def test_uses_confirmed_charging_keyword_labels() -> None:
-    assert BASE_CHARGING_KEYWORD["sleep_until_noon"] == "방해 없는 늦잠"
-    assert BASE_CHARGING_KEYWORD["stay_in_bed"] == "침대와 한몸"
-    assert EMERGENCY_CHARGING_KEYWORD["go_to_bed"] == "혼자만의 시간"
+    assert BASE_CHARGING_KEYWORD == {
+        "sleep_until_noon": "충분한 휴식",
+        "morning_run": "에너지 발산",
+        "brunch_cafe": "소확행",
+        "stay_in_bed": "침대와 한몸",
+        "watch_streaming": "몰입",
+        "self_development": "작은 성취",
+    }
+    assert EMERGENCY_CHARGING_KEYWORD == {
+        "go_to_bed": "혼자만의 시간",
+        "contact_others": "친구 만나기",
+        "eat_alone": "맛있는 음식",
+        "go_for_drive": "새로운 환경",
+    }
 
 
 def test_defines_confirmed_q07_charging_mechanisms_and_descriptions() -> None:
