@@ -1,127 +1,111 @@
-# Pakit Backend
+<div align="center">
+  <img src="src/pakit/static/characters/spinning_top.png" width="140" alt="Pakit character" />
 
-**나 사용 설명서** 서비스의 FastAPI 백엔드입니다.
-현재 제품 기준은 [`PRD_나사용설명서.html`](./PRD_%E1%84%82%E1%85%A1%E1%84%89%E1%85%A1%E1%84%8B%E1%85%AD%E1%86%BC%E1%84%89%E1%85%A5%E1%86%AF%E1%84%86%E1%85%A7%E1%86%BC%E1%84%89%E1%85%A5.html)입니다.
+# Pakit — 나 사용 설명서
 
-## 시작하기
+**나를 하나의 장난감처럼 언박싱하고, 친구와 서로를 더 잘 이해하는 성향 테스트 서비스**
 
-Python 3.12와 [uv](https://docs.astral.sh/uv/getting-started/installation/)가 필요합니다.
+[서비스 바로가기](https://pakit.kr) · [API 문서](https://api.pakit.kr/docs)
 
-```bash
-cp .env.example .env
-uv sync
-uv run uvicorn pakit.main:app --reload
+</div>
+
+## Pakit은 어떤 서비스인가요?
+
+사람마다 가까워지는 속도도, 마음을 표현하는 방식도, 에너지를 충전하는 방법도 다릅니다.
+Pakit은 일상적인 질문과 MBTI를 바탕으로 사용자의 성향을 분석하고, 그 결과를 **나 사용
+설명서**로 만들어 줍니다.
+
+딱딱한 유형명 대신 장난감 캐릭터, 포장 상자, 개봉 도구라는 친숙한 메타포를 사용합니다.
+결과를 혼자 확인하는 데서 끝나지 않고 친구와 공유해, 두 사람의 거리감과 갈등 해결 방식,
+마음을 주고받는 방식까지 함께 살펴볼 수 있습니다.
+
+## 주요 기능
+
+### 🧸 나를 닮은 장난감 찾기
+
+- 20개 답변과 MBTI를 조합해 16종의 장난감 캐릭터 중 하나를 매칭합니다.
+- 거리 조절, 표현 방식, 익숙함, 감성이라는 네 가지 성향 축을 0–100 점수로 보여줍니다.
+- 성향에 맞는 포장 상자와 개봉 도구를 골라 “나를 알아가는 방법”을 시각적으로 표현합니다.
+
+### 📖 나 사용 설명서 만들기
+
+- 핵심 특징, 사용 방법, 주의사항, 충전 방법을 개인화된 문장으로 제공합니다.
+- 결과 코드를 발급해 언제든 생성 당시의 결과를 다시 볼 수 있습니다.
+- 카피가 업데이트되어도 기존 결과가 바뀌지 않도록 결과 전체를 스냅샷으로 보존합니다.
+
+### 🤝 친구와 궁합 확인하기
+
+- 두 사람의 결과 코드만으로 친구 궁합을 확인할 수 있습니다.
+- 거리감, 갈등을 푸는 속도, 챙김 방식, 함께 움직이는 속도를 비교합니다.
+- 하나의 점수에 그치지 않고 서로에게 필요한 팁과 관계를 오래 이어가는 방법을 제안합니다.
+
+## 결과는 이렇게 만들어집니다
+
+Pakit의 결과 문구는 생성형 AI가 아니라 **명시적인 규칙**으로 결정됩니다. 같은 입력에는 언제나
+같은 결과가 나오고, 각 문장이 어떤 답변에서 비롯됐는지 추적할 수 있습니다.
+
+```mermaid
+flowchart LR
+    A[20개 답변 + MBTI] --> B[입력 계약 검증]
+    B --> C[4개 성향 축 계산]
+    C --> D[캐릭터·콘텐츠 조합]
+    D --> E[결과 스냅샷 저장]
+    E --> F[결과 조회·공유]
+    E --> G[친구 궁합 계산]
 ```
 
-- API 문서: <http://localhost:8000/docs>
-- 수동 테스트 페이지: <http://localhost:8000/test/>
-- 상태 확인: <http://localhost:8000/health>
-- API 상태 확인: <http://localhost:8000/api/health>
+- **계약 기반 입력 검증**: 버전이 지정된 문항·선택지 ID와 Pydantic 모델로 잘못된 제출을
+  차단합니다.
+- **결정적 분류 로직**: 점수, 캐릭터, 특징, 사용 방법과 주의사항을 도메인 규칙으로 조합합니다.
+- **과거 결과 보존**: 결과 생성 시점의 콘텐츠를 PostgreSQL에 스냅샷으로 저장합니다.
+- **개인정보 최소화**: 결과 표시용 닉네임만 저장하고 원본 답변은 저장하지 않습니다.
 
-브라우저 요청은 로컬 프론트엔드 `http://localhost:3000`, `http://localhost:5173`과 운영
-프론트엔드 `https://pakit.kr`에서 허용됩니다. 이 목록은 서버 코드에 고정되어 있으며 `.env`로
-재정의하지 않습니다.
+## 기술 스택
 
-## 로컬에서 실행하기
+| 영역     | 기술                                         |
+| -------- | -------------------------------------------- |
+| API      | Python 3.12, FastAPI, Pydantic v2            |
+| Database | PostgreSQL 17, SQLAlchemy 2.0 Async, Alembic |
+| Package  | uv                                           |
+| Quality  | pytest, coverage, Ruff, mypy                 |
+| Deploy   | Docker, Docker Compose                       |
 
-먼저 `.env.example`을 복사하고 `PAKIT_DATABASE_PASSWORD`와 `POSTGRES_PASSWORD`에 같은
-로컬 DB 비밀번호를 설정합니다.
-
-```bash
-cp .env.example .env
-```
-
-로컬에서는 PostgreSQL만 Docker로 실행합니다. `compose.local.yaml`은 DB 포트를 로컬
-루프백 주소에만 열며 배포에는 사용하지 않습니다.
-
-```bash
-docker compose -f compose.yaml -f compose.local.yaml up -d db
-uv run alembic upgrade head
-uv run uvicorn pakit.main:app --reload
-```
-
-개발을 마치면 DB 컨테이너만 중지할 수 있습니다. `postgres_data` 볼륨은 그대로 유지됩니다.
-
-```bash
-docker compose -f compose.yaml -f compose.local.yaml stop db
-```
-
-## Docker Compose로 배포하기
-
-배포 서버에서는 기존 `compose.yaml`로 API, PostgreSQL, 프론트엔드를 함께 실행합니다. 이때
-백엔드 저장소의 상위 경로에 `frontend-app`이 있어야 합니다.
-
-```bash
-docker compose up --build -d
-```
-
-운영 PostgreSQL은 외부 포트를 열지 않고 Docker 내부 네트워크에서만 접근합니다. 데이터는
-`postgres_data` 볼륨에 저장되므로 일반적인 컨테이너 재시작과 재배포 후에도 유지됩니다. API
-컨테이너는 시작 전에 `alembic upgrade head`를 자동 실행합니다. `docker compose down -v`는
-데이터 볼륨까지 삭제하므로 운영 서버에서 실행하지 않습니다.
-
-## 자주 쓰는 명령
-
-```bash
-uv run pytest
-uv run ruff check .
-uv run ruff format --check .
-uv run mypy
-```
-
-자동 수정은 `uv run ruff check --fix .`와 `uv run ruff format .`을 사용합니다.
-
-## 구조
+초기 제품에서 빠르게 규칙을 검증하면서도 도메인 경계를 지킬 수 있도록 **모듈형 모놀리스**로
+구성했습니다.
 
 ```text
 src/pakit/
-├── api/          # HTTP 라우터와 요청/응답 계약
-├── core/         # 환경 설정과 공통 기반 코드
-├── domain/       # 프레임워크와 분리된 도메인 모델
-└── services/     # 유스케이스와 룰 기반 결과 조립
+├── api/          # HTTP 라우터와 요청·응답 계약
+├── domain/       # 프레임워크에 의존하지 않는 도메인 모델
+├── services/     # 분류, 결과 조합, 궁합 계산 유스케이스
+├── core/         # 설정, 데이터베이스 등 런타임 기반 코드
+├── static/       # 캐릭터와 결과 페이지 이미지
+└── web/          # 콘텐츠 검수용 내부 도구
 ```
 
-프론트엔드는 완료된 22개 답변과 선택한 MBTI 유형을
-`POST /api/tests/submissions`로 제출할 수 있습니다. 응답은 결과 페이지의 7개 영역으로
-구성되며, 응답의 `result_code`를 사용해 `GET /api/results/{result_code}`로 다시 조회할 수
-있습니다. 성향 점수·형용사·MBTI별 캐릭터 명사와 언박싱 아이템은 룰로
-결정합니다. 핵심 특징 아래의 장난감 이야기도 MBTI별 16종 고정 카피로 반환하며, `이렇게
-다뤄주세요`와 `이렇게 하면 고장나요`의 네 문구도 테스트 답변·성향 점수·MBTI를 조합해
-반환합니다. 충전 설명과 활동은 휴일·약속 취소 답변의 조합으로 결정하며, 계산 규칙이 확정되지
-않은 충전 점수는 반환하지 않습니다. 개인 결과의 `compatible_friends`에는 MBTI와 성향 축을 조합한 잘 맞는 친구
-장난감 카드 2개가 포함됩니다. 제출 결과는 URL-safe 8자리 `result_code`와 함께
-PostgreSQL에 닉네임을 포함한 결과 스냅샷으로 저장되며, 이후 카피가 바뀌어도 생성 당시 결과
-그대로 조회됩니다. 원본 답변은 보존 정책이 확정되지 않아 현재 저장하지 않습니다.
+## API
 
-친구 궁합은 두 사람이 발급받은 실제 결과 코드로
-`GET /api/compatibility?mine={내 결과 코드}&friend={친구 결과 코드}`에서 확인할 수 있습니다.
-성향 축과 관계 관련 답변에서 만든 파생 프로필을 70%, MBTI 축 일치도를 30% 반영해 거리감,
-갈등을 푸는 속도, 챙김 방식, 함께 움직이는 속도를 계산합니다. 궁합 기능 도입 전에 만든
-결과처럼 궁합 파생 프로필이 없는 스냅샷은 `409 COMPATIBILITY_PROFILE_UNAVAILABLE`을 반환합니다.
-로컬 개발 중에는 `/compatibility-test/`에서 두 결과 코드를 입력해 궁합 화면과 원본 JSON을
-함께 확인할 수 있습니다. `/test/`에서 새 결과를 만든 뒤 제공되는 링크를 누르면 내 결과 코드가
-자동으로 채워집니다.
+| Method | Endpoint                                       | 설명                           |
+| ------ | ---------------------------------------------- | ------------------------------ |
+| `POST` | `/api/tests/submissions`                       | 답변을 제출하고 개인 결과 생성 |
+| `GET`  | `/api/tests/submissions/count`                 | 누적 테스트 완료 수 조회       |
+| `GET`  | `/api/results/{result_code}`                   | 저장된 결과 조회               |
+| `GET`  | `/api/compatibility?mine={code}&friend={code}` | 두 결과의 친구 궁합 조회       |
+| `GET`  | `/health`                                      | 서버 상태 확인                 |
 
-상세 결정 사항과 다음 구현 순서는 [`docs/architecture.md`](./docs/architecture.md)를 참고하세요.
-20개 문항의 기계 판독 가능한 ID 목록은
-[`docs/assessment-identifiers.v1.json`](./docs/assessment-identifiers.v1.json)에 있습니다.
-실행 가능한 요청·응답 명세와 예시는 서버 실행 후 `/docs`의 Swagger에서 확인할 수 있습니다.
-결과 페이지 와이어프레임 기반의 응답 계약은
-[`docs/result-page-contract.md`](./docs/result-page-contract.md)에 있습니다.
+서버 실행 후 [Swagger UI](http://localhost:8000/docs)에서 실제 요청·응답 예시와 에러 계약을
+확인할 수 있습니다.
 
-## Codex로 작업하기
+## 프로젝트 문서
 
-저장소 루트에서 Codex를 시작하고 이 프로젝트를 신뢰 대상으로 설정하면 다음 구성이
-자동으로 적용됩니다.
+- [백엔드 설계와 제품 결정](docs/architecture.md)
+- [문항·선택지 계약](docs/assessment-identifiers.v1.json)
+- [결과 페이지 API 계약](docs/result-page-contract.md)
+- [친구 궁합 계산 규칙](docs/compatibility-rules.md)
+- [제품 요구사항](PRD_%E1%84%82%E1%85%A1%E1%84%89%E1%85%A1%E1%84%8B%E1%85%AD%E1%86%BC%E1%84%89%E1%85%A5%E1%86%AF%E1%84%86%E1%85%A7%E1%86%BC%E1%84%89%E1%85%A5.html)
 
-- `AGENTS.md`: 항상 적용되는 아키텍처, 보안, 검증 규칙
-- `.codex/config.toml`: workspace-write, 요청 기반 승인, 제한된 네트워크와 비밀 환경변수 보호
-- `.agents/skills/pakit-product-change`: PRD 기반 제품 기능 변경 전용 워크플로
+---
 
-제품 동작을 바꾸는 작업은 스킬을 명시해 요청할 수 있습니다.
-
-```text
-$pakit-product-change를 사용해서 검사 점수 계산 규칙을 구현해줘.
-```
-
-모델, 개인 GitHub 연결, 알림 같은 사용자별 설정은 저장소에 고정하지 않습니다.
+<div align="center">
+  서로를 이해하는 가장 재미있는 방법, <strong>Pakit</strong>
+</div>
