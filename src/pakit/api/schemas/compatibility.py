@@ -58,7 +58,7 @@ COMPATIBILITY_RESPONSE_EXAMPLE: dict[str, Any] = {
         {
             "key": "pace",
             "score": 91,
-            "title": "약속과 행동의 리듬",
+            "title": "함께 움직이는 방식",
             "label": "자연스럽게 맞아요",
             "description": (
                 "지은님은 분위기를 끌어올리고 재밌는 일이 생기면 움직여요. 선우님은 "

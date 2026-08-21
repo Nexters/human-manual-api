@@ -240,6 +240,7 @@ def test_returns_four_detailed_conversation_topics() -> None:
     assert "질문은 공격이 아니고" in details[1].description
     assert details[2].title == "마음을 주고받는 방식"
     assert "같이 웃으며 분위기를 바꿀 때" in details[2].description
+    assert details[3].title == "함께 움직이는 방식"
     assert "재밌는 일이 생겨야" in details[3].description
 
 

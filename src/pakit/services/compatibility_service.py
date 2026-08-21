@@ -732,7 +732,7 @@ def _pace_detail(
     return CompatibilityDetailData(
         key="pace",
         score=score,
-        title="약속과 행동의 리듬",
+        title="함께 움직이는 방식",
         label=_detail_label(score),
         description=description,
     )
