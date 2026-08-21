@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Body, Depends, Path, Request
 from fastapi.responses import JSONResponse
 
-from pakit.api.dependencies import get_result_repository
+from pakit.api.dependencies import get_result_repository, get_usage_event_repository
 from pakit.api.schemas.assessment_submissions import (
     ASSESSMENT_SUBMISSION_EXAMPLE,
     ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE,
@@ -21,6 +21,8 @@ from pakit.services.submission_service import (
     get_result,
     submit_assessment,
 )
+from pakit.services.usage_event_repository import UsageEventRepository
+from pakit.services.usage_tracking_service import record_result_viewed
 
 router = APIRouter(prefix="/tests", tags=["Test"])
 results_router = APIRouter(prefix="/results", tags=["Test"])
@@ -156,6 +158,7 @@ async def get_assessment_result(
         Path(description="테스트 제출 응답에서 받은 결과 조회 코드"),
     ],
     repository: Annotated[ResultRepository, Depends(get_result_repository)],
+    usage_repository: Annotated[UsageEventRepository, Depends(get_usage_event_repository)],
 ) -> AssessmentSubmissionOutput | JSONResponse:
     """고유 결과 코드로 저장된 테스트 결과를 조회합니다."""
     try:
@@ -170,6 +173,7 @@ async def get_assessment_result(
                 }
             },
         )
+    await record_result_viewed(usage_repository, result_code=result_code)
     return AssessmentSubmissionOutput.from_domain(
         result,
         public_base_url=str(request.base_url),

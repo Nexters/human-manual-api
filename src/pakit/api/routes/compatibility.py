@@ -4,13 +4,14 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import JSONResponse
 
-from pakit.api.dependencies import get_result_repository
+from pakit.api.dependencies import get_result_repository, get_usage_event_repository
 from pakit.api.schemas.assessment_submissions import ErrorResponse
 from pakit.api.schemas.compatibility import (
     COMPATIBILITY_RESPONSE_EXAMPLE,
     CompatibilityOutput,
 )
 from pakit.services.compatibility_service import (
+    COMPATIBILITY_RULES_VERSION,
     CompatibilityNotFoundError,
     CompatibilityUnavailableError,
 )
@@ -18,6 +19,8 @@ from pakit.services.compatibility_service import (
     get_compatibility as build_compatibility_result,
 )
 from pakit.services.result_repository import ResultRepository
+from pakit.services.usage_event_repository import UsageEventRepository
+from pakit.services.usage_tracking_service import record_compatibility_completed
 
 router = APIRouter(prefix="/compatibility", tags=["Compatibility"])
 
@@ -49,6 +52,7 @@ async def get_compatibility(
     mine: Annotated[str, Query(description="내 테스트 결과 코드")],
     friend: Annotated[str, Query(description="친구 테스트 결과 코드")],
     repository: Annotated[ResultRepository, Depends(get_result_repository)],
+    usage_repository: Annotated[UsageEventRepository, Depends(get_usage_event_repository)],
 ) -> CompatibilityOutput | JSONResponse:
     """저장된 두 테스트 결과로 친구 궁합을 계산합니다."""
     try:
@@ -73,6 +77,13 @@ async def get_compatibility(
                 }
             },
         )
+    await record_compatibility_completed(
+        usage_repository,
+        mine_result_code=mine,
+        friend_result_code=friend,
+        score=result.synergy.score,
+        version=COMPATIBILITY_RULES_VERSION,
+    )
     return CompatibilityOutput.from_domain_payload(
         asdict(result),
         public_base_url=str(request.base_url),

@@ -73,6 +73,78 @@ flowchart LR
 초기 제품에서 빠르게 규칙을 검증하면서도 도메인 경계를 지킬 수 있도록 **모듈형 모놀리스**로
 구성했습니다.
 
+## 로컬 개발
+
+먼저 `.env.example`을 복사하고 `PAKIT_DATABASE_PASSWORD`와 `POSTGRES_PASSWORD`에 같은
+로컬 DB 비밀번호를 설정합니다.
+
+```bash
+cp .env.example .env
+```
+
+로컬에서는 PostgreSQL만 Docker로 실행합니다. `compose.local.yaml`은 DB 포트를 로컬
+루프백 주소에만 열며 배포에는 사용하지 않습니다.
+
+```bash
+docker compose -f compose.yaml -f compose.local.yaml up -d db
+uv run alembic upgrade head
+uv run uvicorn pakit.main:app --reload
+```
+
+### 운영 어드민과 백엔드 통계
+
+읽기 전용 어드민은 다음 환경변수를 모두 설정해야 열립니다. 하나라도 비어 있으면 `/admin`과
+`/api/admin/*`는 `503`으로 닫힙니다. 운영에서는 반드시 HTTPS와 배포 앞단의 접근 제어를 함께
+사용하세요.
+
+```dotenv
+PAKIT_ADMIN_USERNAME=operator
+PAKIT_ADMIN_PASSWORD=충분히-긴-임의의-비밀번호
+PAKIT_USAGE_TRACKING_STARTED_AT=2026-08-20T18:00:00+09:00
+```
+
+- `/admin`: 생성 결과·궁합 현황과 최근 7일 추이
+- `/admin/results`: 전체 결과 검색과 상세 스냅샷
+- `/admin/analytics`: MBTI·장난감·키워드·성향·궁합 분포
+
+`PAKIT_USAGE_TRACKING_STARTED_AT`은 `backend_usage_events` 계측을 실제로 배포한 시각입니다.
+설정하지 않으면 과거 결과를 미사용자로 오해하지 않도록 궁합 경험 비율을 표시하지 않습니다.
+공개 결과 조회와 궁합 계산의 성공 요청만 기록하며 닉네임, 원본 답변, IP, User-Agent는 사용
+기록에 저장하지 않습니다. 프론트 페이지뷰·클릭·유입 분석은 GA에서 관리합니다.
+
+개발을 마치면 DB 컨테이너만 중지할 수 있습니다. `postgres_data` 볼륨은 그대로 유지됩니다.
+
+```bash
+docker compose -f compose.yaml -f compose.local.yaml stop db
+```
+
+## Docker Compose로 배포하기
+
+배포 서버에서는 기존 `compose.yaml`로 API, PostgreSQL, 프론트엔드를 함께 실행합니다. 이때
+백엔드 저장소의 상위 경로에 `frontend-app`이 있어야 합니다.
+
+```bash
+docker compose up --build -d
+```
+
+운영 PostgreSQL은 외부 포트를 열지 않고 Docker 내부 네트워크에서만 접근합니다. 데이터는
+`postgres_data` 볼륨에 저장되므로 일반적인 컨테이너 재시작과 재배포 후에도 유지됩니다. API
+컨테이너는 시작 전에 `alembic upgrade head`를 자동 실행합니다. `docker compose down -v`는
+데이터 볼륨까지 삭제하므로 운영 서버에서 실행하지 않습니다.
+
+## 자주 쓰는 명령
+
+```bash
+uv run pytest
+uv run ruff check .
+uv run ruff format --check .
+uv run mypy
+```
+
+자동 수정은 `uv run ruff check --fix .`와 `uv run ruff format .`을 사용합니다.
+
+## 구조
+
 ```text
 src/pakit/
 ├── api/          # HTTP 라우터와 요청·응답 계약
