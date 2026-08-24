@@ -6,6 +6,7 @@ from pakit.services.admin_service import (
     build_dashboard,
     build_result_analytics,
     filter_results,
+    usage_counts,
 )
 
 
@@ -87,7 +88,7 @@ def test_calculates_result_code_based_view_to_compatibility_conversion() -> None
 
     analytics = build_compatibility_analytics(results, events, tracking_started_at=started_at)
 
-    assert analytics["completed_count"] == 3
+    assert analytics["completed_count"] == 1
     assert analytics["experienced_result_count"] == 2
     assert analytics["experience_ratio"] == 100.0
     assert analytics["viewed_result_count"] == 2
@@ -95,14 +96,19 @@ def test_calculates_result_code_based_view_to_compatibility_conversion() -> None
     assert analytics["viewed_result_ratio"] == 100.0
     assert analytics["view_to_compatibility_ratio"] == 50.0
     assert analytics["average_per_experienced_result"] == 1.5
-    assert analytics["average_score"] == 70.0
+    assert analytics["average_score"] == 90.0
     assert analytics["score_bands"] == {
         "0~24": 0,
-        "25~49": 1,
+        "25~49": 0,
         "50~74": 0,
-        "75~100": 2,
+        "75~100": 1,
     }
-    assert analytics["mbti_combinations"][0]["key"] == "ENTP x INTJ"
+    assert analytics["mbti_combinations"][0] == {
+        "key": "ENTP x INTJ",
+        "count": 1,
+        "ratio": 100.0,
+    }
+    assert analytics["versions"] == [{"key": "rules-v1", "count": 1, "ratio": 100.0}]
 
 
 def test_does_not_publish_experience_ratio_without_tracking_start() -> None:
@@ -190,6 +196,23 @@ def test_dashboard_counts_unique_unordered_compatibility_pairs() -> None:
     assert dashboard["counts"]["seven_day_compatibility"] == 3
     assert dashboard["trend"][-1]["compatibility"] == 2
     assert dashboard["trend"][-2]["compatibility"] == 1
+
+
+def test_usage_counts_unique_partners_for_both_results_in_each_pair() -> None:
+    now = datetime(2026, 8, 20, tzinfo=UTC)
+    events = [
+        _event("result_viewed", "RESULT01", now),
+        _event("result_viewed", "RESULT01", now + timedelta(minutes=1)),
+        _event("compatibility_completed", "RESULT01", now, friend="RESULT02"),
+        _event("compatibility_completed", "RESULT01", now, friend="RESULT02"),
+        _event("compatibility_completed", "RESULT02", now, friend="RESULT01"),
+        _event("compatibility_completed", "RESULT01", now, friend="RESULT03"),
+    ]
+
+    views, compatibility = usage_counts(events)
+
+    assert views == {"RESULT01": 2}
+    assert compatibility == {"RESULT01": 2, "RESULT02": 1, "RESULT03": 1}
 
 
 def test_filters_results_by_nickname_and_mbti() -> None:

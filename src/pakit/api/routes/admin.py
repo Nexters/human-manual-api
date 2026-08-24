@@ -111,15 +111,11 @@ async def get_admin_result_detail(
     if result is None:
         raise HTTPException(status_code=404, detail="결과를 찾을 수 없습니다.")
     events = await repository.list_usage_events()
+    _, compatibility = usage_counts(events)
     views = [
         event
         for event in events
         if event.event_name == "result_viewed" and event.result_code == result_code
-    ]
-    compatibility = [
-        event
-        for event in events
-        if event.event_name == "compatibility_completed" and event.result_code == result_code
     ]
     participant = result.snapshot.get("participant")
     nickname = participant.get("nickname") if isinstance(participant, dict) else None
@@ -132,7 +128,7 @@ async def get_admin_result_detail(
         usage={
             "view_count": len(views),
             "last_viewed_at": max((event.occurred_at for event in views), default=None),
-            "compatibility_count": len(compatibility),
+            "compatibility_count": compatibility[result_code],
         },
         snapshot=result.snapshot,
     )

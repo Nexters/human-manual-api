@@ -145,21 +145,38 @@ def usage_counts(events: list[StoredUsageEvent]) -> tuple[Counter[str], Counter[
     for event in events:
         if event.event_name == "result_viewed":
             views[event.result_code] += 1
-        elif event.event_name == "compatibility_completed":
-            compatibility[event.result_code] += 1
+    for first, second in _unique_compatibility_pairs(events):
+        compatibility[first] += 1
+        if second != first:
+            compatibility[second] += 1
     return views, compatibility
+
+
+def _compatibility_pair(event: StoredUsageEvent) -> tuple[str, str] | None:
+    if event.event_name != "compatibility_completed" or event.related_result_code is None:
+        return None
+    first, second = sorted((event.result_code, event.related_result_code))
+    return first, second
 
 
 def _unique_compatibility_pairs(
     events: Iterable[StoredUsageEvent],
 ) -> set[tuple[str, str]]:
-    pairs: set[tuple[str, str]] = set()
+    return {pair for event in events if (pair := _compatibility_pair(event)) is not None}
+
+
+def _latest_compatibility_events_by_pair(
+    events: Iterable[StoredUsageEvent],
+) -> dict[tuple[str, str], StoredUsageEvent]:
+    latest: dict[tuple[str, str], StoredUsageEvent] = {}
     for event in events:
-        if event.event_name != "compatibility_completed" or event.related_result_code is None:
+        pair = _compatibility_pair(event)
+        if pair is None:
             continue
-        first, second = sorted((event.result_code, event.related_result_code))
-        pairs.add((first, second))
-    return pairs
+        current = latest.get(pair)
+        if current is None or _aware(event.occurred_at) > _aware(current.occurred_at):
+            latest[pair] = event
+    return latest
 
 
 def distribution(
@@ -230,6 +247,7 @@ def build_compatibility_analytics(
         for event in events
         if event.event_name == "compatibility_completed" and event.result_code in result_by_code
     ]
+    latest_pair_events = list(_latest_compatibility_events_by_pair(compatibility_events).values())
     view_events = [
         event
         for event in events
@@ -259,7 +277,7 @@ def build_compatibility_analytics(
     viewed_codes = set(viewed_at)
     scores = [
         event.compatibility_score
-        for event in compatibility_events
+        for event in latest_pair_events
         if event.compatibility_score is not None
     ]
     score_bands = {
@@ -269,7 +287,7 @@ def build_compatibility_analytics(
         "75~100": sum(75 <= score <= 100 for score in scores),
     }
     combinations: list[str] = []
-    for event in compatibility_events:
+    for event in latest_pair_events:
         mine = result_by_code.get(event.result_code)
         friend = result_by_code.get(event.related_result_code or "")
         mine_mbti = _mbti(mine) if mine else None
@@ -278,7 +296,7 @@ def build_compatibility_analytics(
             combinations.append(" x ".join(sorted((mine_mbti, friend_mbti))))
     return {
         "tracking_started_at": tracking_start,
-        "completed_count": len(compatibility_events),
+        "completed_count": len(latest_pair_events),
         "experienced_result_count": len(experienced_codes),
         "experience_ratio": (
             round(len(experienced_codes) / len(eligible_codes) * 100, 1) if eligible_codes else None
@@ -301,7 +319,7 @@ def build_compatibility_analytics(
         "average_score": round(sum(scores) / len(scores), 1) if scores else None,
         "score_bands": score_bands,
         "mbti_combinations": distribution(combinations),
-        "versions": distribution([event.compatibility_version for event in compatibility_events]),
+        "versions": distribution([event.compatibility_version for event in latest_pair_events]),
     }
 
 

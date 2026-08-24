@@ -104,8 +104,8 @@ PAKIT_USAGE_TRACKING_STARTED_AT=2026-08-20T18:00:00+09:00
 ```
 
 - `/admin`: 생성 결과·고유 결과 코드 조합 기준 궁합 현황과 최근 7일 추이
-- `/admin/results`: 전체 결과 검색과 상세 스냅샷
-- `/admin/analytics`: MBTI·장난감·키워드·성향·궁합 분포
+- `/admin/results`: 전체 결과 검색, 고유 궁합 상대 수와 상세 스냅샷
+- `/admin/analytics`: MBTI·장난감·키워드·성향·고유 결과 코드 조합 기준 궁합 분포
 
 `PAKIT_USAGE_TRACKING_STARTED_AT`은 `backend_usage_events` 계측을 실제로 배포한 시각입니다.
 설정하지 않으면 과거 결과를 미사용자로 오해하지 않도록 궁합 경험 비율을 표시하지 않습니다.

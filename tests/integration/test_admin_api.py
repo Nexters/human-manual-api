@@ -128,7 +128,9 @@ def test_admin_html_and_read_only_apis_show_results_and_conversion(
     html = client.get("/admin", auth=auth)
     dashboard = client.get("/api/admin/dashboard", auth=auth)
     results = client.get("/api/admin/results", auth=auth)
+    results_with_compatibility = client.get("/api/admin/results?has_compatibility=true", auth=auth)
     detail = client.get("/api/admin/results/RESULT01", auth=auth)
+    friend_detail = client.get("/api/admin/results/RESULT02", auth=auth)
     analytics = client.get("/api/admin/analytics/compatibility", auth=auth)
     missing = client.get("/api/admin/results/UNKNOWN1", auth=auth)
 
@@ -141,13 +143,17 @@ def test_admin_html_and_read_only_apis_show_results_and_conversion(
     assert dashboard.json()["experience_ratio"] == 50.0
     assert dashboard.json()["view_to_compatibility_ratio"] == 100.0
     assert results.json()["items"][0]["nickname"] == "선우"
+    assert results.json()["items"][0]["compatibility_count"] == 1
     assert results.json()["items"][1]["nickname"] == "해서니"
+    assert results.json()["items"][1]["compatibility_count"] == 1
+    assert results_with_compatibility.json()["total"] == 2
     assert detail.json()["nickname"] == "해서니"
     assert detail.json()["usage"] == {
         "view_count": 1,
         "last_viewed_at": "2026-08-20T01:00:00Z",
         "compatibility_count": 1,
     }
+    assert friend_detail.json()["usage"]["compatibility_count"] == 1
     assert analytics.json()["completed_count"] == 1
     assert analytics.json()["view_to_compatibility_ratio"] == 100.0
     assert missing.status_code == 404
