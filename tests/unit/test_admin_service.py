@@ -54,7 +54,7 @@ def _event(
     )
 
 
-def test_calculates_result_code_based_view_to_compatibility_conversion() -> None:
+def test_calculates_result_code_based_compatibility_analytics() -> None:
     started_at = datetime(2026, 8, 20, tzinfo=UTC)
     results = [
         _result("RESULT01", "ENTP", started_at),
@@ -89,12 +89,12 @@ def test_calculates_result_code_based_view_to_compatibility_conversion() -> None
     analytics = build_compatibility_analytics(results, events, tracking_started_at=started_at)
 
     assert analytics["completed_count"] == 1
+    assert analytics["eligible_result_count"] == 2
     assert analytics["experienced_result_count"] == 2
     assert analytics["experience_ratio"] == 100.0
     assert analytics["viewed_result_count"] == 2
     assert analytics["result_view_count"] == 2
     assert analytics["viewed_result_ratio"] == 100.0
-    assert analytics["view_to_compatibility_ratio"] == 50.0
     assert analytics["average_per_experienced_result"] == 1.5
     assert analytics["average_score"] == 90.0
     assert analytics["score_bands"] == {
@@ -120,6 +120,8 @@ def test_does_not_publish_experience_ratio_without_tracking_start() -> None:
     )
 
     assert analytics["experience_ratio"] is None
+    assert analytics["eligible_result_count"] == 0
+    assert analytics["experienced_result_count"] == 0
     assert analytics["tracking_started_at"] is None
 
 

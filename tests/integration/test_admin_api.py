@@ -136,12 +136,12 @@ def test_admin_html_and_read_only_apis_show_results_and_conversion(
 
     assert html.status_code == 200
     assert "Pakit Admin" in html.text
+    assert "궁합 도달 결과" in html.text
     assert html.headers["cache-control"] == "no-store"
     assert dashboard.status_code == 200
     assert dashboard.headers["cache-control"] == "no-store"
     assert dashboard.json()["counts"]["total_results"] == 2
     assert dashboard.json()["experience_ratio"] == 50.0
-    assert dashboard.json()["view_to_compatibility_ratio"] == 100.0
     assert results.json()["items"][0]["nickname"] == "선우"
     assert results.json()["items"][0]["compatibility_count"] == 1
     assert results.json()["items"][1]["nickname"] == "해서니"
@@ -155,6 +155,7 @@ def test_admin_html_and_read_only_apis_show_results_and_conversion(
     }
     assert friend_detail.json()["usage"]["compatibility_count"] == 1
     assert analytics.json()["completed_count"] == 1
-    assert analytics.json()["view_to_compatibility_ratio"] == 100.0
+    assert analytics.json()["eligible_result_count"] == 2
+    assert analytics.json()["experienced_result_count"] == 1
     assert missing.status_code == 404
     assert missing.headers["cache-control"] == "no-store"

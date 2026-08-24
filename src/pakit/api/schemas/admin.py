@@ -29,7 +29,6 @@ class TrendPoint(BaseModel):
 class AdminDashboardOutput(BaseModel):
     counts: DashboardCounts
     experience_ratio: float | None
-    view_to_compatibility_ratio: float | None
     trend: list[TrendPoint]
     top_mbti: list[DistributionItem]
     top_characters: list[DistributionItem]
@@ -96,12 +95,12 @@ class ResultAnalyticsOutput(BaseModel):
 class CompatibilityAnalyticsOutput(BaseModel):
     tracking_started_at: datetime | None
     completed_count: int
+    eligible_result_count: int
     experienced_result_count: int
     experience_ratio: float | None
     viewed_result_count: int
     result_view_count: int
     viewed_result_ratio: float | None
-    view_to_compatibility_ratio: float | None
     average_per_experienced_result: float | None
     average_score: float | None
     score_bands: dict[str, int]

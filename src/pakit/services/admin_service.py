@@ -262,19 +262,7 @@ def build_compatibility_analytics(
     experienced_codes = {
         event.result_code for event in compatibility_events if event.result_code in eligible_codes
     }
-    viewed_at: dict[str, datetime] = {}
-    for event in view_events:
-        occurred_at = _aware(event.occurred_at)
-        current = viewed_at.get(event.result_code)
-        if current is None or occurred_at < current:
-            viewed_at[event.result_code] = occurred_at
-    converted_codes = {
-        event.result_code
-        for event in compatibility_events
-        if event.result_code in viewed_at
-        and _aware(event.occurred_at) > viewed_at[event.result_code]
-    }
-    viewed_codes = set(viewed_at)
+    viewed_codes = {event.result_code for event in view_events}
     scores = [
         event.compatibility_score
         for event in latest_pair_events
@@ -297,6 +285,7 @@ def build_compatibility_analytics(
     return {
         "tracking_started_at": tracking_start,
         "completed_count": len(latest_pair_events),
+        "eligible_result_count": len(eligible_codes),
         "experienced_result_count": len(experienced_codes),
         "experience_ratio": (
             round(len(experienced_codes) / len(eligible_codes) * 100, 1) if eligible_codes else None
@@ -307,9 +296,6 @@ def build_compatibility_analytics(
             round(len(viewed_codes & eligible_codes) / len(eligible_codes) * 100, 1)
             if eligible_codes
             else None
-        ),
-        "view_to_compatibility_ratio": (
-            round(len(converted_codes) / len(viewed_codes) * 100, 1) if viewed_codes else None
         ),
         "average_per_experienced_result": (
             round(len(compatibility_events) / len({e.result_code for e in compatibility_events}), 1)
@@ -386,7 +372,6 @@ def build_dashboard(
             ),
         },
         "experience_ratio": compatibility_analytics["experience_ratio"],
-        "view_to_compatibility_ratio": compatibility_analytics["view_to_compatibility_ratio"],
         "trend": trend,
         "top_mbti": result_analytics["mbti"][:5],
         "top_characters": result_analytics["characters"][:5],
