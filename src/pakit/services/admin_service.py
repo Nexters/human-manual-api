@@ -1,5 +1,5 @@
 from collections import Counter
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from datetime import UTC, date, datetime, time, timedelta
 from statistics import median
 from typing import Any
@@ -148,6 +148,18 @@ def usage_counts(events: list[StoredUsageEvent]) -> tuple[Counter[str], Counter[
         elif event.event_name == "compatibility_completed":
             compatibility[event.result_code] += 1
     return views, compatibility
+
+
+def _unique_compatibility_pairs(
+    events: Iterable[StoredUsageEvent],
+) -> set[tuple[str, str]]:
+    pairs: set[tuple[str, str]] = set()
+    for event in events:
+        if event.event_name != "compatibility_completed" or event.related_result_code is None:
+            continue
+        first, second = sorted((event.result_code, event.related_result_code))
+        pairs.add((first, second))
+    return pairs
 
 
 def distribution(
@@ -328,10 +340,12 @@ def build_dashboard(
                     and _aware(event.occurred_at).astimezone(SEOUL).date() == day
                     for event in events
                 ),
-                "compatibility": sum(
-                    event.event_name == "compatibility_completed"
-                    and _aware(event.occurred_at).astimezone(SEOUL).date() == day
-                    for event in events
+                "compatibility": len(
+                    _unique_compatibility_pairs(
+                        event
+                        for event in events
+                        if _aware(event.occurred_at).astimezone(SEOUL).date() == day
+                    )
                 ),
             }
         )
@@ -343,18 +357,14 @@ def build_dashboard(
             "thirty_day_results": sum(_aware(r.created_at) >= since(30) for r in results),
             "total_results": len(results),
             "today_compatibility": len(
-                {
-                    event.result_code
-                    for event in compatibility_events
-                    if _aware(event.occurred_at) >= since(1)
-                }
+                _unique_compatibility_pairs(
+                    event for event in compatibility_events if _aware(event.occurred_at) >= since(1)
+                )
             ),
             "seven_day_compatibility": len(
-                {
-                    event.result_code
-                    for event in compatibility_events
-                    if _aware(event.occurred_at) >= since(7)
-                }
+                _unique_compatibility_pairs(
+                    event for event in compatibility_events if _aware(event.occurred_at) >= since(7)
+                )
             ),
         },
         "experience_ratio": compatibility_analytics["experience_ratio"],

@@ -103,7 +103,7 @@ PAKIT_ADMIN_PASSWORD=충분히-긴-임의의-비밀번호
 PAKIT_USAGE_TRACKING_STARTED_AT=2026-08-20T18:00:00+09:00
 ```
 
-- `/admin`: 생성 결과·고유 결과 코드 기준 궁합 현황과 최근 7일 추이
+- `/admin`: 생성 결과·고유 결과 코드 조합 기준 궁합 현황과 최근 7일 추이
 - `/admin/results`: 전체 결과 검색과 상세 스냅샷
 - `/admin/analytics`: MBTI·장난감·키워드·성향·궁합 분포
 
