@@ -342,11 +342,19 @@ def build_dashboard(
             "seven_day_results": sum(_aware(r.created_at) >= since(7) for r in results),
             "thirty_day_results": sum(_aware(r.created_at) >= since(30) for r in results),
             "total_results": len(results),
-            "today_compatibility": sum(
-                _aware(event.occurred_at) >= since(1) for event in compatibility_events
+            "today_compatibility": len(
+                {
+                    event.result_code
+                    for event in compatibility_events
+                    if _aware(event.occurred_at) >= since(1)
+                }
             ),
-            "seven_day_compatibility": sum(
-                _aware(event.occurred_at) >= since(7) for event in compatibility_events
+            "seven_day_compatibility": len(
+                {
+                    event.result_code
+                    for event in compatibility_events
+                    if _aware(event.occurred_at) >= since(7)
+                }
             ),
         },
         "experience_ratio": compatibility_analytics["experience_ratio"],

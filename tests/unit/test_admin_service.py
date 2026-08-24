@@ -131,6 +131,27 @@ def test_dashboard_uses_seoul_calendar_day_boundary() -> None:
     assert dashboard["trend"][-1]["results"] == 1
 
 
+def test_dashboard_counts_unique_mine_result_codes_for_compatibility_periods() -> None:
+    now = datetime(2026, 8, 20, 16, 0, tzinfo=UTC)  # 2026-08-21 01:00 KST
+    results = [
+        _result("RESULT01", "ENTP", now),
+        _result("RESULT02", "INTJ", now),
+        _result("RESULT03", "ENFP", now),
+    ]
+    events = [
+        _event("compatibility_completed", "RESULT01", now - timedelta(minutes=20)),
+        _event("compatibility_completed", "RESULT01", now - timedelta(minutes=10)),
+        _event("compatibility_completed", "RESULT02", now - timedelta(days=2)),
+        _event("compatibility_completed", "RESULT02", now - timedelta(days=1)),
+        _event("compatibility_completed", "RESULT03", now - timedelta(days=7, hours=2)),
+    ]
+
+    dashboard = build_dashboard(results, events, tracking_started_at=None, now=now)
+
+    assert dashboard["counts"]["today_compatibility"] == 1
+    assert dashboard["counts"]["seven_day_compatibility"] == 2
+
+
 def test_filters_results_by_nickname_and_mbti() -> None:
     now = datetime(2026, 8, 20, tzinfo=UTC)
     results = [
