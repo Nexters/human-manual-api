@@ -254,13 +254,14 @@ def build_compatibility_analytics(
         if event.event_name == "result_viewed" and event.result_code in result_by_code
     ]
     tracking_start = _aware(tracking_started_at) if tracking_started_at else None
+    all_codes = set(result_by_code)
     eligible_codes = {
         result.result_code
         for result in results
         if tracking_start is not None and _aware(result.created_at) >= tracking_start
     }
     experienced_codes = {
-        event.result_code for event in compatibility_events if event.result_code in eligible_codes
+        event.result_code for event in compatibility_events if event.result_code in all_codes
     }
     viewed_codes = {event.result_code for event in view_events}
     scores = [
@@ -285,10 +286,10 @@ def build_compatibility_analytics(
     return {
         "tracking_started_at": tracking_start,
         "completed_count": len(latest_pair_events),
-        "eligible_result_count": len(eligible_codes),
+        "total_result_count": len(all_codes),
         "experienced_result_count": len(experienced_codes),
         "experience_ratio": (
-            round(len(experienced_codes) / len(eligible_codes) * 100, 1) if eligible_codes else None
+            round(len(experienced_codes) / len(all_codes) * 100, 1) if all_codes else None
         ),
         "viewed_result_count": len(viewed_codes),
         "result_view_count": len(view_events),

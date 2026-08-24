@@ -95,7 +95,7 @@ class ResultAnalyticsOutput(BaseModel):
 class CompatibilityAnalyticsOutput(BaseModel):
     tracking_started_at: datetime | None
     completed_count: int
-    eligible_result_count: int
+    total_result_count: int
     experienced_result_count: int
     experience_ratio: float | None
     viewed_result_count: int

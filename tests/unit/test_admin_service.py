@@ -89,7 +89,7 @@ def test_calculates_result_code_based_compatibility_analytics() -> None:
     analytics = build_compatibility_analytics(results, events, tracking_started_at=started_at)
 
     assert analytics["completed_count"] == 1
-    assert analytics["eligible_result_count"] == 2
+    assert analytics["total_result_count"] == 2
     assert analytics["experienced_result_count"] == 2
     assert analytics["experience_ratio"] == 100.0
     assert analytics["viewed_result_count"] == 2
@@ -111,7 +111,7 @@ def test_calculates_result_code_based_compatibility_analytics() -> None:
     assert analytics["versions"] == [{"key": "rules-v1", "count": 1, "ratio": 100.0}]
 
 
-def test_does_not_publish_experience_ratio_without_tracking_start() -> None:
+def test_uses_all_results_for_experience_ratio_without_tracking_start() -> None:
     now = datetime(2026, 8, 20, tzinfo=UTC)
     analytics = build_compatibility_analytics(
         [_result("RESULT01", "ENTP", now)],
@@ -119,9 +119,9 @@ def test_does_not_publish_experience_ratio_without_tracking_start() -> None:
         tracking_started_at=None,
     )
 
-    assert analytics["experience_ratio"] is None
-    assert analytics["eligible_result_count"] == 0
-    assert analytics["experienced_result_count"] == 0
+    assert analytics["experience_ratio"] == 100.0
+    assert analytics["total_result_count"] == 1
+    assert analytics["experienced_result_count"] == 1
     assert analytics["tracking_started_at"] is None
 
 

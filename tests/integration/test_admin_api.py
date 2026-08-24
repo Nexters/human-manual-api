@@ -155,7 +155,7 @@ def test_admin_html_and_read_only_apis_show_results_and_conversion(
     }
     assert friend_detail.json()["usage"]["compatibility_count"] == 1
     assert analytics.json()["completed_count"] == 1
-    assert analytics.json()["eligible_result_count"] == 2
+    assert analytics.json()["total_result_count"] == 2
     assert analytics.json()["experienced_result_count"] == 1
     assert missing.status_code == 404
     assert missing.headers["cache-control"] == "no-store"
