@@ -77,7 +77,7 @@ def test_result_map_includes_copy_from_every_section() -> None:
         "솔직 버튼을 다시 잠가버려요",
         # 주의사항 F·탐색
         "알아봐 달라고 신호를 보냈는데 “말 안 했잖아”라고 하면, 서운함에 눈물 버튼이 눌려요",
-        "상위 3.2%",  # MBTI 희귀도(ENTP)
+        "희귀도 3.2%",  # MBTI 희귀도(ENTP)
         "장난꾸러기",  # 상단 키워드 · MBTI(ENTP)
         "도파민 MAX",  # 상단 키워드 · 탐험 극점
         "거리조절 쪽",  # 상단 키워드 · 축 방향 라벨

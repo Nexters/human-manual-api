@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-21.9"
+RESULT_CONTENT_VERSION = "2026-08-24.1"
 
 FEATURE_TAGS = ("동력", "관계", "마음", "강점")
 
@@ -81,22 +81,22 @@ MBTI_MIDDLE_GROUP: dict[MbtiType, str] = {
 
 
 MBTI_RARITY_COPY: dict[MbtiType, str] = {
-    MbtiType.INFJ: "상위 1.5%",
-    MbtiType.ENTJ: "상위 1.8%",
-    MbtiType.INTJ: "상위 2.1%",
-    MbtiType.ENFJ: "상위 2.5%",
-    MbtiType.ENTP: "상위 3.2%",
-    MbtiType.INTP: "상위 3.3%",
-    MbtiType.ESTP: "상위 4.3%",
-    MbtiType.INFP: "상위 4.4%",
-    MbtiType.ISTP: "상위 5.4%",
-    MbtiType.ENFP: "상위 8.1%",
-    MbtiType.ESFP: "상위 8.5%",
-    MbtiType.ESTJ: "상위 8.7%",
-    MbtiType.ISFP: "상위 8.8%",
-    MbtiType.ISTJ: "상위 11.6%",
-    MbtiType.ESFJ: "상위 12.3%",
-    MbtiType.ISFJ: "상위 13.5%",
+    MbtiType.INFJ: "희귀도 1.5%",
+    MbtiType.ENTJ: "희귀도 1.8%",
+    MbtiType.INTJ: "희귀도 2.1%",
+    MbtiType.ENFJ: "희귀도 2.5%",
+    MbtiType.ENTP: "희귀도 3.2%",
+    MbtiType.INTP: "희귀도 3.3%",
+    MbtiType.ESTP: "희귀도 4.3%",
+    MbtiType.INFP: "희귀도 4.4%",
+    MbtiType.ISTP: "희귀도 5.4%",
+    MbtiType.ENFP: "희귀도 8.1%",
+    MbtiType.ESFP: "희귀도 8.5%",
+    MbtiType.ESTJ: "희귀도 8.7%",
+    MbtiType.ISFP: "희귀도 8.8%",
+    MbtiType.ISTJ: "희귀도 11.6%",
+    MbtiType.ESFJ: "희귀도 12.3%",
+    MbtiType.ISFJ: "희귀도 13.5%",
 }
 
 

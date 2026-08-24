@@ -29,7 +29,7 @@ def _result() -> SubmissionResultData:
         result_code="aB3dE7_x",
         participant=ResultParticipantData(nickname="송송"),
         overview=OverviewData(
-            rarity="상위 4%",
+            rarity="희귀도 4%",
             adjective="테스트용",
             noun="팽이",
             result_name="테스트용 팽이",

@@ -107,7 +107,7 @@ def _result(
     return SubmissionResultData(
         result_code=code,
         participant=ResultParticipantData(nickname),
-        overview=OverviewData("상위 4%", "형용사", "팽이", "형용사 팽이", "top", "", ()),
+        overview=OverviewData("희귀도 4%", "형용사", "팽이", "형용사 팽이", "top", "", ()),
         unboxing_kit=UnboxingKitData(
             axis_scores=scores,
             title="제목",

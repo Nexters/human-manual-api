@@ -54,7 +54,7 @@
 
 | 필드 | 타입 | 설명 |
 |---|---|---|
-| `rarity` | string | 선택한 MBTI의 확정 희귀도. 예: ENTP는 `상위 3.2%` |
+| `rarity` | string | 선택한 MBTI의 확정 희귀도. 예: ENTP는 `희귀도 3.2%` |
 | `adjective` | string | 성향 축 판정으로 결정되는 형용사. 예: `새벽 2시에도 카톡 폭격하는` |
 | `noun` | string | MBTI에 따라 결정되는 명사. 예: `팽이` |
 | `result_name` | string | 형용사와 명사를 합친 최종 결과명. 예: `새벽 2시에도 카톡 폭격하는 팽이` |
@@ -185,7 +185,7 @@
   "result_code": "aB3dE7_x",
   "participant": {"nickname": "송송"},
   "overview": {
-    "rarity": "상위 3.2%",
+    "rarity": "희귀도 3.2%",
     "adjective": "새벽 2시에도 카톡 폭격하는",
     "noun": "팽이",
     "result_name": "새벽 2시에도 카톡 폭격하는 팽이",
