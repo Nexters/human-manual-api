@@ -348,7 +348,7 @@ def test_personal_tips_use_the_other_persons_extreme_attachment_direction() -> N
     result = build_compatibility(mine, friend)
 
     assert result.tips[0].description == (
-        "혼자 있고 싶은 날에도 짧게 안부를 남겨 상대가 안심할 틈을 주세요!"
+        "혼자 있고 싶은 날에도 짧게 안부를 남겨 선우님이 안심할 틈을 주세요!"
     )
     assert result.tips[1].description == (
         "연락이 뜸한 순간을 마음이 멀어진 신호로 단정하지 말고, 혼자 쉴 시간을 주세요!"
@@ -663,7 +663,7 @@ def test_personal_tips_cover_all_sixteen_axis_direction_pairs() -> None:
             scores=AxisScoresData(**friend_scores),
         )
 
-        assert _personal_tip(mine, friend) == copy
+        assert _personal_tip(mine, friend) == copy.replace("상대가", "선우님이")
 
 
 def test_personal_tip_axis_prefers_other_extremeness_then_pair_gap_then_fixed_order() -> None:
@@ -717,7 +717,7 @@ def test_each_personal_tip_independently_uses_the_other_persons_extreme_axis() -
     result = build_compatibility(mine, friend)
 
     assert result.tips[0].description == (
-        "가끔은 상대가 가보고 싶어 한 새로운 곳으로 먼저 연락해 불러내보세요!"
+        "가끔은 선우님이 가보고 싶어 한 새로운 곳으로 먼저 연락해 불러내보세요!"
     )
     assert result.tips[1].description == (
         "둘 다 바로 말하는 편이니, 결론보다 말의 온도를 한 번 더 챙겨주세요!"

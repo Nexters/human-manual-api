@@ -11,7 +11,7 @@ from pakit.domain.characters import CHARACTERS
 from pakit.services.result_repository import ResultRepository
 
 COMPATIBILITY_PROFILE_VERSION = "2026-08-19.1"
-COMPATIBILITY_RULES_VERSION = "2026-08-19.1"
+COMPATIBILITY_RULES_VERSION = "2026-08-25.1"
 
 COMPATIBLE_MBTI: dict[MbtiType, MbtiType] = {
     MbtiType.INTJ: MbtiType.ENFP,
@@ -602,8 +602,10 @@ def _most_extreme_axis(
 
 
 def _personal_tip(target: SubmissionResultData, other: SubmissionResultData) -> str:
+    assert other.participant is not None
     axis = _most_extreme_axis(target, other)
-    return EXTREME_AXIS_TIP_COPY[(axis, _axis_pole(target, axis), _axis_pole(other, axis))]
+    copy = EXTREME_AXIS_TIP_COPY[(axis, _axis_pole(target, axis), _axis_pole(other, axis))]
+    return copy.replace("상대가", f"{other.participant.nickname}님이")
 
 
 def _detail_label(score: int) -> str:

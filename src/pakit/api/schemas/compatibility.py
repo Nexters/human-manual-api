@@ -74,14 +74,16 @@ COMPATIBILITY_RESPONSE_EXAMPLE: dict[str, Any] = {
             "character_id": "spinning_top",
             "image_url": "https://api.pakit.kr/assets/characters/spinning_top.png",
             "title": "지은님에게",
-            "description": "가끔은 상대가 좋아하는 단골 코스에서 둘만 조용히 보내보세요!",
+            "description": "가끔은 선우님이 좋아하는 단골 코스에서 둘만 조용히 보내보세요!",
         },
         {
             "target": "friend",
             "character_id": "teddy_bear",
             "image_url": "https://api.pakit.kr/assets/characters/teddy_bear.png",
             "title": "선우님에게",
-            "description": ("가끔은 상대가 가보고 싶어 한 새로운 곳으로 먼저 연락해 불러내보세요!"),
+            "description": (
+                "가끔은 지은님이 가보고 싶어 한 새로운 곳으로 먼저 연락해 불러내보세요!"
+            ),
         },
     ],
     "relationship_tip": {

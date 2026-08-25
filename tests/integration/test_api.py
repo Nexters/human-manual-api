@@ -384,7 +384,7 @@ def test_calculates_friend_compatibility_from_two_saved_results() -> None:
         "result_code": mine.json()["result_code"],
         "related_result_code": friend.json()["result_code"],
         "compatibility_score": body["synergy"]["score"],
-        "compatibility_version": "2026-08-19.1",
+        "compatibility_version": "2026-08-25.1",
     }
     assert len(body["synergy"]["tags"]) == 2
     assert [detail["key"] for detail in body["details"]] == [
