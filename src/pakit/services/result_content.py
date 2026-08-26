@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from pakit.domain.assessment import MbtiType
 
-RESULT_CONTENT_VERSION = "2026-08-24.1"
+RESULT_CONTENT_VERSION = "2026-08-26.1"
 
 FEATURE_TAGS = ("동력", "관계", "마음", "강점")
 
@@ -286,7 +286,7 @@ MBTI_TRIGGER_WARNING_COPY: dict[MbtiType, str] = {
     MbtiType.ISFJ: "나 말고 내 가까운 사람을 건드리면, 그때부터 웃는 얼굴이 안 나와요",
     MbtiType.ESTJ: ('해보지도 않고 "어차피 안 될걸"이라고 하면, 정색 모드가 바로 켜져요'),
     MbtiType.ESFJ: ('내가 챙겨준 걸 "원래 네가 하는 거잖아"라고 넘기면, 웃고 있어도 속으로 쌓여요'),
-    MbtiType.ISTP: ('"그래서 지금 기분이 어떤데"라며 감정 표현을 강요하면, 대답이 점점 짧아져요'),
+    MbtiType.ISTP: "감정을 바로 말하라고 재촉하면 부담스러워서 말수가 점점 줄어들어요",
     MbtiType.ISFP: ('내 속도로 가는데 "왜 이렇게 느려"라고 재촉하면, 하려던 마음이 강제 종료돼요'),
     MbtiType.ESTP: "할 말을 빙빙 돌리며 결론을 안 내면, 인내심 잔량이 0%가 돼요",
     MbtiType.ESFP: ('분위기 좋았는데 "좀 조용히 해"라며 눈치를 주면, 그 자리 전원이 같이 꺼져요'),

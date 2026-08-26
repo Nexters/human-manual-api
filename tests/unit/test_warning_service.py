@@ -74,7 +74,7 @@ def test_builds_four_warnings_in_fixed_order() -> None:
         ),
         (
             MbtiType.ISTP,
-            '"그래서 지금 기분이 어떤데"라며 감정 표현을 강요하면, 대답이 점점 짧아져요',
+            "감정을 바로 말하라고 재촉하면 부담스러워서 말수가 점점 줄어들어요",
         ),
         (
             MbtiType.ISFP,
