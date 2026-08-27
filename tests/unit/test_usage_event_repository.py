@@ -42,3 +42,41 @@ def test_persists_backend_owned_usage_event_without_personal_data() -> None:
         assert not hasattr(record, "user_agent")
 
     asyncio.run(run())
+
+
+def test_lists_compatibility_events_for_either_side_of_a_pair() -> None:
+    async def run() -> None:
+        engine = create_async_engine("sqlite+aiosqlite://")
+        async with engine.begin() as connection:
+            await connection.run_sync(Base.metadata.create_all)
+
+        sessions = async_sessionmaker(engine, expire_on_commit=False)
+        async with sessions() as session:
+            repository = SqlAlchemyUsageEventRepository(session)
+            await repository.record(
+                event_name="compatibility_completed",
+                result_code="RESULT01",
+                related_result_code="RESULT02",
+                compatibility_score=100,
+                compatibility_version="rules-v1",
+                occurred_at=datetime(2026, 8, 20, 9, 30, tzinfo=UTC),
+            )
+            await repository.record(
+                event_name="compatibility_completed",
+                result_code="RESULT03",
+                related_result_code="RESULT01",
+                compatibility_score=0,
+                compatibility_version="rules-v1",
+                occurred_at=datetime(2026, 8, 20, 10, 30, tzinfo=UTC),
+            )
+            await repository.record(event_name="result_viewed", result_code="RESULT01")
+            events = await repository.list_compatibility_events("RESULT01")
+
+        await engine.dispose()
+        assert [(event.mine_result_code, event.friend_result_code) for event in events] == [
+            ("RESULT03", "RESULT01"),
+            ("RESULT01", "RESULT02"),
+        ]
+        assert [event.score for event in events] == [0, 100]
+
+    asyncio.run(run())

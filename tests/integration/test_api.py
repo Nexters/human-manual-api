@@ -1,20 +1,29 @@
 import re
 from copy import deepcopy
 from dataclasses import replace
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
 
-from pakit.api.dependencies import get_result_repository, get_usage_event_repository
+from pakit.api.dependencies import (
+    get_compatibility_event_reader,
+    get_result_repository,
+    get_usage_event_repository,
+)
 from pakit.api.schemas.assessment_submissions import (
     ASSESSMENT_SUBMISSION_EXAMPLE,
     ASSESSMENT_SUBMISSION_RESPONSE_EXAMPLE,
 )
-from pakit.api.schemas.compatibility import COMPATIBILITY_RESPONSE_EXAMPLE
+from pakit.api.schemas.compatibility import (
+    COMPATIBILITY_RANKING_RESPONSE_EXAMPLE,
+    COMPATIBILITY_RESPONSE_EXAMPLE,
+)
 from pakit.domain.assessment_contract import ASSESSMENT_VERSION, QUESTION_CONTRACTS, AnswerKind
 from pakit.domain.assessment_submission import SubmissionResultData
 from pakit.main import app
+from pakit.services.usage_event_repository import StoredCompatibilityEvent
 
 
 class InMemoryResultRepository:
@@ -44,11 +53,34 @@ class InMemoryUsageEventRepository:
     async def record(self, **event: Any) -> None:
         self.events.append(event)
 
+    async def list_compatibility_events(
+        self,
+        result_code: str,
+    ) -> list[StoredCompatibilityEvent]:
+        stored: list[StoredCompatibilityEvent] = []
+        for index, event in enumerate(self.events):
+            if event.get("event_name") != "compatibility_completed" or result_code not in {
+                event.get("result_code"),
+                event.get("related_result_code"),
+            }:
+                continue
+            stored.append(
+                StoredCompatibilityEvent(
+                    mine_result_code=event["result_code"],
+                    friend_result_code=event["related_result_code"],
+                    score=event["compatibility_score"],
+                    version=event["compatibility_version"],
+                    occurred_at=datetime(2026, 8, 27, tzinfo=UTC) + timedelta(seconds=index),
+                )
+            )
+        return list(reversed(stored))
+
 
 result_repository = InMemoryResultRepository()
 usage_event_repository = InMemoryUsageEventRepository()
 app.dependency_overrides[get_result_repository] = lambda: result_repository
 app.dependency_overrides[get_usage_event_repository] = lambda: usage_event_repository
+app.dependency_overrides[get_compatibility_event_reader] = lambda: usage_event_repository
 client = TestClient(app)
 
 
@@ -238,6 +270,13 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
         "application/json"
     ]["example"]
     assert compatibility_example == COMPATIBILITY_RESPONSE_EXAMPLE
+    ranking_operation = document["paths"]["/api/results/{result_code}/compatibility-ranking"]["get"]
+    assert ranking_operation["tags"] == ["Compatibility"]
+    assert ranking_operation["summary"] == "내 케미 랭킹 조회"
+    ranking_example = ranking_operation["responses"]["200"]["content"]["application/json"][
+        "example"
+    ]
+    assert ranking_example == COMPATIBILITY_RANKING_RESPONSE_EXAMPLE
 
     test_tag = next(tag for tag in document["tags"] if tag["name"] == "Test")
     assert "답변 제출" in test_tag["description"]
@@ -420,6 +459,75 @@ def test_returns_404_for_unknown_compatibility_codes() -> None:
             "message": "친구 궁합 결과를 찾을 수 없습니다.",
         }
     }
+
+
+def test_returns_latest_unique_compatibility_scores_as_a_ranking() -> None:
+    mine = client.post("/api/tests/submissions", json=ASSESSMENT_SUBMISSION_EXAMPLE).json()
+    first_payload = _valid_submission()
+    first_payload["participant"] = {"nickname": "첫째"}
+    first = client.post("/api/tests/submissions", json=first_payload).json()
+    second_payload = _valid_submission()
+    second_payload["participant"] = {"nickname": "둘째"}
+    second = client.post("/api/tests/submissions", json=second_payload).json()
+
+    usage_event_repository.events.extend(
+        [
+            {
+                "event_name": "compatibility_completed",
+                "result_code": mine["result_code"],
+                "related_result_code": first["result_code"],
+                "compatibility_score": 99,
+                "compatibility_version": "old-rules",
+            },
+            {
+                "event_name": "compatibility_completed",
+                "result_code": second["result_code"],
+                "related_result_code": mine["result_code"],
+                "compatibility_score": 85,
+                "compatibility_version": "current-rules",
+            },
+            {
+                "event_name": "compatibility_completed",
+                "result_code": mine["result_code"],
+                "related_result_code": first["result_code"],
+                "compatibility_score": 85,
+                "compatibility_version": "current-rules",
+            },
+        ]
+    )
+
+    response = client.get(f"/api/results/{mine['result_code']}/compatibility-ranking")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["result_code"] == mine["result_code"]
+    assert body["total"] == 2
+    assert [item["rank"] for item in body["rankings"]] == [1, 1]
+    assert [item["nickname"] for item in body["rankings"]] == ["첫째", "둘째"]
+    assert [item["score"] for item in body["rankings"]] == [85, 85]
+    assert body["rankings"][0]["image_url"].startswith("https://testserver/assets/characters/")
+
+
+def test_returns_empty_ranking_for_a_result_without_compatibility_tests() -> None:
+    mine = client.post("/api/tests/submissions", json=ASSESSMENT_SUBMISSION_EXAMPLE).json()
+
+    response = client.get(f"/api/results/{mine['result_code']}/compatibility-ranking")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "result_code": mine["result_code"],
+        "total": 0,
+        "rankings": [],
+    }
+
+
+def test_validates_and_rejects_unknown_compatibility_ranking_code() -> None:
+    invalid = client.get("/api/results/short/compatibility-ranking")
+    unknown = client.get("/api/results/unknown1/compatibility-ranking")
+
+    assert invalid.status_code == 422
+    assert unknown.status_code == 404
+    assert unknown.json()["error"]["code"] == "COMPATIBILITY_RANKING_NOT_FOUND"
 
 
 def test_returns_409_for_a_result_created_before_compatibility_profiles() -> None:

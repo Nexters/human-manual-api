@@ -9,7 +9,7 @@ from pakit.core.result_repository import SqlAlchemyResultRepository
 from pakit.core.usage_event_repository import SqlAlchemyUsageEventRepository
 from pakit.services.admin_repository import AdminRepository
 from pakit.services.result_repository import ResultRepository
-from pakit.services.usage_event_repository import UsageEventRepository
+from pakit.services.usage_event_repository import CompatibilityEventReader, UsageEventRepository
 
 DatabaseSession = Annotated[AsyncSession, Depends(get_database_session)]
 
@@ -19,6 +19,10 @@ def get_result_repository(session: DatabaseSession) -> ResultRepository:
 
 
 def get_usage_event_repository(session: DatabaseSession) -> UsageEventRepository:
+    return SqlAlchemyUsageEventRepository(session)
+
+
+def get_compatibility_event_reader(session: DatabaseSession) -> CompatibilityEventReader:
     return SqlAlchemyUsageEventRepository(session)
 
 

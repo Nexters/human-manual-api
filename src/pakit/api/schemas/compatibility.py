@@ -1,8 +1,38 @@
+from datetime import datetime
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from .image_urls import absolute_image_url
+
+COMPATIBILITY_RANKING_RESPONSE_EXAMPLE: dict[str, Any] = {
+    "result_code": "aB3dE7_x",
+    "total": 2,
+    "rankings": [
+        {
+            "rank": 1,
+            "result_code": "Fr13nd01",
+            "nickname": "선우",
+            "result_name": "품질보증 거부당한 곰인형",
+            "noun": "곰인형",
+            "character_id": "teddy_bear",
+            "image_url": "https://api.pakit.kr/assets/characters/teddy_bear.png",
+            "score": 91,
+            "tested_at": "2026-08-27T12:30:00+09:00",
+        },
+        {
+            "rank": 2,
+            "result_code": "Fr13nd02",
+            "nickname": "지은",
+            "result_name": "한번 돌면 멈추지 않는 팽이",
+            "noun": "팽이",
+            "character_id": "spinning_top",
+            "image_url": "https://api.pakit.kr/assets/characters/spinning_top.png",
+            "score": 84,
+            "tested_at": "2026-08-27T11:20:00+09:00",
+        },
+    ],
+}
 
 COMPATIBILITY_RESPONSE_EXAMPLE: dict[str, Any] = {
     "mine": {
@@ -185,3 +215,39 @@ class CompatibilityOutput(BaseModel):
         for tip in payload["tips"]:
             tip["image_url"] = absolute_image_url(tip["image_url"], public_base_url=public_base_url)
         return cls.model_validate(payload)
+
+
+class CompatibilityRankingItemOutput(BaseModel):
+    """한 사람의 케미 랭킹 표시 정보입니다."""
+
+    rank: int = Field(ge=1, description="동점자는 같은 값을 갖는 케미 순위")
+    result_code: str = Field(
+        min_length=8,
+        max_length=8,
+        pattern=r"^[A-Za-z0-9_-]{8}$",
+        description="랭킹 상대의 결과 코드",
+    )
+    nickname: str | None = Field(description="상대의 표시 이름. 이전 결과에는 없을 수 있음")
+    result_name: str = Field(description="상대의 형용사와 장난감 명사를 합친 결과명")
+    noun: str = Field(description="상대의 장난감 명사")
+    character_id: str = Field(description="상대 캐릭터 이미지 매핑용 고정 ID")
+    image_url: str = Field(description="상대 캐릭터 이미지 절대 URL")
+    score: int = Field(ge=0, le=100, description="해당 상대와의 최신 궁합 점수")
+    tested_at: datetime = Field(description="해당 상대와 마지막으로 궁합을 완료한 시각")
+
+
+class CompatibilityRankingOutput(BaseModel):
+    """한 결과 코드와 케미 테스트를 완료한 상대의 점수 랭킹입니다."""
+
+    model_config = ConfigDict(json_schema_extra={"example": COMPATIBILITY_RANKING_RESPONSE_EXAMPLE})
+
+    result_code: str = Field(
+        min_length=8,
+        max_length=8,
+        pattern=r"^[A-Za-z0-9_-]{8}$",
+        description="랭킹 기준이 되는 내 결과 코드",
+    )
+    total: int = Field(ge=0, description="랭킹에 포함된 고유 상대 수")
+    rankings: list[CompatibilityRankingItemOutput] = Field(
+        description="점수 내림차순의 고유 상대 목록"
+    )

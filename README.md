@@ -157,13 +157,14 @@ src/pakit/
 
 ## API
 
-| Method | Endpoint                                       | 설명                           |
-| ------ | ---------------------------------------------- | ------------------------------ |
-| `POST` | `/api/tests/submissions`                       | 답변을 제출하고 개인 결과 생성 |
-| `GET`  | `/api/tests/submissions/count`                 | 누적 테스트 완료 수 조회       |
-| `GET`  | `/api/results/{result_code}`                   | 저장된 결과 조회               |
-| `GET`  | `/api/compatibility?mine={code}&friend={code}` | 두 결과의 친구 궁합 조회       |
-| `GET`  | `/health`                                      | 서버 상태 확인                 |
+| Method | Endpoint                                           | 설명                           |
+| ------ | -------------------------------------------------- | ------------------------------ |
+| `POST` | `/api/tests/submissions`                           | 답변을 제출하고 개인 결과 생성 |
+| `GET`  | `/api/tests/submissions/count`                     | 누적 테스트 완료 수 조회       |
+| `GET`  | `/api/results/{result_code}`                       | 저장된 결과 조회               |
+| `GET`  | `/api/results/{result_code}/compatibility-ranking` | 내 코드의 케미 점수 랭킹 조회  |
+| `GET`  | `/api/compatibility?mine={code}&friend={code}`     | 두 결과의 친구 궁합 조회       |
+| `GET`  | `/health`                                          | 서버 상태 확인                 |
 
 서버 실행 후 [Swagger UI](http://localhost:8000/docs)에서 실제 요청·응답 예시와 에러 계약을
 확인할 수 있습니다.

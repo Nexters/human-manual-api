@@ -1,14 +1,25 @@
 from dataclasses import asdict
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, Path, Query, Request
 from fastapi.responses import JSONResponse
 
-from pakit.api.dependencies import get_result_repository, get_usage_event_repository
+from pakit.api.dependencies import (
+    get_compatibility_event_reader,
+    get_result_repository,
+    get_usage_event_repository,
+)
 from pakit.api.schemas.assessment_submissions import ErrorResponse
 from pakit.api.schemas.compatibility import (
+    COMPATIBILITY_RANKING_RESPONSE_EXAMPLE,
     COMPATIBILITY_RESPONSE_EXAMPLE,
     CompatibilityOutput,
+    CompatibilityRankingOutput,
+)
+from pakit.api.schemas.image_urls import absolute_image_url
+from pakit.services.compatibility_ranking_service import (
+    CompatibilityRankingNotFoundError,
+    get_compatibility_ranking,
 )
 from pakit.services.compatibility_service import (
     COMPATIBILITY_RULES_VERSION,
@@ -19,10 +30,11 @@ from pakit.services.compatibility_service import (
     get_compatibility as build_compatibility_result,
 )
 from pakit.services.result_repository import ResultRepository
-from pakit.services.usage_event_repository import UsageEventRepository
+from pakit.services.usage_event_repository import CompatibilityEventReader, UsageEventRepository
 from pakit.services.usage_tracking_service import record_compatibility_completed
 
 router = APIRouter(prefix="/compatibility", tags=["Compatibility"])
+ranking_router = APIRouter(prefix="/results", tags=["Compatibility"])
 
 
 @router.get(
@@ -88,3 +100,68 @@ async def get_compatibility(
         asdict(result),
         public_base_url=str(request.base_url),
     )
+
+
+@ranking_router.get(
+    "/{result_code}/compatibility-ranking",
+    response_model=CompatibilityRankingOutput,
+    summary="내 케미 랭킹 조회",
+    description=(
+        "결과 코드와 케미 테스트를 완료한 고유 상대를 최신 궁합 점수의 내림차순으로 "
+        "반환합니다. 같은 상대와 여러 번 테스트한 경우 가장 최근 성공 기록만 사용하며, "
+        "같은 점수는 같은 순위로 표시합니다."
+    ),
+    response_description="내 결과 코드와 케미 테스트를 완료한 상대의 점수 랭킹",
+    responses={
+        200: {
+            "description": "내 결과 코드와 케미 테스트를 완료한 상대의 점수 랭킹",
+            "content": {
+                "application/json": {
+                    "example": COMPATIBILITY_RANKING_RESPONSE_EXAMPLE,
+                }
+            },
+        },
+        404: {"model": ErrorResponse, "description": "기준 결과를 찾을 수 없음"},
+    },
+)
+async def get_my_compatibility_ranking(
+    request: Request,
+    result_code: Annotated[
+        str,
+        Path(
+            min_length=8,
+            max_length=8,
+            pattern=r"^[A-Za-z0-9_-]{8}$",
+            description="랭킹 기준이 되는 내 결과 코드",
+        ),
+    ],
+    result_repository: Annotated[ResultRepository, Depends(get_result_repository)],
+    event_reader: Annotated[
+        CompatibilityEventReader,
+        Depends(get_compatibility_event_reader),
+    ],
+) -> CompatibilityRankingOutput | JSONResponse:
+    try:
+        ranking = await get_compatibility_ranking(
+            result_code,
+            result_repository,
+            event_reader,
+        )
+    except CompatibilityRankingNotFoundError:
+        return JSONResponse(
+            status_code=404,
+            content={
+                "error": {
+                    "code": "COMPATIBILITY_RANKING_NOT_FOUND",
+                    "message": "케미 랭킹의 기준 결과를 찾을 수 없습니다.",
+                }
+            },
+        )
+
+    payload = asdict(ranking)
+    for item in payload["rankings"]:
+        item["image_url"] = absolute_image_url(
+            item["image_url"],
+            public_base_url=str(request.base_url),
+        )
+    return CompatibilityRankingOutput.model_validate(payload)

@@ -1,9 +1,10 @@
 from datetime import datetime
 
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from pakit.core.models import BackendUsageEventRecord
-from pakit.services.usage_event_repository import UsageEventName
+from pakit.services.usage_event_repository import StoredCompatibilityEvent, UsageEventName
 
 
 class SqlAlchemyUsageEventRepository:
@@ -31,3 +32,40 @@ class SqlAlchemyUsageEventRepository:
             )
         )
         await self._session.commit()
+
+    async def list_compatibility_events(
+        self,
+        result_code: str,
+    ) -> list[StoredCompatibilityEvent]:
+        records = (
+            await self._session.scalars(
+                select(BackendUsageEventRecord)
+                .where(
+                    BackendUsageEventRecord.event_name == "compatibility_completed",
+                    BackendUsageEventRecord.related_result_code.is_not(None),
+                    BackendUsageEventRecord.compatibility_score.is_not(None),
+                    BackendUsageEventRecord.compatibility_version.is_not(None),
+                    or_(
+                        BackendUsageEventRecord.result_code == result_code,
+                        BackendUsageEventRecord.related_result_code == result_code,
+                    ),
+                )
+                .order_by(
+                    BackendUsageEventRecord.occurred_at.desc(),
+                    BackendUsageEventRecord.id.desc(),
+                )
+            )
+        ).all()
+        return [
+            StoredCompatibilityEvent(
+                mine_result_code=record.result_code,
+                friend_result_code=record.related_result_code,
+                score=record.compatibility_score,
+                version=record.compatibility_version,
+                occurred_at=record.occurred_at,
+            )
+            for record in records
+            if record.related_result_code is not None
+            and record.compatibility_score is not None
+            and record.compatibility_version is not None
+        ]
