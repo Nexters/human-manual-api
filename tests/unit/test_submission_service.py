@@ -15,6 +15,7 @@ from pakit.services.submission_service import submit_assessment
 class ConflictOnceRepository:
     def __init__(self) -> None:
         self.saved_codes: list[str] = []
+        self.saved_user_ids: list[int | None] = []
 
     async def save(
         self,
@@ -22,8 +23,10 @@ class ConflictOnceRepository:
         *,
         assessment_version: str,
         content_version: str,
+        user_id: int | None = None,
     ) -> None:
         self.saved_codes.append(result.result_code)
+        self.saved_user_ids.append(user_id)
         if len(self.saved_codes) == 1:
             raise ResultCodeConflictError
 
@@ -43,7 +46,8 @@ def test_reissues_the_result_code_when_it_conflicts(monkeypatch: MonkeyPatch) ->
     submission = AssessmentSubmissionInput.model_validate(ASSESSMENT_SUBMISSION_EXAMPLE).to_domain()
     repository = ConflictOnceRepository()
 
-    result = asyncio.run(submit_assessment(submission, repository))
+    result = asyncio.run(submit_assessment(submission, repository, user_id=42))
 
     assert result.result_code == "BBBBBBBB"
     assert repository.saved_codes == ["AAAAAAAA", "BBBBBBBB"]
+    assert repository.saved_user_ids == [42, 42]

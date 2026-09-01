@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Body, Depends, Path, Request
 from fastapi.responses import JSONResponse
 
+from pakit.api.auth_dependencies import get_optional_current_user
 from pakit.api.dependencies import get_result_repository, get_usage_event_repository
 from pakit.api.schemas.assessment_submissions import (
     ASSESSMENT_SUBMISSION_EXAMPLE,
@@ -23,6 +24,7 @@ from pakit.services.submission_service import (
 )
 from pakit.services.usage_event_repository import UsageEventRepository
 from pakit.services.usage_tracking_service import record_result_viewed
+from pakit.services.user_repository import StoredUser
 
 router = APIRouter(prefix="/tests", tags=["Test"])
 results_router = APIRouter(prefix="/results", tags=["Test"])
@@ -100,10 +102,15 @@ async def create_assessment_submission(
         ),
     ],
     repository: Annotated[ResultRepository, Depends(get_result_repository)],
+    current_user: Annotated[StoredUser | None, Depends(get_optional_current_user)],
 ) -> AssessmentSubmissionOutput | JSONResponse:
     """완료한 테스트 답변을 검증하고 규칙 기반 결과를 반환합니다."""
     try:
-        result = await submit_assessment(data.to_domain(), repository)
+        result = await submit_assessment(
+            data.to_domain(),
+            repository,
+            user_id=current_user.id if current_user is not None else None,
+        )
     except UnsupportedAssessmentVersionError:
         return JSONResponse(
             status_code=409,

@@ -23,3 +23,7 @@ def test_admin_and_usage_tracking_are_disabled_by_default() -> None:
     assert settings.admin_username is None
     assert settings.admin_password is None
     assert settings.usage_tracking_started_at is None
+    assert settings.kakao_rest_api_key is None
+    assert settings.kakao_client_secret is None
+    assert settings.kakao_redirect_uri is None
+    assert settings.session_secret is None

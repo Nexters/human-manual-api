@@ -3,7 +3,7 @@ from functools import lru_cache
 from typing import Literal
 from urllib.parse import quote_plus
 
-from pydantic import SecretStr
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 ALLOWED_CORS_ORIGINS = (
@@ -33,6 +33,12 @@ class Settings(BaseSettings):
     admin_username: str | None = None
     admin_password: SecretStr | None = None
     usage_tracking_started_at: datetime | None = None
+    kakao_rest_api_key: str | None = None
+    kakao_client_secret: SecretStr | None = None
+    kakao_redirect_uri: str | None = None
+    frontend_auth_redirect_url: str = "http://localhost:3000"
+    session_secret: SecretStr | None = None
+    session_max_age_seconds: int = Field(default=60 * 60 * 24 * 30, gt=0)
 
     @property
     def database_url(self) -> str:

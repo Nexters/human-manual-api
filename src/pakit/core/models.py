@@ -1,13 +1,31 @@
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import JSON, BigInteger, DateTime, Index, Integer, String, func
+from sqlalchemy import JSON, BigInteger, DateTime, ForeignKey, Index, Integer, String, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):
     pass
+
+
+class UserRecord(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(
+        BigInteger().with_variant(Integer, "sqlite"),
+        primary_key=True,
+    )
+    kakao_user_id: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+    )
+    last_logged_in_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+    )
 
 
 class AssessmentResultRecord(Base):
@@ -22,6 +40,12 @@ class AssessmentResultRecord(Base):
     content_version: Mapped[str] = mapped_column(String(32))
     result_snapshot: Mapped[dict[str, Any]] = mapped_column(
         JSON().with_variant(JSONB(), "postgresql")
+    )
+    user_id: Mapped[int | None] = mapped_column(
+        BigInteger().with_variant(Integer, "sqlite"),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

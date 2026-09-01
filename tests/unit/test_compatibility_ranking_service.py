@@ -19,7 +19,14 @@ class FakeResultRepository:
     async def get(self, result_code: str) -> Any | None:
         return self.results.get(result_code)
 
-    async def save(self, result: Any, **versions: str) -> None:
+    async def save(
+        self,
+        result: Any,
+        *,
+        assessment_version: str,
+        content_version: str,
+        user_id: int | None = None,
+    ) -> None:
         self.results[result.result_code] = result
 
     async def count(self) -> int:

@@ -100,6 +100,7 @@ def test_persists_and_restores_an_immutable_result_snapshot() -> None:
                 expected,
                 assessment_version="assessment-v1",
                 content_version="content-v1",
+                user_id=42,
             )
 
         async with sessions() as session:
@@ -113,6 +114,7 @@ def test_persists_and_restores_an_immutable_result_snapshot() -> None:
         assert record is not None
         assert record.assessment_version == "assessment-v1"
         assert record.content_version == "content-v1"
+        assert record.user_id == 42
         assert record.result_snapshot["participant"] == {"nickname": "송송"}
         assert record.result_snapshot["compatibility_profile"]["mbti"] == "ENTP"
 

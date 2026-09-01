@@ -14,6 +14,7 @@ class ResultRepository(Protocol):
         *,
         assessment_version: str,
         content_version: str,
+        user_id: int | None = None,
     ) -> None: ...
 
     async def get(self, result_code: str) -> SubmissionResultData | None: ...

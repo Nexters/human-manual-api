@@ -132,6 +132,7 @@ class SqlAlchemyResultRepository:
         *,
         assessment_version: str,
         content_version: str,
+        user_id: int | None = None,
     ) -> None:
         self._session.add(
             AssessmentResultRecord(
@@ -139,6 +140,7 @@ class SqlAlchemyResultRepository:
                 assessment_version=assessment_version,
                 content_version=content_version,
                 result_snapshot=asdict(result),
+                user_id=user_id,
             )
         )
         try:

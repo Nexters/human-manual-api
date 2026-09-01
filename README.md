@@ -39,6 +39,12 @@ Pakit은 일상적인 질문과 MBTI를 바탕으로 사용자의 성향을 분�
 - 거리감, 갈등을 푸는 속도, 챙김 방식, 함께 움직이는 속도를 비교합니다.
 - 하나의 점수에 그치지 않고 서로에게 필요한 팁과 관계를 오래 이어가는 방법을 제안합니다.
 
+### 🔐 선택적으로 결과 모아보기
+
+- 로그인하지 않아도 테스트, 결과 공유와 친구 궁합을 모두 사용할 수 있습니다.
+- 카카오 로그인 후 브라우저에 저장한 결과 코드를 계정에 연결할 수 있습니다.
+- 연결된 결과와 해당 결과들로 완료한 궁합 이력은 다른 기기에서도 다시 볼 수 있습니다.
+
 ## 결과는 이렇게 만들어집니다
 
 Pakit의 결과 문구는 생성형 AI가 아니라 **명시적인 규칙**으로 결정됩니다. 같은 입력에는 언제나
@@ -112,6 +118,25 @@ PAKIT_USAGE_TRACKING_STARTED_AT=2026-08-20T18:00:00+09:00
 공개 결과 조회와 궁합 계산의 성공 요청만 기록하며 닉네임, 원본 답변, IP, User-Agent는 사용
 기록에 저장하지 않습니다. 프론트 페이지뷰·클릭·유입 분석은 GA에서 관리합니다.
 
+### 카카오 로그인
+
+카카오 로그인은 선택 기능입니다. 설정하지 않아도 기존 비회원 테스트·공유·궁합 API는 그대로
+동작하며 인증 API만 `503`을 반환합니다.
+
+```dotenv
+PAKIT_KAKAO_REST_API_KEY=
+PAKIT_KAKAO_CLIENT_SECRET=
+PAKIT_KAKAO_REDIRECT_URI=https://api.pakit.kr/api/auth/kakao/callback
+PAKIT_FRONTEND_AUTH_REDIRECT_URL=https://pakit.kr/auth/complete
+PAKIT_SESSION_SECRET=충분히-긴-임의의-서명키
+PAKIT_SESSION_MAX_AGE_SECONDS=2592000
+```
+
+카카오 개발자 콘솔에도 `PAKIT_KAKAO_REDIRECT_URI`와 동일한 Redirect URI를 등록해야 합니다.
+서버는 카카오 회원번호만 저장하고 이메일·프로필과 카카오 액세스·리프레시 토큰은 저장하지
+않습니다. 프론트엔드는 로그인 완료 후 localStorage의 결과 코드들을
+`POST /api/auth/me/results/sync`로 보내 계정에 연결합니다.
+
 개발을 마치면 DB 컨테이너만 중지할 수 있습니다. `postgres_data` 볼륨은 그대로 유지됩니다.
 
 ```bash
@@ -164,6 +189,12 @@ src/pakit/
 | `GET`  | `/api/results/{result_code}`                       | 저장된 결과 조회               |
 | `GET`  | `/api/results/{result_code}/compatibility-ranking` | 내 코드의 케미 점수 랭킹 조회  |
 | `GET`  | `/api/compatibility?mine={code}&friend={code}`     | 두 결과의 친구 궁합 조회       |
+| `GET`  | `/api/auth/kakao/login`                           | 카카오 로그인 시작             |
+| `GET`  | `/api/auth/me`                                    | 현재 로그인 사용자 조회        |
+| `POST` | `/api/auth/logout`                                | Pakit 로그아웃                  |
+| `POST` | `/api/auth/me/results/sync`                       | 로컬 결과 코드를 계정에 연결    |
+| `GET`  | `/api/auth/me/results`                            | 내 테스트 결과 목록 조회       |
+| `GET`  | `/api/auth/me/compatibilities`                    | 내 친구 궁합 이력 조회          |
 | `GET`  | `/health`                                          | 서버 상태 확인                 |
 
 서버 실행 후 [Swagger UI](http://localhost:8000/docs)에서 실제 요청·응답 예시와 에러 계약을

@@ -36,6 +36,7 @@ class InMemoryResultRepository:
         *,
         assessment_version: str,
         content_version: str,
+        user_id: int | None = None,
     ) -> None:
         self.results[result.result_code] = result
 

@@ -220,6 +220,8 @@ def _build_result(
 async def submit_assessment(
     submission: AssessmentSubmission,
     repository: ResultRepository,
+    *,
+    user_id: int | None = None,
 ) -> SubmissionResultData:
     if submission.assessment_version != ASSESSMENT_VERSION:
         raise UnsupportedAssessmentVersionError
@@ -233,6 +235,7 @@ async def submit_assessment(
                 result,
                 assessment_version=submission.assessment_version,
                 content_version=RESULT_CONTENT_VERSION,
+                user_id=user_id,
             )
         except ResultCodeConflictError:
             continue
