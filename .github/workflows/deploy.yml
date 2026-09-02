@@ -17,11 +17,16 @@ jobs:
           PAKIT_ADMIN_USERNAME: ${{ secrets.PAKIT_ADMIN_USERNAME }}
           PAKIT_ADMIN_PASSWORD: ${{ secrets.PAKIT_ADMIN_PASSWORD }}
           PAKIT_USAGE_TRACKING_STARTED_AT: ${{ secrets.PAKIT_USAGE_TRACKING_STARTED_AT }}
+          PAKIT_KAKAO_REST_API_KEY: ${{ secrets.PAKIT_KAKAO_REST_API_KEY }}
+          PAKIT_KAKAO_CLIENT_SECRET: ${{ secrets.PAKIT_KAKAO_CLIENT_SECRET }}
+          PAKIT_KAKAO_REDIRECT_URI: ${{ secrets.PAKIT_KAKAO_REDIRECT_URI }}
+          PAKIT_FRONTEND_AUTH_REDIRECT_URL: ${{ secrets.PAKIT_FRONTEND_AUTH_REDIRECT_URL }}
+          PAKIT_SESSION_SECRET: ${{ secrets.PAKIT_SESSION_SECRET }}
         with:
           host: ${{ secrets.GAIA_HOST }}
           username: ${{ secrets.GAIA_USERNAME }}
           key: ${{ secrets.GAIA_SSH_KEY }}
-          envs: PAKIT_ADMIN_USERNAME,PAKIT_ADMIN_PASSWORD,PAKIT_USAGE_TRACKING_STARTED_AT
+          envs: PAKIT_ADMIN_USERNAME,PAKIT_ADMIN_PASSWORD,PAKIT_USAGE_TRACKING_STARTED_AT,PAKIT_KAKAO_REST_API_KEY,PAKIT_KAKAO_CLIENT_SECRET,PAKIT_KAKAO_REDIRECT_URI,PAKIT_FRONTEND_AUTH_REDIRECT_URL,PAKIT_SESSION_SECRET
           request_pty: true
           script: |
             # 1. 서버 내부 프로젝트 폴더로 이동
@@ -31,7 +36,7 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
-            # 3. GitHub Secrets로 관리자 설정만 갱신 (기존 DB 설정은 보존)
+            # 3. GitHub Secrets로 관리자 및 카카오 로그인 설정 갱신 (기존 DB 설정은 보존)
             python3 - <<'PY'
             import os
             from pathlib import Path
@@ -40,13 +45,18 @@ jobs:
                 "PAKIT_ADMIN_USERNAME",
                 "PAKIT_ADMIN_PASSWORD",
                 "PAKIT_USAGE_TRACKING_STARTED_AT",
+                "PAKIT_KAKAO_REST_API_KEY",
+                "PAKIT_KAKAO_CLIENT_SECRET",
+                "PAKIT_KAKAO_REDIRECT_URI",
+                "PAKIT_FRONTEND_AUTH_REDIRECT_URL",
+                "PAKIT_SESSION_SECRET",
             )
             values = {key: os.environ.get(key, "") for key in keys}
             missing = [key for key, value in values.items() if not value]
             if missing:
                 raise SystemExit(f"Missing required GitHub Secrets: {', '.join(missing)}")
             if any("\n" in value or "\r" in value for value in values.values()):
-                raise SystemExit("Admin secrets must not contain line breaks")
+                raise SystemExit("Deployment secrets must not contain line breaks")
 
             env_path = Path(".env")
             existing = env_path.read_text() if env_path.exists() else ""
