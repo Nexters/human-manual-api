@@ -84,16 +84,16 @@ def test_treats_exactly_300_messages_as_neutral_signal() -> None:
         )
     )
 
-    assert result.axis_scores.attachment == 10
+    assert result.axis_scores.attachment == 60
 
 
 @pytest.mark.parametrize(
     ("q04", "q05", "q06", "expected"),
     [
-        (0, "share_selectively", 999, 50),
-        (100, "share_everything", 0, 50),
-        (25, "share_selectively", 999, 38),
-        (75, "share_everything", 0, 63),
+        (0, "share_selectively", 999, 0),
+        (100, "share_everything", 0, 100),
+        (25, "share_selectively", 999, 13),
+        (75, "share_everything", 0, 88),
     ],
 )
 def test_weights_attachment_inputs_50_30_20(

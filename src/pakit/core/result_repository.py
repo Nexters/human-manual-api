@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from pakit.core.models import AssessmentResultRecord
 from pakit.domain.assessment_submission import (
+    AssessmentSubmission,
     AxisScoresData,
     CharacterStoryData,
     ChargingActivityData,
@@ -130,16 +131,21 @@ class SqlAlchemyResultRepository:
         self,
         result: SubmissionResultData,
         *,
-        assessment_version: str,
+        submission: AssessmentSubmission,
         content_version: str,
         user_id: int | None = None,
     ) -> None:
         self._session.add(
             AssessmentResultRecord(
                 result_code=result.result_code,
-                assessment_version=assessment_version,
+                assessment_version=submission.assessment_version,
                 content_version=content_version,
                 result_snapshot=asdict(result),
+                response_snapshot={
+                    "assessment_version": submission.assessment_version,
+                    "mbti": submission.mbti.value,
+                    "answers": [asdict(answer) for answer in submission.answers],
+                },
                 user_id=user_id,
             )
         )

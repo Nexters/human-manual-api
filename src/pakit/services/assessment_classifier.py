@@ -76,7 +76,7 @@ def classify_submission(submission: AssessmentSubmission) -> AssessmentClassific
         _choice_score(str(answers["step2.q03"]), "send_immediately"),
     )
     attachment = _weighted_score(
-        (100 - int(answers["step2.q04"]), 50),
+        (int(answers["step2.q04"]), 50),
         (_choice_score(str(answers["step2.q05"]), "share_everything"), 30),
         (_message_count_score(int(answers["step2.q06"])), 20),
     )

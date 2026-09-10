@@ -64,7 +64,13 @@ flowchart LR
   차단합니다.
 - **결정적 분류 로직**: 점수, 캐릭터, 특징, 사용 방법과 주의사항을 도메인 규칙으로 조합합니다.
 - **과거 결과 보존**: 결과 생성 시점의 콘텐츠를 PostgreSQL에 스냅샷으로 저장합니다.
-- **개인정보 최소화**: 결과 표시용 닉네임만 저장하고 원본 답변은 저장하지 않습니다.
+- **원본 응답 보존**: 새 테스트 제출마다 `assessment_results.response_snapshot`에 질문지 버전,
+  MBTI, 20개 문항의 ID·선택값을 결과와 같은 트랜잭션으로 저장합니다. 결과 표시용 닉네임은
+  기존 결과 스냅샷에 유지합니다. 원본 응답은 공개 제출·결과·궁합 API에 노출하지 않습니다.
+  기존 결과의 원본 응답은 `NULL`이며 역산하지 않습니다. 질문·선택지 원문은 해당 질문지
+  버전 자료와 연결합니다. 보존 기간과 삭제 정책은 별도 제품 결정으로 남아 있습니다.
+- 원본 응답 저장 배포 전 `uv run alembic upgrade head`로 `20260908_04`를 적용해야 합니다.
+  이 마이그레이션을 되돌리면 원본 응답 컬럼과 그 데이터는 삭제되고 결과 스냅샷은 유지됩니다.
 
 ## 기술 스택
 
@@ -189,6 +195,7 @@ src/pakit/
 | `GET`  | `/api/results/{result_code}`                       | 저장된 결과 조회               |
 | `GET`  | `/api/results/{result_code}/compatibility-ranking` | 내 코드의 케미 점수 랭킹 조회  |
 | `GET`  | `/api/compatibility?mine={code}&friend={code}`     | 두 결과의 친구 궁합 조회       |
+| `POST` | `/api/relationship-reports/romantic`               | AI 연인 관계 설명서 생성        |
 | `GET`  | `/api/auth/kakao/login`                           | 카카오 로그인 시작             |
 | `GET`  | `/api/auth/me`                                    | 현재 로그인 사용자 조회        |
 | `POST` | `/api/auth/logout`                                | Pakit 로그아웃                  |
@@ -213,3 +220,13 @@ src/pakit/
 <div align="center">
   서로를 이해하는 가장 재미있는 방법, <strong>Pakit</strong>
 </div>
+
+## 유료 AI 관계 설명서 실험
+
+연인용 프롬프트와 입력 변환 규칙은
+[프롬프트 사용 안내](src/pakit/prompts/relationship/README.md)에 정리되어 있습니다.
+`POST /api/relationship-reports/romantic`은 두 결과 코드와 각 성별을 받아 저장된 원본 응답을
+성향 프로필로 바꾸고 OpenAI Responses API로 관계 설명서를 생성합니다. 같은 입력·모델·문구
+버전의 생성 결과는 DB에서 재사용합니다. 운영 전에 `20260910_05` 마이그레이션을 적용하고
+`PAKIT_OPENAI_API_KEY`, `PAKIT_OPENAI_MODEL`을 설정해야 합니다. 결제 권한 검증은 아직
+연결하지 않았으므로 이 단계에서는 품질 검증용 API로 취급합니다.

@@ -11,7 +11,7 @@ from pakit.api.dependencies import get_result_repository, get_user_repository
 from pakit.api.schemas.assessment_submissions import ASSESSMENT_SUBMISSION_EXAMPLE
 from pakit.core.config import Settings, get_settings
 from pakit.core.kakao import KakaoOAuthError
-from pakit.domain.assessment_submission import SubmissionResultData
+from pakit.domain.assessment_submission import AssessmentSubmission, SubmissionResultData
 from pakit.main import app
 from pakit.services.user_repository import (
     ResultSyncSummary,
@@ -106,7 +106,7 @@ class FakeResultRepository:
         self,
         result: SubmissionResultData,
         *,
-        assessment_version: str,
+        submission: AssessmentSubmission,
         content_version: str,
         user_id: int | None = None,
     ) -> None:

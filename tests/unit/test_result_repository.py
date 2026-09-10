@@ -5,6 +5,10 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+from pakit.api.schemas.assessment_submissions import (
+    ASSESSMENT_SUBMISSION_EXAMPLE,
+    AssessmentSubmissionInput,
+)
 from pakit.core.models import AssessmentResultRecord, Base
 from pakit.core.result_repository import SqlAlchemyResultRepository
 from pakit.domain.assessment_submission import (
@@ -98,7 +102,9 @@ def test_persists_and_restores_an_immutable_result_snapshot() -> None:
             repository = SqlAlchemyResultRepository(session)
             await repository.save(
                 expected,
-                assessment_version="assessment-v1",
+                submission=AssessmentSubmissionInput.model_validate(
+                    ASSESSMENT_SUBMISSION_EXAMPLE
+                ).to_domain(),
                 content_version="content-v1",
                 user_id=42,
             )
@@ -112,7 +118,14 @@ def test_persists_and_restores_an_immutable_result_snapshot() -> None:
 
         assert restored == expected
         assert record is not None
-        assert record.assessment_version == "assessment-v1"
+        assert record.assessment_version == ASSESSMENT_SUBMISSION_EXAMPLE["assessment_version"]
+        assert record.response_snapshot == {
+            "assessment_version": ASSESSMENT_SUBMISSION_EXAMPLE["assessment_version"],
+            "mbti": ASSESSMENT_SUBMISSION_EXAMPLE["mbti"],
+            "answers": ASSESSMENT_SUBMISSION_EXAMPLE["answers"],
+        }
+        assert "answers" not in record.result_snapshot
+        assert "response_snapshot" not in record.result_snapshot
         assert record.content_version == "content-v1"
         assert record.user_id == 42
         assert record.result_snapshot["participant"] == {"nickname": "송송"}
@@ -149,7 +162,9 @@ def test_counts_persisted_results() -> None:
             assert await repository.count() == 0
             await repository.save(
                 _result(),
-                assessment_version="assessment-v1",
+                submission=AssessmentSubmissionInput.model_validate(
+                    ASSESSMENT_SUBMISSION_EXAMPLE
+                ).to_domain(),
                 content_version="content-v1",
             )
             assert await repository.count() == 1
@@ -169,11 +184,19 @@ def test_rejects_a_duplicate_result_code() -> None:
         async with sessions() as session:
             repository = SqlAlchemyResultRepository(session)
             await repository.save(
-                _result(), assessment_version="assessment-v1", content_version="content-v1"
+                _result(),
+                submission=AssessmentSubmissionInput.model_validate(
+                    ASSESSMENT_SUBMISSION_EXAMPLE
+                ).to_domain(),
+                content_version="content-v1",
             )
             with pytest.raises(ResultCodeConflictError):
                 await repository.save(
-                    _result(), assessment_version="assessment-v1", content_version="content-v1"
+                    _result(),
+                    submission=AssessmentSubmissionInput.model_validate(
+                        ASSESSMENT_SUBMISSION_EXAMPLE
+                    ).to_domain(),
+                    content_version="content-v1",
                 )
 
         await engine.dispose()
@@ -210,6 +233,9 @@ def test_restores_a_legacy_snapshot_without_a_participant() -> None:
 
         async with sessions() as session:
             restored = await SqlAlchemyResultRepository(session).get("legacy01")
+            legacy_record = await session.scalar(select(AssessmentResultRecord))
+            assert legacy_record is not None
+            assert legacy_record.response_snapshot is None
 
         await engine.dispose()
         assert restored is not None

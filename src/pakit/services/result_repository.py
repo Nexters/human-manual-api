@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from pakit.domain.assessment_submission import SubmissionResultData
+from pakit.domain.assessment_submission import AssessmentSubmission, SubmissionResultData
 
 
 class ResultCodeConflictError(RuntimeError):
@@ -12,7 +12,7 @@ class ResultRepository(Protocol):
         self,
         result: SubmissionResultData,
         *,
-        assessment_version: str,
+        submission: AssessmentSubmission,
         content_version: str,
         user_id: int | None = None,
     ) -> None: ...

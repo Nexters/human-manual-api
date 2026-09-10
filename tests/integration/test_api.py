@@ -21,7 +21,7 @@ from pakit.api.schemas.compatibility import (
     COMPATIBILITY_RESPONSE_EXAMPLE,
 )
 from pakit.domain.assessment_contract import ASSESSMENT_VERSION, QUESTION_CONTRACTS, AnswerKind
-from pakit.domain.assessment_submission import SubmissionResultData
+from pakit.domain.assessment_submission import AssessmentSubmission, SubmissionResultData
 from pakit.main import app
 from pakit.services.usage_event_repository import StoredCompatibilityEvent
 
@@ -34,7 +34,7 @@ class InMemoryResultRepository:
         self,
         result: SubmissionResultData,
         *,
-        assessment_version: str,
+        submission: AssessmentSubmission,
         content_version: str,
         user_id: int | None = None,
     ) -> None:
@@ -617,7 +617,7 @@ def test_submission_uses_answers_and_mbti_for_deterministic_result_fields() -> N
                 "step2.q01": "approach_directly",
                 "step2.q02": "resolve_immediately",
                 "step2.q03": "send_immediately",
-                "step2.q04": 100,
+                "step2.q04": 0,
                 "step2.q05": "share_selectively",
                 "step2.q06": 999,
                 "step2.q07": "decorate_for_mood",
@@ -860,7 +860,7 @@ def test_uses_mbti_energy_and_attachment_for_social_energy_warning() -> None:
     low_answers = low_attachment["answers"]
     assert isinstance(low_answers, list)
     low_attachment_values = {
-        "step2.q04": 100,
+        "step2.q04": 0,
         "step2.q05": "share_selectively",
         "step2.q06": 999,
     }

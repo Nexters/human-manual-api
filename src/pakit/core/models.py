@@ -1,7 +1,18 @@
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import JSON, BigInteger, DateTime, ForeignKey, Index, Integer, String, func
+from sqlalchemy import (
+    JSON,
+    BigInteger,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -41,6 +52,10 @@ class AssessmentResultRecord(Base):
     result_snapshot: Mapped[dict[str, Any]] = mapped_column(
         JSON().with_variant(JSONB(), "postgresql")
     )
+    response_snapshot: Mapped[dict[str, Any] | None] = mapped_column(
+        JSON(none_as_null=True).with_variant(JSONB(none_as_null=True), "postgresql"),
+        nullable=True,
+    )
     user_id: Mapped[int | None] = mapped_column(
         BigInteger().with_variant(Integer, "sqlite"),
         ForeignKey("users.id", ondelete="SET NULL"),
@@ -74,4 +89,40 @@ class BackendUsageEventRecord(Base):
     occurred_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
+    )
+
+
+class RomanticRelationshipReportRecord(Base):
+    __tablename__ = "romantic_relationship_reports"
+    __table_args__ = (
+        UniqueConstraint(
+            "mine_result_code",
+            "partner_result_code",
+            "mine_gender",
+            "partner_gender",
+            "prompt_version",
+            "profile_version",
+            "model",
+            name="uq_romantic_report_generation_input",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger().with_variant(Integer, "sqlite"), primary_key=True)
+    report_code: Mapped[str] = mapped_column(String(12), unique=True, index=True)
+    mine_result_code: Mapped[str] = mapped_column(String(8), index=True)
+    partner_result_code: Mapped[str] = mapped_column(String(8), index=True)
+    mine_gender: Mapped[str] = mapped_column(String(20))
+    partner_gender: Mapped[str] = mapped_column(String(20))
+    prompt_version: Mapped[str] = mapped_column(String(32))
+    profile_version: Mapped[str] = mapped_column(String(32))
+    model: Mapped[str] = mapped_column(String(64))
+    input_snapshot: Mapped[dict[str, Any]] = mapped_column(
+        JSON().with_variant(JSONB(), "postgresql")
+    )
+    content: Mapped[str] = mapped_column(Text)
+    provider_response_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    input_tokens: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    output_tokens: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), index=True
     )

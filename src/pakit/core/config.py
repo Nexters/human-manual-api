@@ -39,6 +39,10 @@ class Settings(BaseSettings):
     frontend_auth_redirect_url: str = "http://localhost:3000"
     session_secret: SecretStr | None = None
     session_max_age_seconds: int = Field(default=60 * 60 * 24 * 30, gt=0)
+    openai_api_key: SecretStr | None = None
+    openai_model: str | None = None
+    openai_max_output_tokens: int = Field(default=5000, ge=1000, le=16000)
+    openai_timeout_seconds: float = Field(default=60.0, gt=0, le=180)
 
     @property
     def database_url(self) -> str:

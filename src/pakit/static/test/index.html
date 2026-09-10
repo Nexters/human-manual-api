@@ -137,7 +137,7 @@
       const fieldset = document.createElement("fieldset");
       fieldset.innerHTML = `<legend>${question.id} · ${question.prompt}</legend>`;
       if (question.kind === "scale") {
-        fieldset.innerHTML += `<span>밀착</span> <input name="${question.id}" type="range" min="0" max="100" step="25" value="50"> <output>선택 안 함</output> <span>거리조절</span>`;
+        fieldset.innerHTML += `<span>각자 시간</span> <input name="${question.id}" type="range" min="0" max="100" step="25" value="50"> <output>선택 안 함</output> <span>늘 함께</span>`;
         const input = fieldset.querySelector("input");
         const selectScaleValue = () => {
           input.setCustomValidity("");

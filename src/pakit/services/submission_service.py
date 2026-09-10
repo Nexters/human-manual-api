@@ -233,7 +233,7 @@ async def submit_assessment(
         try:
             await repository.save(
                 result,
-                assessment_version=submission.assessment_version,
+                submission=submission,
                 content_version=RESULT_CONTENT_VERSION,
                 user_id=user_id,
             )

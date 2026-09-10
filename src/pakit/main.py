@@ -36,6 +36,10 @@ def create_app() -> FastAPI:
                 "description": "두 테스트 결과를 비교하는 친구 궁합 API입니다.",
             },
             {
+                "name": "Relationship Report",
+                "description": "두 사람의 저장된 응답으로 AI 연인 관계 설명서를 생성합니다.",
+            },
+            {
                 "name": "Auth",
                 "description": "선택적 카카오 로그인과 내 결과·궁합 이력 API입니다.",
             },

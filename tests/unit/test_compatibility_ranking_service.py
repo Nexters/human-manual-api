@@ -5,6 +5,7 @@ from typing import Any
 
 import pytest
 
+from pakit.domain.assessment_submission import AssessmentSubmission
 from pakit.services.compatibility_ranking_service import (
     CompatibilityRankingNotFoundError,
     get_compatibility_ranking,
@@ -23,7 +24,7 @@ class FakeResultRepository:
         self,
         result: Any,
         *,
-        assessment_version: str,
+        submission: AssessmentSubmission,
         content_version: str,
         user_id: int | None = None,
     ) -> None:
