@@ -5,17 +5,13 @@
 이 설명서는 두 사람이 서로를 덜 오해하고, 반복되는 갈등 패턴을 알아차리며, 더 나은 관계
 방식을 함께 만들어갈 수 있도록 돕는 글이어야 합니다.
 
-## 사람 A 프로필
-
-[{{participant_a_name}}]
+## {{participant_a_name}} 프로필
 
 - 성별: {{participant_a_gender}}
 - MBTI: {{participant_a_mbti}}
 {{participant_a_profile}}
 
-## 사람 B 프로필
-
-[{{participant_b_name}}]
+## {{participant_b_name}} 프로필
 
 - 성별: {{participant_b_gender}}
 - MBTI: {{participant_b_mbti}}
@@ -66,8 +62,8 @@
 
 8번은 하나의 장 안에서 양방향으로 구성하세요.
 
-- A가 B에게 해주면 좋은 것
-- B가 A에게 해주면 좋은 것
+- {{participant_a_name}} → {{participant_b_name}}
+- {{participant_b_name}} → {{participant_a_name}}
 
 9번에서는 두 사람에게 실제로 도움이 될 관계 규칙을 3개에서 5개까지 제안하세요. 각 규칙은
 다음 형식을 사용하세요.
@@ -92,5 +88,5 @@
 - 반복될 수 있는 상호작용 패턴을 찾아주세요.
 - 함께 바꿔볼 수 있는 구체적인 방법을 제안하세요.
 - 입력에 없는 사실은 단정하지 마세요.
-- A와 B의 개인 사용 설명서를 별도 항목으로 작성하지 마세요.
+- 두 사람의 개인 사용 설명서를 별도 항목으로 작성하지 마세요.
 - 같은 차이나 조언을 제목만 바꿔 반복하지 마세요.

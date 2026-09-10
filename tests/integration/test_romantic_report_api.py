@@ -138,7 +138,12 @@ def test_generates_and_reuses_romantic_report() -> None:
     assert len(generator.calls) == 1
     instructions, user_prompt = generator.calls[0]
     assert "연애·관계 전문 심리 컨설턴트" in instructions
-    assert "[해선]" in user_prompt
+    assert "## 해선 프로필" in user_prompt
+    assert "## 진 프로필" in user_prompt
+    assert "해선 → 진" in user_prompt
+    assert "진 → 해선" in user_prompt
+    assert "사람 A 프로필" not in user_prompt
+    assert "사람 B 프로필" not in user_prompt
     assert "MBTI: ENTP" in user_prompt
     assert "step2.q" not in user_prompt
 
