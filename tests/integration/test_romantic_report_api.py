@@ -138,6 +138,8 @@ def test_generates_and_reuses_romantic_report() -> None:
     assert len(generator.calls) == 1
     instructions, user_prompt = generator.calls[0]
     assert "연애·관계 전문 심리 컨설턴트" in instructions
+    assert "MBTI 관점은 약 30%의 비중" in instructions
+    assert "결과에 MBTI 유형명이나 알파벳을 직접 나타내지 마세요" in instructions
     assert "## 해선 프로필" in user_prompt
     assert "## 진 프로필" in user_prompt
     assert "해선 → 진" in user_prompt
