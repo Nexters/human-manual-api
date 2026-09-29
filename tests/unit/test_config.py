@@ -27,4 +27,5 @@ def test_admin_and_usage_tracking_are_disabled_by_default() -> None:
     assert settings.kakao_client_secret is None
     assert settings.kakao_redirect_uri is None
     assert settings.session_secret is None
+    assert settings.openai_timeout_seconds == 150
     assert settings.romantic_report_beta_access_code is None

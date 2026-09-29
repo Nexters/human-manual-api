@@ -43,7 +43,7 @@ class Settings(BaseSettings):
     openai_api_key: SecretStr | None = None
     openai_model: str | None = None
     openai_max_output_tokens: int = Field(default=5000, ge=1000, le=16000)
-    openai_timeout_seconds: float = Field(default=60.0, gt=0, le=180)
+    openai_timeout_seconds: float = Field(default=150.0, gt=0, le=180)
     romantic_report_beta_access_code: SecretStr | None = Field(
         default=None,
         min_length=8,

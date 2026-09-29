@@ -233,3 +233,5 @@ src/pakit/
 `PAKIT_ROMANTIC_REPORT_BETA_ACCESS_CODE`에 베타 코드를 설정하고, 허용할 클라이언트만
 같은 값을 `X-Pakit-Beta-Code` 요청 헤더로 보내야 합니다. 코드는 URL이나 요청 본문에 넣지
 않으며, 유출되면 환경변수 값을 교체해 폐기합니다.
+AI 생성 요청은 최대 150초까지 기다리며, 운영 Nginx는
+`deploy/nginx/pakit-api-timeouts.conf`의 180초 upstream 제한을 배포 시 적용합니다.

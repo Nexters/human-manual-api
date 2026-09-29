@@ -82,7 +82,14 @@ jobs:
             temp_path.replace(env_path)
             PY
 
-            # 4. 백엔드 서비스 무중단 빌드 및 교체 (DB는 내리지 않고 유지)
+            # 4. 긴 AI 생성 요청을 받을 수 있도록 Nginx upstream 대기 시간 적용
+            sudo install -m 0644 \
+              deploy/nginx/pakit-api-timeouts.conf \
+              /etc/nginx/conf.d/pakit-api-timeouts.conf
+            sudo nginx -t
+            sudo systemctl reload nginx
+
+            # 5. 백엔드 서비스 무중단 빌드 및 교체 (DB는 내리지 않고 유지)
             docker compose build api
             docker compose up -d --no-deps api
 
@@ -100,5 +107,5 @@ jobs:
               exit 1
             fi
 
-            # 5. 사용하지 않는 찌꺼기 이미지 정리
+            # 6. 사용하지 않는 찌꺼기 이미지 정리
             docker image prune -f
