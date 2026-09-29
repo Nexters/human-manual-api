@@ -45,8 +45,8 @@ class RomanticReportOutput(BaseModel):
 
 
 ROMANTIC_REPORT_REQUEST_EXAMPLE = {
-    "mine_result_code": "GU26BwcL",
-    "partner_result_code": "877ApB1D",
+    "mine_result_code": "si0KO1L8",
+    "partner_result_code": "O1Qu7UrT",
     "mine_gender": "여자",
     "partner_gender": "남자",
 }
