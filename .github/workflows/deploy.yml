@@ -86,5 +86,19 @@ jobs:
             docker compose build api
             docker compose up -d --no-deps api
 
+            # 새 컨테이너가 실제로 요청을 받을 때까지 확인
+            healthy=false
+            for attempt in $(seq 1 12); do
+              if curl --fail --silent http://127.0.0.1:8000/health > /dev/null; then
+                healthy=true
+                break
+              fi
+              sleep 5
+            done
+            if [ "$healthy" != "true" ]; then
+              docker compose logs --tail=100 api
+              exit 1
+            fi
+
             # 5. 사용하지 않는 찌꺼기 이미지 정리
             docker image prune -f
