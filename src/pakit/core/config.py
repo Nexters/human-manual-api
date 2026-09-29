@@ -19,6 +19,7 @@ class Settings(BaseSettings):
         env_prefix="PAKIT_",
         env_ignore_empty=True,
         extra="ignore",
+        hide_input_in_errors=True,
     )
 
     app_name: str = "Pakit API"
@@ -43,6 +44,11 @@ class Settings(BaseSettings):
     openai_model: str | None = None
     openai_max_output_tokens: int = Field(default=5000, ge=1000, le=16000)
     openai_timeout_seconds: float = Field(default=60.0, gt=0, le=180)
+    romantic_report_beta_access_code: SecretStr | None = Field(
+        default=None,
+        min_length=8,
+        max_length=256,
+    )
 
     @property
     def database_url(self) -> str:

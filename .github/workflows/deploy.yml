@@ -22,11 +22,14 @@ jobs:
           PAKIT_KAKAO_REDIRECT_URI: ${{ secrets.PAKIT_KAKAO_REDIRECT_URI }}
           PAKIT_FRONTEND_AUTH_REDIRECT_URL: ${{ secrets.PAKIT_FRONTEND_AUTH_REDIRECT_URL }}
           PAKIT_SESSION_SECRET: ${{ secrets.PAKIT_SESSION_SECRET }}
+          PAKIT_ROMANTIC_REPORT_BETA_ACCESS_CODE: ${{ secrets.PAKIT_ROMANTIC_REPORT_BETA_ACCESS_CODE }}
+          PAKIT_OPENAI_API_KEY: ${{ secrets.PAKIT_OPENAI_API_KEY }}
+          PAKIT_OPENAI_MODEL: ${{ secrets.PAKIT_OPENAI_MODEL }}
         with:
           host: ${{ secrets.GAIA_HOST }}
           username: ${{ secrets.GAIA_USERNAME }}
           key: ${{ secrets.GAIA_SSH_KEY }}
-          envs: PAKIT_ADMIN_USERNAME,PAKIT_ADMIN_PASSWORD,PAKIT_USAGE_TRACKING_STARTED_AT,PAKIT_KAKAO_REST_API_KEY,PAKIT_KAKAO_CLIENT_SECRET,PAKIT_KAKAO_REDIRECT_URI,PAKIT_FRONTEND_AUTH_REDIRECT_URL,PAKIT_SESSION_SECRET
+          envs: PAKIT_ADMIN_USERNAME,PAKIT_ADMIN_PASSWORD,PAKIT_USAGE_TRACKING_STARTED_AT,PAKIT_KAKAO_REST_API_KEY,PAKIT_KAKAO_CLIENT_SECRET,PAKIT_KAKAO_REDIRECT_URI,PAKIT_FRONTEND_AUTH_REDIRECT_URL,PAKIT_SESSION_SECRET,PAKIT_ROMANTIC_REPORT_BETA_ACCESS_CODE,PAKIT_OPENAI_API_KEY,PAKIT_OPENAI_MODEL
           request_pty: true
           script: |
             # 1. 서버 내부 프로젝트 폴더로 이동
@@ -50,6 +53,9 @@ jobs:
                 "PAKIT_KAKAO_REDIRECT_URI",
                 "PAKIT_FRONTEND_AUTH_REDIRECT_URL",
                 "PAKIT_SESSION_SECRET",
+                "PAKIT_ROMANTIC_REPORT_BETA_ACCESS_CODE",
+                "PAKIT_OPENAI_API_KEY",
+                "PAKIT_OPENAI_MODEL",
             )
             values = {key: os.environ.get(key, "") for key in keys}
             missing = [key for key, value in values.items() if not value]

@@ -230,3 +230,6 @@ src/pakit/
 버전의 생성 결과는 DB에서 재사용합니다. 운영 전에 `20260910_05` 마이그레이션을 적용하고
 `PAKIT_OPENAI_API_KEY`, `PAKIT_OPENAI_MODEL`을 설정해야 합니다. 결제 권한 검증은 아직
 연결하지 않았으므로 이 단계에서는 품질 검증용 API로 취급합니다.
+`PAKIT_ROMANTIC_REPORT_BETA_ACCESS_CODE`에 베타 코드를 설정하고, 허용할 클라이언트만
+같은 값을 `X-Pakit-Beta-Code` 요청 헤더로 보내야 합니다. 코드는 URL이나 요청 본문에 넣지
+않으며, 유출되면 환경변수 값을 교체해 폐기합니다.

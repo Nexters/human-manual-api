@@ -1,6 +1,7 @@
+from hmac import compare_digest
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Header
 from fastapi.responses import JSONResponse
 
 from pakit.api.dependencies import (
@@ -13,6 +14,7 @@ from pakit.api.schemas.romantic_reports import (
     RomanticReportCreateInput,
     RomanticReportOutput,
 )
+from pakit.core.config import Settings, get_settings
 from pakit.services.romantic_profile_builder import RomanticProfileUnavailableError
 from pakit.services.romantic_report_generator import (
     RomanticReportGenerationError,
@@ -38,7 +40,7 @@ router = APIRouter(prefix="/relationship-reports", tags=["Relationship Report"])
     description=(
         "저장된 두 테스트 결과와 화면에서 입력받은 성별로 AI 연인 관계 설명서를 생성합니다. "
         "같은 입력과 생성 버전의 결과가 이미 있으면 AI를 다시 호출하지 않고 저장된 설명서를 "
-        "반환합니다. 현재 품질 검증 단계라 결제 권한 확인은 아직 적용하지 않았습니다."
+        "반환합니다. 현재 베타 기간에는 X-Pakit-Beta-Code 헤더가 필요합니다."
     ),
     openapi_extra={
         "requestBody": {
@@ -50,6 +52,7 @@ router = APIRouter(prefix="/relationship-reports", tags=["Relationship Report"])
         }
     },
     responses={
+        403: {"model": ErrorResponse, "description": "베타 접근 코드가 유효하지 않음"},
         404: {"model": ErrorResponse, "description": "결과 코드를 찾을 수 없음"},
         409: {"model": ErrorResponse, "description": "원본 응답을 사용할 수 없음"},
         502: {"model": ErrorResponse, "description": "AI 생성 실패"},
@@ -60,7 +63,25 @@ async def generate_romantic_report(
     body: RomanticReportCreateInput,
     repository: Annotated[RomanticReportRepository, Depends(get_romantic_report_repository)],
     generator: Annotated[RomanticReportGenerator | None, Depends(get_romantic_report_generator)],
+    settings: Annotated[Settings, Depends(get_settings)],
+    beta_access_code: Annotated[str | None, Header(alias="X-Pakit-Beta-Code")] = None,
 ) -> RomanticReportOutput | JSONResponse:
+    configured_beta_code = settings.romantic_report_beta_access_code
+    if configured_beta_code is None:
+        return _error(
+            503,
+            "RELATIONSHIP_REPORT_BETA_NOT_CONFIGURED",
+            "관계 설명서 베타 접근 설정이 필요합니다.",
+        )
+    if beta_access_code is None or not compare_digest(
+        beta_access_code,
+        configured_beta_code.get_secret_value(),
+    ):
+        return _error(
+            403,
+            "RELATIONSHIP_REPORT_BETA_ACCESS_DENIED",
+            "유효한 베타 접근 코드가 필요합니다.",
+        )
     if generator is None:
         return _error(
             503,
