@@ -245,6 +245,18 @@ AI 생성 요청은 최대 150초까지 기다리며, 운영 Nginx는
 상대 결과·성별을 `POST /api/payments/kakaopay/ready`로 보내고, 응답의 접속 환경별 URL로
 이동합니다. 승인 콜백이 완료된 주문만
 `POST /api/relationship-reports/romantic/orders/{order_id}`에서 관계 설명서를 생성할 수 있습니다.
+GitHub Actions 배포를 사용하려면 저장소 Secrets에 다음 값을 등록해야 하며, 배포 워크플로가
+가비아 서버의 `.env`에 자동 반영합니다.
+
+```dotenv
+PAKIT_KAKAOPAY_CID=TC0ONETIME
+PAKIT_KAKAOPAY_SECRET_KEY=카카오페이-Secret-key(dev)
+PAKIT_FRONTEND_PAYMENT_REDIRECT_URL=https://pakit.kr/payments/kakaopay/complete
+```
+
+운영 결제를 시작할 때는 테스트 CID와 개발 키를 계약 후 발급받은 운영 CID와 운영 Secret key로
+교체해야 합니다. 카카오페이 Developers의 Web 플랫폼에는 결제 콜백을 받는
+`https://api.pakit.kr` 도메인을 등록합니다.
 가격은 클라이언트 입력을 받지 않고 서버에서 990원으로 고정합니다.
 결제 주문은 향후 다른 상품도 사용할 수 있도록 상품 코드·표시명·가격과 상품별 payload의
 불변 스냅샷을 저장하며, 현재 관계 설명서만 `romantic-report-v1` payload를 해석합니다.
