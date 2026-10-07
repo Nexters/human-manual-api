@@ -242,3 +242,46 @@ def test_returns_bad_gateway_when_kakao_exchange_fails(
     )
 
     assert response.status_code == 502
+
+
+def test_returns_to_safe_frontend_path_after_login(
+    auth_client: tuple[TestClient, FakeUserRepository, FakeResultRepository],
+) -> None:
+    client, _, _ = auth_client
+    started = client.get(
+        "/api/auth/kakao/login",
+        params={"return_to": "/compatibility/checkout?mine=MINE0001&friend=FRIEND01"},
+        follow_redirects=False,
+    )
+    state = parse_qs(urlparse(started.headers["location"]).query)["state"][0]
+
+    completed = client.get(
+        "/api/auth/kakao/callback",
+        params={"code": "authorization-code", "state": state},
+        follow_redirects=False,
+    )
+
+    assert completed.status_code == 307
+    assert completed.headers["location"] == (
+        "https://pakit.kr/compatibility/checkout?mine=MINE0001&friend=FRIEND01"
+    )
+
+
+def test_ignores_external_login_return_url(
+    auth_client: tuple[TestClient, FakeUserRepository, FakeResultRepository],
+) -> None:
+    client, _, _ = auth_client
+    started = client.get(
+        "/api/auth/kakao/login",
+        params={"return_to": "https://evil.example/steal"},
+        follow_redirects=False,
+    )
+    state = parse_qs(urlparse(started.headers["location"]).query)["state"][0]
+
+    completed = client.get(
+        "/api/auth/kakao/callback",
+        params={"code": "authorization-code", "state": state},
+        follow_redirects=False,
+    )
+
+    assert completed.headers["location"] == "https://pakit.kr/auth/complete"

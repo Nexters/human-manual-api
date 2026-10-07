@@ -196,6 +196,10 @@ src/pakit/
 | `GET`  | `/api/results/{result_code}/compatibility-ranking` | 내 코드의 케미 점수 랭킹 조회  |
 | `GET`  | `/api/compatibility?mine={code}&friend={code}`     | 두 결과의 친구 궁합 조회       |
 | `POST` | `/api/relationship-reports/romantic`               | AI 연인 관계 설명서 생성        |
+| `POST` | `/api/payments/kakaopay/ready`                    | 카카오페이 단건결제 준비        |
+| `GET`  | `/api/payments/kakaopay/{order_id}/approve`       | 카카오페이 결제 승인 콜백       |
+| `GET`  | `/api/payments/kakaopay/{order_id}`               | 내 결제 주문 상태 조회          |
+| `POST` | `/api/relationship-reports/romantic/orders/{order_id}` | 결제한 관계 설명서 생성     |
 | `GET`  | `/api/auth/kakao/login`                           | 카카오 로그인 시작             |
 | `GET`  | `/api/auth/me`                                    | 현재 로그인 사용자 조회        |
 | `POST` | `/api/auth/logout`                                | Pakit 로그아웃                  |
@@ -227,11 +231,20 @@ src/pakit/
 [프롬프트 사용 안내](src/pakit/prompts/relationship/README.md)에 정리되어 있습니다.
 `POST /api/relationship-reports/romantic`은 두 결과 코드와 각 성별을 받아 저장된 원본 응답을
 성향 프로필로 바꾸고 OpenAI Responses API로 관계 설명서를 생성합니다. 같은 입력·모델·문구
-버전의 생성 결과는 DB에서 재사용합니다. 운영 전에 `20260910_05` 마이그레이션을 적용하고
+버전의 생성 결과는 DB에서 재사용합니다. 운영 전에 `20261007_06`까지 마이그레이션을 적용하고
 `PAKIT_OPENAI_API_KEY`, `PAKIT_OPENAI_MODEL`을 설정해야 합니다. 결제 권한 검증은 아직
-연결하지 않았으므로 이 단계에서는 품질 검증용 API로 취급합니다.
+없는 기존 endpoint이므로 이 단계에서는 품질 검증용 API로 취급합니다.
 `PAKIT_ROMANTIC_REPORT_BETA_ACCESS_CODE`에 베타 코드를 설정하고, 허용할 클라이언트만
 같은 값을 `X-Pakit-Beta-Code` 요청 헤더로 보내야 합니다. 코드는 URL이나 요청 본문에 넣지
 않으며, 유출되면 환경변수 값을 교체해 폐기합니다.
 AI 생성 요청은 최대 150초까지 기다리며, 운영 Nginx는
 `deploy/nginx/pakit-api-timeouts.conf`의 180초 upstream 제한을 배포 시 적용합니다.
+
+카카오페이 개발 결제는 `PAKIT_KAKAOPAY_CID=TC0ONETIME`과 발급받은
+`PAKIT_KAKAOPAY_SECRET_KEY` 개발 키를 사용합니다. 로그인 사용자는 본인 계정에 연결된 결과와
+상대 결과·성별을 `POST /api/payments/kakaopay/ready`로 보내고, 응답의 접속 환경별 URL로
+이동합니다. 승인 콜백이 완료된 주문만
+`POST /api/relationship-reports/romantic/orders/{order_id}`에서 관계 설명서를 생성할 수 있습니다.
+가격은 클라이언트 입력을 받지 않고 서버에서 990원으로 고정합니다.
+결제 주문은 향후 다른 상품도 사용할 수 있도록 상품 코드·표시명·가격과 상품별 payload의
+불변 스냅샷을 저장하며, 현재 관계 설명서만 `romantic-report-v1` payload를 해석합니다.

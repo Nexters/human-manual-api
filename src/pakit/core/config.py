@@ -8,7 +8,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 ALLOWED_CORS_ORIGINS = (
     "http://localhost:3000",
+    "http://localhost:4173",
     "http://localhost:5173",
+    "http://127.0.0.1:4173",
     "https://pakit.kr",
 )
 
@@ -37,7 +39,11 @@ class Settings(BaseSettings):
     kakao_rest_api_key: str | None = None
     kakao_client_secret: SecretStr | None = None
     kakao_redirect_uri: str | None = None
+    kakaopay_cid: str | None = None
+    kakaopay_secret_key: SecretStr | None = None
+    kakaopay_timeout_seconds: float = Field(default=10.0, gt=0, le=30)
     frontend_auth_redirect_url: str = "http://localhost:3000"
+    frontend_payment_redirect_url: str = "http://localhost:3000/payments/kakaopay/complete"
     session_secret: SecretStr | None = None
     session_max_age_seconds: int = Field(default=60 * 60 * 24 * 30, gt=0)
     openai_api_key: SecretStr | None = None

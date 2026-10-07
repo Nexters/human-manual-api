@@ -44,6 +44,10 @@ def create_app() -> FastAPI:
                 "description": "선택적 카카오 로그인과 내 결과·궁합 이력 API입니다.",
             },
             {
+                "name": "Payment",
+                "description": "카카오페이 단건결제 주문과 승인 API입니다.",
+            },
+            {
                 "name": "Admin",
                 "description": "인증된 운영자만 사용하는 읽기 전용 결과·통계 API입니다.",
             },

@@ -126,3 +126,32 @@ class RomanticRelationshipReportRecord(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), index=True
     )
+
+
+class PaymentOrderRecord(Base):
+    __tablename__ = "payment_orders"
+
+    id: Mapped[int] = mapped_column(
+        BigInteger().with_variant(Integer, "sqlite"),
+        primary_key=True,
+    )
+    order_id: Mapped[str] = mapped_column(String(32), unique=True, index=True)
+    user_id: Mapped[int] = mapped_column(
+        BigInteger().with_variant(Integer, "sqlite"),
+        ForeignKey("users.id", ondelete="RESTRICT"),
+        index=True,
+    )
+    product_code: Mapped[str] = mapped_column(String(32))
+    product_name: Mapped[str] = mapped_column(String(100))
+    product_payload: Mapped[dict[str, Any]] = mapped_column(
+        JSON().with_variant(JSONB(), "postgresql")
+    )
+    amount: Mapped[int] = mapped_column(Integer)
+    currency: Mapped[str] = mapped_column(String(3), default="KRW")
+    status: Mapped[str] = mapped_column(String(16), index=True)
+    kakaopay_tid: Mapped[str | None] = mapped_column(String(20), unique=True, nullable=True)
+    kakaopay_aid: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    payment_method_type: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    fulfillment_reference: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

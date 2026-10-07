@@ -1,5 +1,6 @@
 from secrets import token_urlsafe
 from typing import Annotated
+from urllib.parse import urlsplit, urlunsplit
 
 from fastapi import APIRouter, Cookie, Depends, Query, Request, Response, status
 from fastapi.responses import JSONResponse, RedirectResponse
@@ -28,6 +29,7 @@ from pakit.services.user_repository import StoredUser, UserRepository
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 OAUTH_STATE_COOKIE_NAME = "pakit_oauth_state"
+OAUTH_RETURN_TO_COOKIE_NAME = "pakit_oauth_return_to"
 OAUTH_STATE_MAX_AGE_SECONDS = 600
 
 
@@ -39,6 +41,7 @@ def _secure_cookie(settings: Settings) -> bool:
 async def start_kakao_login(
     client: Annotated[KakaoClient, Depends(get_kakao_client)],
     settings: Annotated[Settings, Depends(get_settings)],
+    return_to: Annotated[str | None, Query(max_length=500)] = None,
 ) -> RedirectResponse:
     state = token_urlsafe(32)
     response = RedirectResponse(client.authorization_url(state))
@@ -50,6 +53,18 @@ async def start_kakao_login(
         secure=_secure_cookie(settings),
         samesite="lax",
     )
+    safe_return_to = _safe_return_to(return_to)
+    if safe_return_to is not None:
+        response.set_cookie(
+            OAUTH_RETURN_TO_COOKIE_NAME,
+            safe_return_to,
+            max_age=OAUTH_STATE_MAX_AGE_SECONDS,
+            httponly=True,
+            secure=_secure_cookie(settings),
+            samesite="lax",
+        )
+    else:
+        response.delete_cookie(OAUTH_RETURN_TO_COOKIE_NAME)
     return response
 
 
@@ -68,6 +83,7 @@ async def complete_kakao_login(
     state: Annotated[str | None, Query()] = None,
     error: Annotated[str | None, Query()] = None,
     oauth_state: Annotated[str | None, Cookie(alias=OAUTH_STATE_COOKIE_NAME)] = None,
+    return_to: Annotated[str | None, Cookie(alias=OAUTH_RETURN_TO_COOKIE_NAME)] = None,
 ) -> RedirectResponse | JSONResponse:
     if error is not None:
         return JSONResponse(status_code=400, content={"detail": "카카오 로그인이 취소됐습니다."})
@@ -80,8 +96,9 @@ async def complete_kakao_login(
             status_code=status.HTTP_502_BAD_GATEWAY,
             content={"detail": "카카오 로그인 처리에 실패했습니다."},
         )
-    response = RedirectResponse(settings.frontend_auth_redirect_url)
+    response = RedirectResponse(_frontend_redirect(settings.frontend_auth_redirect_url, return_to))
     response.delete_cookie(OAUTH_STATE_COOKIE_NAME)
+    response.delete_cookie(OAUTH_RETURN_TO_COOKIE_NAME)
     response.set_cookie(
         SESSION_COOKIE_NAME,
         signer.create(user.id),
@@ -91,6 +108,24 @@ async def complete_kakao_login(
         samesite="lax",
     )
     return response
+
+
+def _safe_return_to(value: str | None) -> str | None:
+    if value is None or not value.startswith("/") or value.startswith("//"):
+        return None
+    parsed = urlsplit(value)
+    if parsed.scheme or parsed.netloc:
+        return None
+    return value
+
+
+def _frontend_redirect(base_url: str, return_to: str | None) -> str:
+    safe_path = _safe_return_to(return_to)
+    if safe_path is None:
+        return base_url
+    base = urlsplit(base_url)
+    target = urlsplit(safe_path)
+    return urlunsplit((base.scheme, base.netloc, target.path, target.query, ""))
 
 
 @router.get("/me", response_model=CurrentUserOutput, summary="현재 로그인 사용자 조회")
