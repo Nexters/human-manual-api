@@ -38,6 +38,8 @@ class RomanticReportToSave:
 
 
 class RomanticReportRepository(Protocol):
+    async def get_by_report_code(self, report_code: str) -> StoredRomanticReport | None: ...
+
     async def get_profile_source(self, result_code: str) -> RelationshipProfileSource | None: ...
 
     async def find_existing(

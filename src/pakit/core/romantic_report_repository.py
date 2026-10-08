@@ -15,6 +15,14 @@ class SqlAlchemyRomanticReportRepository(RomanticReportRepository):
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
+    async def get_by_report_code(self, report_code: str) -> StoredRomanticReport | None:
+        record = await self._session.scalar(
+            select(RomanticRelationshipReportRecord).where(
+                RomanticRelationshipReportRecord.report_code == report_code
+            )
+        )
+        return _stored(record) if record is not None else None
+
     async def get_profile_source(self, result_code: str) -> RelationshipProfileSource | None:
         record = await self._session.scalar(
             select(AssessmentResultRecord).where(AssessmentResultRecord.result_code == result_code)

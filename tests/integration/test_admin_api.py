@@ -1,12 +1,19 @@
 from datetime import UTC, datetime, timedelta
+from typing import cast
 
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from pydantic import SecretStr
 from pytest import MonkeyPatch
 
 import pakit.api.admin_auth as admin_auth
 import pakit.api.routes.admin as admin_routes
-from pakit.api.dependencies import get_admin_repository
+from pakit.api.dependencies import (
+    get_admin_repository,
+    get_payment_repository,
+    get_romantic_report_generator,
+    get_romantic_report_repository,
+)
 from pakit.core.config import Settings
 from pakit.main import create_app
 from pakit.services.admin_repository import (
@@ -15,6 +22,13 @@ from pakit.services.admin_repository import (
     StoredAdminUser,
     StoredResult,
     StoredUsageEvent,
+)
+from pakit.services.payment_service import PaymentOrder
+from pakit.services.romantic_report_generator import GeneratedRelationshipReport
+from pakit.services.romantic_report_repository import (
+    RelationshipProfileSource,
+    RomanticReportToSave,
+    StoredRomanticReport,
 )
 
 
@@ -139,7 +153,12 @@ def _client(monkeypatch: MonkeyPatch, *, configured: bool = True) -> TestClient:
             user_id=42,
             product_code="romantic-report-v1",
             product_name="Pakit 연인 관계 설명서",
-            product_payload={"mine_result_code": "RESULT01"},
+            product_payload={
+                "mine_result_code": "RESULT01",
+                "partner_result_code": "RESULT02",
+                "mine_gender": "여자",
+                "partner_gender": "남자",
+            },
             amount=990,
             currency="KRW",
             status="APPROVED",
@@ -293,3 +312,57 @@ def test_admin_read_only_commerce_tabs_show_linked_data(monkeypatch: MonkeyPatch
             report,
         )
     )
+
+
+class RefreshPaymentRepository:
+    def __init__(self) -> None:
+        self.attached_report_code: str | None = None
+
+    async def attach_report(
+        self, order_id: str, user_id: int, report_code: str
+    ) -> PaymentOrder | None:
+        self.attached_report_code = report_code
+        return object()  # type: ignore[return-value]
+
+
+class RefreshReportRepository:
+    report = StoredRomanticReport(
+        "REPORT000002", "새 관계 설명서", datetime(2026, 10, 8, tzinfo=UTC)
+    )
+
+    async def get_by_report_code(self, report_code: str) -> StoredRomanticReport | None:
+        return self.report if report_code == self.report.report_code else None
+
+    async def get_profile_source(self, result_code: str) -> RelationshipProfileSource | None:
+        return None
+
+    async def find_existing(self, **keys: str) -> StoredRomanticReport | None:
+        return self.report
+
+    async def save(self, report: RomanticReportToSave) -> StoredRomanticReport:
+        raise AssertionError("현재 버전 보고서를 재사용해야 합니다.")
+
+
+class RefreshGenerator:
+    model = "test-model"
+
+    async def generate(self, *, instructions: str, user_prompt: str) -> GeneratedRelationshipReport:
+        raise AssertionError("현재 버전 보고서를 재사용해야 합니다.")
+
+
+def test_admin_can_refresh_one_paid_order_to_current_report(monkeypatch: MonkeyPatch) -> None:
+    client = _client(monkeypatch)
+    payment_repository = RefreshPaymentRepository()
+    application = cast(FastAPI, client.app)
+    application.dependency_overrides[get_payment_repository] = lambda: payment_repository
+    application.dependency_overrides[get_romantic_report_repository] = RefreshReportRepository
+    application.dependency_overrides[get_romantic_report_generator] = RefreshGenerator
+
+    response = client.post(
+        "/api/admin/payments/order_123456789012345/relationship-report/refresh",
+        auth=("operator", "correct-horse"),
+    )
+
+    assert response.status_code == 200
+    assert response.json()["report_code"] == "REPORT000002"
+    assert payment_repository.attached_report_code == "REPORT000002"

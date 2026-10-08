@@ -314,6 +314,12 @@ def test_requires_kakaopay_configuration() -> None:
 class MemoryReportRepository:
     def __init__(self) -> None:
         self.stored: StoredRomanticReport | None = None
+        self.reuse_current_version = True
+
+    async def get_by_report_code(self, report_code: str) -> StoredRomanticReport | None:
+        if self.stored is None or self.stored.report_code != report_code:
+            return None
+        return self.stored
 
     async def get_profile_source(self, result_code: str) -> RelationshipProfileSource | None:
         if result_code not in {"MINE0001", "FRIEND01"}:
@@ -342,7 +348,7 @@ class MemoryReportRepository:
         )
 
     async def find_existing(self, **keys: str) -> StoredRomanticReport | None:
-        return self.stored
+        return self.stored if self.reuse_current_version else None
 
     async def save(self, report: RomanticReportToSave) -> StoredRomanticReport:
         self.stored = StoredRomanticReport(report.report_code, report.content, NOW)
@@ -352,7 +358,11 @@ class MemoryReportRepository:
 class FakeReportGenerator:
     model = "test-model"
 
+    def __init__(self) -> None:
+        self.calls = 0
+
     async def generate(self, *, instructions: str, user_prompt: str) -> GeneratedRelationshipReport:
+        self.calls += 1
         headings = (
             "이 관계의 핵심 구조",
             "연락 속도의 차이",
@@ -395,3 +405,28 @@ def test_generates_report_only_after_payment_is_approved() -> None:
     assert generated.json()["content"].startswith("## 1. 이 관계의 핵심 구조")
     assert repository.order is not None
     assert repository.order.fulfillment_reference == generated.json()["report_code"]
+
+
+def test_paid_report_stays_fixed_when_generation_version_changes() -> None:
+    repository = MemoryPaymentRepository()
+    gateway = FakePaymentGateway()
+    report_repository = MemoryReportRepository()
+    generator = FakeReportGenerator()
+    client, application = _client(repository, gateway)
+    application.dependency_overrides[get_romantic_report_repository] = lambda: report_repository
+    application.dependency_overrides[get_romantic_report_generator] = lambda: generator
+
+    client.post("/api/payments/kakaopay/ready", json=PURCHASE)
+    client.get(
+        f"/api/payments/kakaopay/{ORDER_ID}/approve",
+        params={"pg_token": "pg-token"},
+        follow_redirects=False,
+    )
+    first = client.post(f"/api/relationship-reports/romantic/orders/{ORDER_ID}")
+    report_repository.reuse_current_version = False
+    reopened = client.post(f"/api/relationship-reports/romantic/orders/{ORDER_ID}")
+
+    assert first.status_code == 200
+    assert reopened.status_code == 200
+    assert reopened.json() == first.json()
+    assert generator.calls == 1

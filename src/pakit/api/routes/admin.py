@@ -3,9 +3,15 @@ from math import ceil
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
+from pydantic import ValidationError
 
 from pakit.api.admin_auth import require_admin
-from pakit.api.dependencies import get_admin_repository
+from pakit.api.dependencies import (
+    get_admin_repository,
+    get_payment_repository,
+    get_romantic_report_generator,
+    get_romantic_report_repository,
+)
 from pakit.api.schemas.admin import (
     AdminDashboardOutput,
     AdminPaidReportListOutput,
@@ -22,6 +28,7 @@ from pakit.api.schemas.admin import (
     CompatibilityAnalyticsOutput,
     ResultAnalyticsOutput,
 )
+from pakit.api.schemas.romantic_reports import RomanticReportCreateInput, RomanticReportOutput
 from pakit.core.config import get_settings
 from pakit.services.admin_repository import AdminRepository
 from pakit.services.admin_service import (
@@ -35,6 +42,24 @@ from pakit.services.admin_service import (
     filter_usage_events,
     result_summary,
     usage_counts,
+)
+from pakit.services.payment_service import (
+    ROMANTIC_REPORT_PRODUCT_CODE,
+    PaymentRepository,
+)
+from pakit.services.romantic_profile_builder import RomanticProfileUnavailableError
+from pakit.services.romantic_report_generator import (
+    RomanticReportGenerationError,
+    RomanticReportGenerator,
+)
+from pakit.services.romantic_report_repository import (
+    RelationshipProfileSourceUnavailableError,
+    RomanticReportRepository,
+)
+from pakit.services.romantic_report_service import (
+    CreateRomanticReportCommand,
+    RomanticReportResultNotFoundError,
+    create_romantic_report,
 )
 
 router = APIRouter(
@@ -202,6 +227,62 @@ async def get_admin_payment_detail(
     if payment is None:
         raise HTTPException(status_code=404, detail="결제 주문을 찾을 수 없습니다.")
     return AdminPaymentOutput.model_validate(payment, from_attributes=True)
+
+
+@router.post(
+    "/payments/{order_id}/relationship-report/refresh",
+    response_model=RomanticReportOutput,
+    summary="결제 주문을 현재 버전 관계 설명서로 교체",
+)
+async def refresh_admin_payment_relationship_report(
+    repository: Annotated[AdminRepository, Depends(get_admin_repository)],
+    payment_repository: Annotated[PaymentRepository, Depends(get_payment_repository)],
+    report_repository: Annotated[RomanticReportRepository, Depends(get_romantic_report_repository)],
+    generator: Annotated[RomanticReportGenerator | None, Depends(get_romantic_report_generator)],
+    order_id: Annotated[str, Path(min_length=16, max_length=32)],
+) -> RomanticReportOutput:
+    payment = await repository.get_payment(order_id)
+    if payment is None:
+        raise HTTPException(status_code=404, detail="결제 주문을 찾을 수 없습니다.")
+    if payment.status != "APPROVED" or payment.product_code != ROMANTIC_REPORT_PRODUCT_CODE:
+        raise HTTPException(status_code=409, detail="승인된 관계 설명서 주문이 아닙니다.")
+    if generator is None:
+        raise HTTPException(status_code=503, detail="관계 설명서 AI 생성 설정이 필요합니다.")
+    try:
+        purchase = RomanticReportCreateInput.model_validate(payment.product_payload)
+        report = await create_romantic_report(
+            CreateRomanticReportCommand(
+                mine_result_code=purchase.mine_result_code,
+                partner_result_code=purchase.partner_result_code,
+                mine_gender=purchase.mine_gender,
+                partner_gender=purchase.partner_gender,
+            ),
+            report_repository,
+            generator,
+        )
+    except ValidationError as error:
+        raise HTTPException(
+            status_code=409, detail="주문의 관계 설명서 입력이 유효하지 않습니다."
+        ) from error
+    except RomanticReportResultNotFoundError as error:
+        raise HTTPException(status_code=404, detail="테스트 결과를 찾을 수 없습니다.") from error
+    except (RelationshipProfileSourceUnavailableError, RomanticProfileUnavailableError) as error:
+        raise HTTPException(
+            status_code=409,
+            detail="이 결과의 원본 응답으로는 관계 설명서를 만들 수 없습니다.",
+        ) from error
+    except RomanticReportGenerationError as error:
+        raise HTTPException(status_code=502, detail="관계 설명서 생성에 실패했습니다.") from error
+    attached = await payment_repository.attach_report(order_id, payment.user_id, report.report_code)
+    if attached is None:
+        raise HTTPException(
+            status_code=409, detail="결제 주문에 관계 설명서를 연결하지 못했습니다."
+        )
+    return RomanticReportOutput(
+        report_code=report.report_code,
+        content=report.content,
+        created_at=report.created_at,
+    )
 
 
 @router.get("/users", response_model=AdminUserListOutput)

@@ -66,6 +66,19 @@ async def generate_paid_romantic_report(
         return _error(404, "PAYMENT_ORDER_NOT_FOUND", "결제 주문을 찾을 수 없습니다.")
     if order.status != "APPROVED":
         return _error(402, "PAYMENT_REQUIRED", "승인된 결제가 필요합니다.")
+    if order.fulfillment_reference is not None:
+        stored = await report_repository.get_by_report_code(order.fulfillment_reference)
+        if stored is None:
+            return _error(
+                409,
+                "RELATIONSHIP_REPORT_UNAVAILABLE",
+                "결제에 연결된 관계 설명서를 찾을 수 없습니다.",
+            )
+        return RomanticReportOutput(
+            report_code=stored.report_code,
+            content=stored.content,
+            created_at=stored.created_at,
+        )
     if generator is None:
         return _error(
             503,

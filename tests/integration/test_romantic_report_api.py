@@ -71,6 +71,12 @@ class MemoryRomanticReportRepository(RomanticReportRepository):
         }
         self.reports: dict[tuple[str, ...], StoredRomanticReport] = {}
 
+    async def get_by_report_code(self, report_code: str) -> StoredRomanticReport | None:
+        return next(
+            (report for report in self.reports.values() if report.report_code == report_code),
+            None,
+        )
+
     async def get_profile_source(self, result_code: str) -> RelationshipProfileSource | None:
         return self.sources.get(result_code)
 
