@@ -16,9 +16,17 @@ class SessionSigner:
         self._secret = secret.encode()
         self._max_age_seconds = max_age_seconds
 
-    def create(self, user_id: int, *, now: datetime | None = None) -> str:
+    def create(
+        self,
+        user_id: int,
+        *,
+        now: datetime | None = None,
+        max_age_seconds: int | None = None,
+    ) -> str:
         issued_at = now or datetime.now(UTC)
-        expires_at = issued_at + timedelta(seconds=self._max_age_seconds)
+        requested_age = self._max_age_seconds if max_age_seconds is None else max_age_seconds
+        session_age = min(requested_age, self._max_age_seconds)
+        expires_at = issued_at + timedelta(seconds=session_age)
         payload = json.dumps(
             {"user_id": user_id, "exp": int(expires_at.timestamp())},
             separators=(",", ":"),

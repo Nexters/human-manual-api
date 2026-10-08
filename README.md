@@ -145,9 +145,10 @@ PAKIT_SESSION_MAX_AGE_SECONDS=2592000
 로그인 시작 API의 `return_to`는 상대경로 또는 서버의 CORS 허용 목록에 등록된 프론트엔드
 origin의 절대 URL만 허용합니다. 따라서 로컬 프론트엔드에서 시작한 로그인은 로컬 주소로,
 운영 프론트엔드에서 시작한 로그인은 운영 주소로 돌아가며 그 밖의 외부 주소는 무시합니다.
-운영 API에 연결한 localhost 프론트엔드로 복귀할 때만 세션 쿠키를 `SameSite=None; Secure`로
-발급해 교차 사이트 개발 요청에 사용할 수 있게 합니다. 운영 프론트엔드 로그인은 기존처럼
-`SameSite=Lax`를 유지합니다.
+운영 API에 연결한 localhost 프론트엔드는 브라우저의 서드파티 쿠키 차단과 무관하게 개발할 수
+있도록 로그인 콜백 URL의 fragment로 1시간짜리 개발 세션을 전달합니다. 프론트엔드는 이를
+`sessionStorage`에 보관하고 localhost에서만 Bearer 인증에 사용해야 합니다. 운영 프론트엔드는
+기존 HttpOnly `SameSite=Lax` 세션 쿠키만 사용합니다.
 
 개발을 마치면 DB 컨테이너만 중지할 수 있습니다. `postgres_data` 볼륨은 그대로 유지됩니다.
 

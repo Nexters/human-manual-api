@@ -1,15 +1,33 @@
 from typing import Annotated
+from urllib.parse import urlsplit, urlunsplit
 
 from fastapi import Depends, HTTPException, Request, status
 
 from pakit.api.dependencies import get_user_repository
-from pakit.core.config import Settings, get_settings
+from pakit.core.config import ALLOWED_CORS_ORIGINS, Settings, get_settings
 from pakit.core.kakao import KakaoOAuthClient
 from pakit.core.session import InvalidSessionError, SessionSigner
 from pakit.services.auth_service import KakaoClient
 from pakit.services.user_repository import StoredUser, UserRepository
 
 SESSION_COOKIE_NAME = "pakit_session"
+
+
+def _local_dev_bearer_token(request: Request) -> str | None:
+    origin = request.headers.get("origin")
+    if origin is None:
+        return None
+    parsed = urlsplit(origin)
+    normalized_origin = urlunsplit((parsed.scheme, parsed.netloc, "", "", ""))
+    if normalized_origin not in ALLOWED_CORS_ORIGINS or parsed.hostname not in {
+        "localhost",
+        "127.0.0.1",
+    }:
+        return None
+    scheme, _, token = request.headers.get("authorization", "").partition(" ")
+    if scheme.lower() != "bearer" or not token:
+        return None
+    return token
 
 
 def get_kakao_client(settings: Annotated[Settings, Depends(get_settings)]) -> KakaoClient:
@@ -46,18 +64,24 @@ async def get_optional_current_user(
     repository: Annotated[UserRepository, Depends(get_user_repository)],
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> StoredUser | None:
-    token = request.cookies.get(SESSION_COOKIE_NAME)
-    if token is None or settings.session_secret is None:
+    if settings.session_secret is None:
         return None
+    tokens = [request.cookies.get(SESSION_COOKIE_NAME), _local_dev_bearer_token(request)]
     signer = SessionSigner(
         settings.session_secret.get_secret_value(),
         max_age_seconds=settings.session_max_age_seconds,
     )
-    try:
-        user_id = signer.verify(token)
-    except InvalidSessionError:
-        return None
-    return await repository.get_user(user_id)
+    for token in tokens:
+        if token is None:
+            continue
+        try:
+            user_id = signer.verify(token)
+        except InvalidSessionError:
+            continue
+        user = await repository.get_user(user_id)
+        if user is not None:
+            return user
+    return None
 
 
 async def require_current_user(
