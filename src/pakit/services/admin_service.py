@@ -5,7 +5,13 @@ from statistics import median
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from pakit.services.admin_repository import StoredResult, StoredUsageEvent
+from pakit.services.admin_repository import (
+    StoredAdminPaidReport,
+    StoredAdminPayment,
+    StoredAdminUser,
+    StoredResult,
+    StoredUsageEvent,
+)
 
 SEOUL = ZoneInfo("Asia/Seoul")
 AXIS_KEYS = ("attachment", "expression", "routine", "egen")
@@ -113,6 +119,54 @@ def filter_usage_events(
 ) -> list[StoredUsageEvent]:
     start, end = seoul_date_range(date_from, date_to)
     return [event for event in events if _in_range(event.occurred_at, start, end)]
+
+
+def filter_admin_payments(
+    payments: list[StoredAdminPayment],
+    *,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    order_id: str | None = None,
+    user_id: int | None = None,
+    status: str | None = None,
+    product_code: str | None = None,
+) -> list[StoredAdminPayment]:
+    start, end = seoul_date_range(date_from, date_to)
+    return [
+        payment
+        for payment in payments
+        if _in_range(payment.created_at, start, end)
+        and (order_id is None or order_id.casefold() in payment.order_id.casefold())
+        and (user_id is None or payment.user_id == user_id)
+        and (status is None or payment.status == status)
+        and (product_code is None or payment.product_code == product_code)
+    ]
+
+
+def filter_admin_users(
+    users: list[StoredAdminUser],
+    *,
+    user_id: int | None = None,
+) -> list[StoredAdminUser]:
+    return [user for user in users if user_id is None or user.user_id == user_id]
+
+
+def filter_admin_paid_reports(
+    reports: list[StoredAdminPaidReport],
+    *,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    report_code: str | None = None,
+    user_id: int | None = None,
+) -> list[StoredAdminPaidReport]:
+    start, end = seoul_date_range(date_from, date_to)
+    return [
+        report
+        for report in reports
+        if _in_range(report.created_at, start, end)
+        and (report_code is None or report_code.casefold() in report.report_code.casefold())
+        and (user_id is None or user_id in report.user_ids)
+    ]
 
 
 def result_summary(

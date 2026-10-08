@@ -214,6 +214,10 @@ src/pakit/
 | `GET`  | `/api/auth/me/compatibilities`                    | 내 친구 궁합 이력 조회          |
 | `GET`  | `/health`                                          | 서버 상태 확인                 |
 
+관리자 화면 `/admin`은 기존 결과·통계 화면에 조회 전용 `결제 내역`, `로그인 유저`,
+`유료 결과` 탭을 추가로 제공합니다. 각 탭은 `/api/admin/payments`, `/api/admin/users`,
+`/api/admin/paid-reports` 목록·상세 API를 사용하며 기존 관리자 Basic 인증을 동일하게 요구합니다.
+
 서버 실행 후 [Swagger UI](http://localhost:8000/docs)에서 실제 요청·응답 예시와 에러 계약을
 확인할 수 있습니다.
 

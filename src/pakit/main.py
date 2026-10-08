@@ -131,6 +131,71 @@ def create_app() -> FastAPI:
         )
 
     @application.get(
+        "/admin/payments",
+        response_class=HTMLResponse,
+        include_in_schema=False,
+        dependencies=[Depends(require_admin)],
+    )
+    async def admin_payments_page() -> HTMLResponse:
+        return HTMLResponse(render_admin_page("payments"), headers={"Cache-Control": "no-store"})
+
+    @application.get(
+        "/admin/payments/{order_id}",
+        response_class=HTMLResponse,
+        include_in_schema=False,
+        dependencies=[Depends(require_admin)],
+    )
+    async def admin_payment_detail_page(order_id: str) -> HTMLResponse:
+        return HTMLResponse(
+            render_admin_page("payment-detail", order_id),
+            headers={"Cache-Control": "no-store"},
+        )
+
+    @application.get(
+        "/admin/users",
+        response_class=HTMLResponse,
+        include_in_schema=False,
+        dependencies=[Depends(require_admin)],
+    )
+    async def admin_users_page() -> HTMLResponse:
+        return HTMLResponse(render_admin_page("users"), headers={"Cache-Control": "no-store"})
+
+    @application.get(
+        "/admin/users/{user_id}",
+        response_class=HTMLResponse,
+        include_in_schema=False,
+        dependencies=[Depends(require_admin)],
+    )
+    async def admin_user_detail_page(user_id: int) -> HTMLResponse:
+        return HTMLResponse(
+            render_admin_page("user-detail", str(user_id)),
+            headers={"Cache-Control": "no-store"},
+        )
+
+    @application.get(
+        "/admin/paid-reports",
+        response_class=HTMLResponse,
+        include_in_schema=False,
+        dependencies=[Depends(require_admin)],
+    )
+    async def admin_paid_reports_page() -> HTMLResponse:
+        return HTMLResponse(
+            render_admin_page("paid-reports"), headers={"Cache-Control": "no-store"}
+        )
+
+    @application.get(
+        "/admin/paid-reports/{report_code}",
+        response_class=HTMLResponse,
+        include_in_schema=False,
+        dependencies=[Depends(require_admin)],
+    )
+    async def admin_paid_report_detail_page(report_code: str) -> HTMLResponse:
+        return HTMLResponse(
+            render_admin_page("paid-report-detail", report_code),
+            headers={"Cache-Control": "no-store"},
+        )
+
+    @application.get(
         "/admin/analytics",
         response_class=HTMLResponse,
         include_in_schema=False,

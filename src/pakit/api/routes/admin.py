@@ -8,8 +8,17 @@ from pakit.api.admin_auth import require_admin
 from pakit.api.dependencies import get_admin_repository
 from pakit.api.schemas.admin import (
     AdminDashboardOutput,
+    AdminPaidReportListOutput,
+    AdminPaidReportOutput,
+    AdminPaidReportSummaryOutput,
+    AdminPaymentListOutput,
+    AdminPaymentOutput,
+    AdminPaymentSummaryOutput,
     AdminResultDetailOutput,
     AdminResultListOutput,
+    AdminUserListOutput,
+    AdminUserOutput,
+    AdminUserSummaryOutput,
     CompatibilityAnalyticsOutput,
     ResultAnalyticsOutput,
 )
@@ -19,6 +28,9 @@ from pakit.services.admin_service import (
     build_compatibility_analytics,
     build_dashboard,
     build_result_analytics,
+    filter_admin_paid_reports,
+    filter_admin_payments,
+    filter_admin_users,
     filter_results,
     filter_usage_events,
     result_summary,
@@ -132,6 +144,161 @@ async def get_admin_result_detail(
         },
         snapshot=result.snapshot,
     )
+
+
+@router.get("/payments", response_model=AdminPaymentListOutput)
+async def get_admin_payments(
+    repository: Annotated[AdminRepository, Depends(get_admin_repository)],
+    page: Annotated[int, Query(ge=1)] = 1,
+    page_size: Annotated[int, Query(ge=1, le=100)] = 20,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    order_id: str | None = None,
+    user_id: Annotated[int | None, Query(ge=1)] = None,
+    status: str | None = None,
+    product_code: str | None = None,
+) -> AdminPaymentListOutput:
+    payments = filter_admin_payments(
+        await repository.list_payments(),
+        date_from=date_from,
+        date_to=date_to,
+        order_id=order_id,
+        user_id=user_id,
+        status=status,
+        product_code=product_code,
+    )
+    payments.sort(key=lambda payment: payment.created_at, reverse=True)
+    total = len(payments)
+    start = (page - 1) * page_size
+    return AdminPaymentListOutput(
+        items=[
+            AdminPaymentSummaryOutput(
+                order_id=payment.order_id,
+                user_id=payment.user_id,
+                product_code=payment.product_code,
+                product_name=payment.product_name,
+                amount=payment.amount,
+                currency=payment.currency,
+                status=payment.status,
+                report_code=payment.report_code,
+                created_at=payment.created_at,
+                approved_at=payment.approved_at,
+            )
+            for payment in payments[start : start + page_size]
+        ],
+        page=page,
+        page_size=page_size,
+        total=total,
+        pages=ceil(total / page_size) if total else 0,
+    )
+
+
+@router.get("/payments/{order_id}", response_model=AdminPaymentOutput)
+async def get_admin_payment_detail(
+    repository: Annotated[AdminRepository, Depends(get_admin_repository)],
+    order_id: Annotated[str, Path(min_length=16, max_length=32)],
+) -> AdminPaymentOutput:
+    payment = await repository.get_payment(order_id)
+    if payment is None:
+        raise HTTPException(status_code=404, detail="결제 주문을 찾을 수 없습니다.")
+    return AdminPaymentOutput.model_validate(payment, from_attributes=True)
+
+
+@router.get("/users", response_model=AdminUserListOutput)
+async def get_admin_users(
+    repository: Annotated[AdminRepository, Depends(get_admin_repository)],
+    page: Annotated[int, Query(ge=1)] = 1,
+    page_size: Annotated[int, Query(ge=1, le=100)] = 20,
+    user_id: Annotated[int | None, Query(ge=1)] = None,
+) -> AdminUserListOutput:
+    users = filter_admin_users(await repository.list_users(), user_id=user_id)
+    users.sort(key=lambda user: user.created_at, reverse=True)
+    total = len(users)
+    start = (page - 1) * page_size
+    return AdminUserListOutput(
+        items=[
+            AdminUserSummaryOutput(
+                user_id=user.user_id,
+                created_at=user.created_at,
+                last_logged_in_at=user.last_logged_in_at,
+                result_count=len(user.result_codes),
+                approved_payment_count=user.approved_payment_count,
+                total_paid_amount=user.total_paid_amount,
+                report_count=len(user.report_codes),
+            )
+            for user in users[start : start + page_size]
+        ],
+        page=page,
+        page_size=page_size,
+        total=total,
+        pages=ceil(total / page_size) if total else 0,
+    )
+
+
+@router.get("/users/{user_id}", response_model=AdminUserOutput)
+async def get_admin_user_detail(
+    repository: Annotated[AdminRepository, Depends(get_admin_repository)],
+    user_id: Annotated[int, Path(ge=1)],
+) -> AdminUserOutput:
+    user = await repository.get_user(user_id)
+    if user is None:
+        raise HTTPException(status_code=404, detail="사용자를 찾을 수 없습니다.")
+    return AdminUserOutput.model_validate(user, from_attributes=True)
+
+
+@router.get("/paid-reports", response_model=AdminPaidReportListOutput)
+async def get_admin_paid_reports(
+    repository: Annotated[AdminRepository, Depends(get_admin_repository)],
+    page: Annotated[int, Query(ge=1)] = 1,
+    page_size: Annotated[int, Query(ge=1, le=100)] = 20,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    report_code: str | None = None,
+    user_id: Annotated[int | None, Query(ge=1)] = None,
+) -> AdminPaidReportListOutput:
+    reports = filter_admin_paid_reports(
+        await repository.list_paid_reports(),
+        date_from=date_from,
+        date_to=date_to,
+        report_code=report_code,
+        user_id=user_id,
+    )
+    reports.sort(key=lambda report: report.created_at, reverse=True)
+    total = len(reports)
+    start = (page - 1) * page_size
+    return AdminPaidReportListOutput(
+        items=[
+            AdminPaidReportSummaryOutput(
+                report_code=report.report_code,
+                order_count=len(report.order_ids),
+                user_ids=report.user_ids,
+                mine_result_code=report.mine_result_code,
+                partner_result_code=report.partner_result_code,
+                mine_gender=report.mine_gender,
+                partner_gender=report.partner_gender,
+                prompt_version=report.prompt_version,
+                profile_version=report.profile_version,
+                model=report.model,
+                created_at=report.created_at,
+            )
+            for report in reports[start : start + page_size]
+        ],
+        page=page,
+        page_size=page_size,
+        total=total,
+        pages=ceil(total / page_size) if total else 0,
+    )
+
+
+@router.get("/paid-reports/{report_code}", response_model=AdminPaidReportOutput)
+async def get_admin_paid_report_detail(
+    repository: Annotated[AdminRepository, Depends(get_admin_repository)],
+    report_code: Annotated[str, Path(min_length=8, max_length=32)],
+) -> AdminPaidReportOutput:
+    report = await repository.get_paid_report(report_code)
+    if report is None:
+        raise HTTPException(status_code=404, detail="유료 결과를 찾을 수 없습니다.")
+    return AdminPaidReportOutput.model_validate(report, from_attributes=True)
 
 
 @router.get("/analytics/results", response_model=ResultAnalyticsOutput)
