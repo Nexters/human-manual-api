@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from pakit.core.models import AssessmentResultRecord, RomanticRelationshipReportRecord
@@ -86,7 +87,22 @@ class SqlAlchemyRomanticReportRepository(RomanticReportRepository):
     async def save(self, report: RomanticReportToSave) -> StoredRomanticReport:
         record = RomanticRelationshipReportRecord(**report.__dict__)
         self._session.add(record)
-        await self._session.commit()
+        try:
+            await self._session.commit()
+        except IntegrityError:
+            await self._session.rollback()
+            existing = await self.find_existing(
+                mine_result_code=report.mine_result_code,
+                partner_result_code=report.partner_result_code,
+                mine_gender=report.mine_gender,
+                partner_gender=report.partner_gender,
+                prompt_version=report.prompt_version,
+                profile_version=report.profile_version,
+                model=report.model,
+            )
+            if existing is not None:
+                return existing
+            raise
         await self._session.refresh(record)
         return _stored(record)
 

@@ -50,6 +50,23 @@ def test_reads_profile_source_and_persists_generated_report() -> None:
                     output_tokens=20,
                 )
             )
+            duplicate = await repository.save(
+                RomanticReportToSave(
+                    report_code="otherCode123",
+                    mine_result_code=result.result_code,
+                    partner_result_code="BBBBBBBB",
+                    mine_gender="여자",
+                    partner_gender="남자",
+                    prompt_version="prompt-v1",
+                    profile_version="profile-v1",
+                    model="model-v1",
+                    input_snapshot={"mine": {}, "partner": {}},
+                    content="동시에 생성된 다른 본문",
+                    provider_response_id="resp_456",
+                    input_tokens=11,
+                    output_tokens=21,
+                )
+            )
             existing = await repository.find_existing(
                 mine_result_code=result.result_code,
                 partner_result_code="BBBBBBBB",
@@ -62,6 +79,7 @@ def test_reads_profile_source_and_persists_generated_report() -> None:
         await engine.dispose()
 
         assert stored == existing
+        assert duplicate == stored
         assert stored.created_at.year == 2026
 
     asyncio.run(run())
