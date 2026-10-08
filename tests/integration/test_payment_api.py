@@ -155,13 +155,17 @@ class FakePaymentGateway:
 
 
 def _client(
-    repository: MemoryPaymentRepository, gateway: FakePaymentGateway
+    repository: MemoryPaymentRepository,
+    gateway: FakePaymentGateway,
+    *,
+    settings: Settings | None = None,
 ) -> tuple[TestClient, FastAPI]:
     application = create_app()
     application.dependency_overrides[require_current_user] = lambda: USER
     application.dependency_overrides[get_payment_repository] = lambda: repository
     application.dependency_overrides[get_payment_gateway] = lambda: gateway
-    application.dependency_overrides[get_settings] = lambda: Settings(_env_file=None)
+    configured_settings = settings or Settings(_env_file=None)
+    application.dependency_overrides[get_settings] = lambda: configured_settings
     return TestClient(application), application
 
 
@@ -224,6 +228,34 @@ def test_returns_to_local_frontend_that_started_payment() -> None:
     assert approved.status_code == 307
     assert approved.headers["location"].startswith(
         "http://localhost:5173/payments/kakaopay/complete?"
+    )
+
+
+def test_uses_configured_public_api_origin_for_gateway_callbacks() -> None:
+    repository = MemoryPaymentRepository()
+    gateway = FakePaymentGateway()
+    settings = Settings(
+        _env_file=None,
+        kakao_redirect_uri="https://api.pakit.kr/api/auth/kakao/callback",
+    )
+    client, _ = _client(repository, gateway, settings=settings)
+
+    ready = client.post(
+        "/api/payments/kakaopay/ready",
+        json=PURCHASE,
+        headers={"Origin": "https://pakit.kr"},
+    )
+
+    assert ready.status_code == 200
+    assert gateway.ready_request is not None
+    assert gateway.ready_request.approval_url.startswith(
+        f"https://api.pakit.kr/api/payments/kakaopay/{ORDER_ID}/approve?"
+    )
+    assert gateway.ready_request.cancel_url.startswith(
+        f"https://api.pakit.kr/api/payments/kakaopay/{ORDER_ID}/cancel?"
+    )
+    assert gateway.ready_request.fail_url.startswith(
+        f"https://api.pakit.kr/api/payments/kakaopay/{ORDER_ID}/fail?"
     )
 
 

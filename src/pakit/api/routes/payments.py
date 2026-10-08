@@ -52,6 +52,7 @@ async def ready_kakaopay_payment(
     user: Annotated[StoredUser, Depends(require_current_user)],
     repository: Annotated[PaymentRepository, Depends(get_payment_repository)],
     gateway: Annotated[PaymentGateway | None, Depends(get_payment_gateway)],
+    settings: Annotated[Settings, Depends(get_settings)],
 ) -> KakaoPayReadyOutput | JSONResponse:
     if gateway is None:
         return _error(503, "KAKAOPAY_NOT_CONFIGURED", "카카오페이 설정이 필요합니다.")
@@ -62,10 +63,14 @@ async def ready_kakaopay_payment(
             user_id=user.id,
             purchase=purchase,
             approval_url=_gateway_callback_url(
-                request, "approve_kakaopay_payment", frontend_origin
+                request, settings, "approve_kakaopay_payment", frontend_origin
             ),
-            cancel_url=_gateway_callback_url(request, "cancel_kakaopay_payment", frontend_origin),
-            fail_url=_gateway_callback_url(request, "fail_kakaopay_payment", frontend_origin),
+            cancel_url=_gateway_callback_url(
+                request, settings, "cancel_kakaopay_payment", frontend_origin
+            ),
+            fail_url=_gateway_callback_url(
+                request, settings, "fail_kakaopay_payment", frontend_origin
+            ),
             repository=repository,
             gateway=gateway,
         )
@@ -172,8 +177,20 @@ def _safe_frontend_origin(value: str | None) -> str | None:
     return origin if value == origin and origin in ALLOWED_CORS_ORIGINS else None
 
 
-def _gateway_callback_url(request: Request, route_name: str, frontend_origin: str | None) -> str:
-    callback_url = str(request.url_for(route_name, order_id="ORDER_ID"))
+def _gateway_callback_url(
+    request: Request,
+    settings: Settings,
+    route_name: str,
+    frontend_origin: str | None,
+) -> str:
+    generated = urlsplit(str(request.url_for(route_name, order_id="ORDER_ID")))
+    public_api = urlsplit(settings.kakao_redirect_uri or "")
+    if public_api.scheme in {"http", "https"} and public_api.netloc:
+        callback_url = urlunsplit(
+            (public_api.scheme, public_api.netloc, generated.path, generated.query, "")
+        )
+    else:
+        callback_url = generated.geturl()
     if frontend_origin is None:
         return callback_url
     return f"{callback_url}?{urlencode({'frontend_origin': frontend_origin})}"
