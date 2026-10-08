@@ -267,6 +267,28 @@ def test_returns_to_safe_frontend_path_after_login(
     )
 
 
+def test_returns_to_allowed_local_frontend_after_login(
+    auth_client: tuple[TestClient, FakeUserRepository, FakeResultRepository],
+) -> None:
+    client, _, _ = auth_client
+    local_return_to = "http://localhost:5173/compatibility/checkout?mine=MINE0001&friend=FRIEND01"
+    started = client.get(
+        "/api/auth/kakao/login",
+        params={"return_to": local_return_to},
+        follow_redirects=False,
+    )
+    state = parse_qs(urlparse(started.headers["location"]).query)["state"][0]
+
+    completed = client.get(
+        "/api/auth/kakao/callback",
+        params={"code": "authorization-code", "state": state},
+        follow_redirects=False,
+    )
+
+    assert completed.status_code == 307
+    assert completed.headers["location"] == local_return_to
+
+
 def test_ignores_external_login_return_url(
     auth_client: tuple[TestClient, FakeUserRepository, FakeResultRepository],
 ) -> None:

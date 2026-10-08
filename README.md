@@ -142,6 +142,9 @@ PAKIT_SESSION_MAX_AGE_SECONDS=2592000
 서버는 카카오 회원번호만 저장하고 이메일·프로필과 카카오 액세스·리프레시 토큰은 저장하지
 않습니다. 프론트엔드는 로그인 완료 후 localStorage의 결과 코드들을
 `POST /api/auth/me/results/sync`로 보내 계정에 연결합니다.
+로그인 시작 API의 `return_to`는 상대경로 또는 서버의 CORS 허용 목록에 등록된 프론트엔드
+origin의 절대 URL만 허용합니다. 따라서 로컬 프론트엔드에서 시작한 로그인은 로컬 주소로,
+운영 프론트엔드에서 시작한 로그인은 운영 주소로 돌아가며 그 밖의 외부 주소는 무시합니다.
 
 개발을 마치면 DB 컨테이너만 중지할 수 있습니다. `postgres_data` 볼륨은 그대로 유지됩니다.
 
@@ -245,6 +248,9 @@ AI 생성 요청은 최대 150초까지 기다리며, 운영 Nginx는
 상대 결과·성별을 `POST /api/payments/kakaopay/ready`로 보내고, 응답의 접속 환경별 URL로
 이동합니다. 승인 콜백이 완료된 주문만
 `POST /api/relationship-reports/romantic/orders/{order_id}`에서 관계 설명서를 생성할 수 있습니다.
+결제 준비 요청의 `Origin`이 서버의 CORS 허용 목록에 있으면 승인·취소·실패 후에도 해당
+프론트엔드 origin의 결제 완료 페이지로 돌아갑니다. 허용되지 않은 origin은 아래 설정값으로
+대체됩니다.
 GitHub Actions 배포를 사용하려면 저장소 Secrets에 다음 값을 등록해야 하며, 배포 워크플로가
 가비아 서버의 `.env`에 자동 반영합니다.
 

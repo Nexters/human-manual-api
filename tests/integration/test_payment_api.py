@@ -1,5 +1,6 @@
 from datetime import UTC, datetime
 from typing import cast
+from urllib.parse import parse_qs, urlparse
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -196,6 +197,49 @@ def test_prepares_and_approves_fixed_price_payment_idempotently() -> None:
     )
     assert second.status_code == 307
     assert gateway.approval_calls == 1
+
+
+def test_returns_to_local_frontend_that_started_payment() -> None:
+    repository = MemoryPaymentRepository()
+    gateway = FakePaymentGateway()
+    client, _ = _client(repository, gateway)
+
+    ready = client.post(
+        "/api/payments/kakaopay/ready",
+        json=PURCHASE,
+        headers={"Origin": "http://localhost:5173"},
+    )
+
+    assert ready.status_code == 200
+    assert gateway.ready_request is not None
+    callback_query = parse_qs(urlparse(gateway.ready_request.approval_url).query)
+    assert callback_query["frontend_origin"] == ["http://localhost:5173"]
+
+    approved = client.get(
+        f"/api/payments/kakaopay/{ORDER_ID}/approve",
+        params={"pg_token": "pg-token", "frontend_origin": "http://localhost:5173"},
+        follow_redirects=False,
+    )
+
+    assert approved.status_code == 307
+    assert approved.headers["location"].startswith(
+        "http://localhost:5173/payments/kakaopay/complete?"
+    )
+
+
+def test_ignores_untrusted_payment_frontend_origin() -> None:
+    repository = MemoryPaymentRepository()
+    gateway = FakePaymentGateway()
+    client, _ = _client(repository, gateway)
+
+    client.post(
+        "/api/payments/kakaopay/ready",
+        json=PURCHASE,
+        headers={"Origin": "https://evil.example"},
+    )
+
+    assert gateway.ready_request is not None
+    assert "frontend_origin" not in gateway.ready_request.approval_url
 
 
 def test_rejects_payment_when_mine_result_is_not_owned() -> None:

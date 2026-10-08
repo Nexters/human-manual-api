@@ -1,5 +1,5 @@
 from typing import Annotated
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlsplit, urlunsplit
 
 from fastapi import APIRouter, Depends, Path, Query, Request
 from fastapi.responses import JSONResponse, RedirectResponse
@@ -13,7 +13,7 @@ from pakit.api.schemas.payments import (
     KakaoPayRedirectOutput,
     PaymentOrderOutput,
 )
-from pakit.core.config import Settings, get_settings
+from pakit.core.config import ALLOWED_CORS_ORIGINS, Settings, get_settings
 from pakit.services.payment_service import (
     PaymentGateway,
     PaymentGatewayError,
@@ -57,12 +57,15 @@ async def ready_kakaopay_payment(
         return _error(503, "KAKAOPAY_NOT_CONFIGURED", "카카오페이 설정이 필요합니다.")
     purchase = RomanticReportPurchase(**body.model_dump())
     try:
+        frontend_origin = _safe_frontend_origin(request.headers.get("origin"))
         ready = await prepare_payment(
             user_id=user.id,
             purchase=purchase,
-            approval_url=str(request.url_for("approve_kakaopay_payment", order_id="ORDER_ID")),
-            cancel_url=str(request.url_for("cancel_kakaopay_payment", order_id="ORDER_ID")),
-            fail_url=str(request.url_for("fail_kakaopay_payment", order_id="ORDER_ID")),
+            approval_url=_gateway_callback_url(
+                request, "approve_kakaopay_payment", frontend_origin
+            ),
+            cancel_url=_gateway_callback_url(request, "cancel_kakaopay_payment", frontend_origin),
+            fail_url=_gateway_callback_url(request, "fail_kakaopay_payment", frontend_origin),
             repository=repository,
             gateway=gateway,
         )
@@ -87,6 +90,7 @@ async def approve_kakaopay_payment(
     repository: Annotated[PaymentRepository, Depends(get_payment_repository)],
     gateway: Annotated[PaymentGateway | None, Depends(get_payment_gateway)],
     settings: Annotated[Settings, Depends(get_settings)],
+    frontend_origin: Annotated[str | None, Query(max_length=200)] = None,
 ) -> RedirectResponse | JSONResponse:
     if gateway is None:
         return _error(503, "KAKAOPAY_NOT_CONFIGURED", "카카오페이 설정이 필요합니다.")
@@ -104,7 +108,9 @@ async def approve_kakaopay_payment(
         return _error(409, "PAYMENT_ORDER_STATE_INVALID", "승인할 수 없는 결제 상태입니다.")
     except PaymentGatewayError:
         return _error(502, "KAKAOPAY_APPROVAL_FAILED", "카카오페이 결제 승인에 실패했습니다.")
-    return RedirectResponse(_frontend_result_url(settings, order.order_id, "approved"))
+    return RedirectResponse(
+        _frontend_result_url(settings, order.order_id, "approved", frontend_origin)
+    )
 
 
 @router.get("/{order_id}/cancel", response_model=PaymentOrderOutput)
@@ -113,11 +119,14 @@ async def cancel_kakaopay_payment(
     user: Annotated[StoredUser, Depends(require_current_user)],
     repository: Annotated[PaymentRepository, Depends(get_payment_repository)],
     settings: Annotated[Settings, Depends(get_settings)],
+    frontend_origin: Annotated[str | None, Query(max_length=200)] = None,
 ) -> RedirectResponse | JSONResponse:
     order = await repository.set_canceled(order_id, user.id)
     if order is None:
         return _error(404, "PAYMENT_ORDER_NOT_FOUND", "결제 주문을 찾을 수 없습니다.")
-    return RedirectResponse(_frontend_result_url(settings, order.order_id, "canceled"))
+    return RedirectResponse(
+        _frontend_result_url(settings, order.order_id, "canceled", frontend_origin)
+    )
 
 
 @router.get("/{order_id}/fail", response_model=PaymentOrderOutput)
@@ -126,11 +135,14 @@ async def fail_kakaopay_payment(
     user: Annotated[StoredUser, Depends(require_current_user)],
     repository: Annotated[PaymentRepository, Depends(get_payment_repository)],
     settings: Annotated[Settings, Depends(get_settings)],
+    frontend_origin: Annotated[str | None, Query(max_length=200)] = None,
 ) -> RedirectResponse | JSONResponse:
     order = await repository.set_failed(order_id, user.id)
     if order is None:
         return _error(404, "PAYMENT_ORDER_NOT_FOUND", "결제 주문을 찾을 수 없습니다.")
-    return RedirectResponse(_frontend_result_url(settings, order.order_id, "failed"))
+    return RedirectResponse(
+        _frontend_result_url(settings, order.order_id, "failed", frontend_origin)
+    )
 
 
 @router.get("/{order_id}", response_model=PaymentOrderOutput)
@@ -152,7 +164,35 @@ def _error(status_code: int, code: str, message: str) -> JSONResponse:
     )
 
 
-def _frontend_result_url(settings: Settings, order_id: str, status: str) -> str:
-    separator = "&" if "?" in settings.frontend_payment_redirect_url else "?"
+def _safe_frontend_origin(value: str | None) -> str | None:
+    if value is None:
+        return None
+    parsed = urlsplit(value)
+    origin = urlunsplit((parsed.scheme, parsed.netloc, "", "", ""))
+    return origin if value == origin and origin in ALLOWED_CORS_ORIGINS else None
+
+
+def _gateway_callback_url(request: Request, route_name: str, frontend_origin: str | None) -> str:
+    callback_url = str(request.url_for(route_name, order_id="ORDER_ID"))
+    if frontend_origin is None:
+        return callback_url
+    return f"{callback_url}?{urlencode({'frontend_origin': frontend_origin})}"
+
+
+def _frontend_result_url(
+    settings: Settings,
+    order_id: str,
+    status: str,
+    frontend_origin: str | None = None,
+) -> str:
+    redirect_url = settings.frontend_payment_redirect_url
+    safe_origin = _safe_frontend_origin(frontend_origin)
+    if safe_origin is not None:
+        configured = urlsplit(redirect_url)
+        origin = urlsplit(safe_origin)
+        redirect_url = urlunsplit(
+            (origin.scheme, origin.netloc, configured.path, configured.query, "")
+        )
+    separator = "&" if "?" in redirect_url else "?"
     query = urlencode({"order_id": order_id, "status": status})
-    return f"{settings.frontend_payment_redirect_url}{separator}{query}"
+    return f"{redirect_url}{separator}{query}"

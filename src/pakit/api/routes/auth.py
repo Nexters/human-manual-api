@@ -21,7 +21,7 @@ from pakit.api.schemas.auth import (
     ResultSyncInput,
     ResultSyncOutput,
 )
-from pakit.core.config import Settings, get_settings
+from pakit.core.config import ALLOWED_CORS_ORIGINS, Settings, get_settings
 from pakit.core.kakao import KakaoOAuthError
 from pakit.core.session import SessionSigner
 from pakit.services.auth_service import KakaoClient, log_in_with_kakao
@@ -111,10 +111,15 @@ async def complete_kakao_login(
 
 
 def _safe_return_to(value: str | None) -> str | None:
-    if value is None or not value.startswith("/") or value.startswith("//"):
+    if value is None:
         return None
     parsed = urlsplit(value)
     if parsed.scheme or parsed.netloc:
+        origin = urlunsplit((parsed.scheme, parsed.netloc, "", "", ""))
+        if origin not in ALLOWED_CORS_ORIGINS:
+            return None
+        return urlunsplit((parsed.scheme, parsed.netloc, parsed.path, parsed.query, ""))
+    if not value.startswith("/") or value.startswith("//"):
         return None
     return value
 
@@ -123,8 +128,10 @@ def _frontend_redirect(base_url: str, return_to: str | None) -> str:
     safe_path = _safe_return_to(return_to)
     if safe_path is None:
         return base_url
-    base = urlsplit(base_url)
     target = urlsplit(safe_path)
+    if target.scheme and target.netloc:
+        return safe_path
+    base = urlsplit(base_url)
     return urlunsplit((base.scheme, base.netloc, target.path, target.query, ""))
 
 
