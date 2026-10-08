@@ -51,10 +51,7 @@ def test_prompt_requires_names_for_each_participants_reaction() -> None:
     instructions, user_prompt = render_prompts(mine, partner)
 
     assert "행동, 감정, 욕구, 해석의 주체" in instructions
-    assert "성별이 같거나 다를 수 있습니다" in instructions
-    assert "`T엔팁님`과 `T인팁님`을 모두 쓰세요" in user_prompt
-    assert "T인팁님이 기다릴 때" in user_prompt
-    assert "T인팁님은 T엔팁님보다" in user_prompt
-    assert "“한 사람”, “다른 사람”, “한쪽”" in user_prompt
+    assert "성별이 같거나 다를 수 있습니다" not in instructions
+    assert "닉네임과 주체를 명확히 쓰는 규칙" not in user_prompt
     assert "{{participant_a_name}}" not in user_prompt
-    assert PROMPT_VERSION == "romantic-prompt-2026-10-08.1"
+    assert PROMPT_VERSION == "romantic-prompt-2026-10-08.2"
