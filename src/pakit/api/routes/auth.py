@@ -1,6 +1,6 @@
 from secrets import token_urlsafe
 from typing import Annotated
-from urllib.parse import urlencode, urlsplit, urlunsplit
+from urllib.parse import urlsplit, urlunsplit
 
 from fastapi import APIRouter, Cookie, Depends, Query, Request, Response, status
 from fastapi.responses import JSONResponse, RedirectResponse
@@ -31,8 +31,6 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 OAUTH_STATE_COOKIE_NAME = "pakit_oauth_state"
 OAUTH_RETURN_TO_COOKIE_NAME = "pakit_oauth_return_to"
 OAUTH_STATE_MAX_AGE_SECONDS = 600
-LOCAL_DEV_SESSION_MAX_AGE_SECONDS = 60 * 60
-LOCAL_DEV_SESSION_FRAGMENT_KEY = "pakit_dev_session"
 
 
 def _secure_cookie(settings: Settings) -> bool:
@@ -98,14 +96,7 @@ async def complete_kakao_login(
             status_code=status.HTTP_502_BAD_GATEWAY,
             content={"detail": "카카오 로그인 처리에 실패했습니다."},
         )
-    redirect_url = _frontend_redirect(settings.frontend_auth_redirect_url, return_to)
-    if _is_local_return_to(return_to):
-        dev_session = signer.create(
-            user.id,
-            max_age_seconds=LOCAL_DEV_SESSION_MAX_AGE_SECONDS,
-        )
-        redirect_url = f"{redirect_url}#{urlencode({LOCAL_DEV_SESSION_FRAGMENT_KEY: dev_session})}"
-    response = RedirectResponse(redirect_url)
+    response = RedirectResponse(_frontend_redirect(settings.frontend_auth_redirect_url, return_to))
     response.delete_cookie(OAUTH_STATE_COOKIE_NAME)
     response.delete_cookie(OAUTH_RETURN_TO_COOKIE_NAME)
     response.set_cookie(
@@ -142,13 +133,6 @@ def _frontend_redirect(base_url: str, return_to: str | None) -> str:
         return safe_path
     base = urlsplit(base_url)
     return urlunsplit((base.scheme, base.netloc, target.path, target.query, ""))
-
-
-def _is_local_return_to(return_to: str | None) -> bool:
-    safe_return_to = _safe_return_to(return_to)
-    if safe_return_to is None:
-        return False
-    return urlsplit(safe_return_to).hostname in {"localhost", "127.0.0.1"}
 
 
 @router.get("/me", response_model=CurrentUserOutput, summary="현재 로그인 사용자 조회")

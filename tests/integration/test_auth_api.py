@@ -286,9 +286,7 @@ def test_returns_to_allowed_local_frontend_after_login(
     )
 
     assert completed.status_code == 307
-    redirect = urlparse(completed.headers["location"])
-    assert redirect._replace(fragment="").geturl() == local_return_to
-    dev_session = parse_qs(redirect.fragment)["pakit_dev_session"][0]
+    assert completed.headers["location"] == local_return_to
     session_cookie = next(
         value
         for value in completed.headers.get_list("set-cookie")
@@ -296,22 +294,6 @@ def test_returns_to_allowed_local_frontend_after_login(
     )
     assert "SameSite=lax" in session_cookie
     assert "Secure" not in session_cookie
-    client.cookies.delete("pakit_session")
-    authenticated = client.get(
-        "/api/auth/me",
-        headers={
-            "Origin": "http://localhost:5173",
-            "Authorization": f"Bearer {dev_session}",
-        },
-    )
-    rejected_without_local_origin = client.get(
-        "/api/auth/me",
-        headers={"Authorization": f"Bearer {dev_session}"},
-    )
-
-    assert authenticated.status_code == 200
-    assert authenticated.json()["user_id"] == 42
-    assert rejected_without_local_origin.status_code == 401
 
 
 def test_ignores_external_login_return_url(

@@ -100,7 +100,7 @@ cp .env.example .env
 ```bash
 docker compose -f compose.yaml -f compose.local.yaml up -d db
 uv run alembic upgrade head
-uv run uvicorn pakit.main:app --reload
+uv run uvicorn pakit.main:app --reload --port 8001
 ```
 
 ### 운영 어드민과 백엔드 통계
@@ -145,10 +145,9 @@ PAKIT_SESSION_MAX_AGE_SECONDS=2592000
 로그인 시작 API의 `return_to`는 상대경로 또는 서버의 CORS 허용 목록에 등록된 프론트엔드
 origin의 절대 URL만 허용합니다. 따라서 로컬 프론트엔드에서 시작한 로그인은 로컬 주소로,
 운영 프론트엔드에서 시작한 로그인은 운영 주소로 돌아가며 그 밖의 외부 주소는 무시합니다.
-운영 API에 연결한 localhost 프론트엔드는 브라우저의 서드파티 쿠키 차단과 무관하게 개발할 수
-있도록 로그인 콜백 URL의 fragment로 1시간짜리 개발 세션을 전달합니다. 프론트엔드는 이를
-`sessionStorage`에 보관하고 localhost에서만 Bearer 인증에 사용해야 합니다. 운영 프론트엔드는
-기존 HttpOnly `SameSite=Lax` 세션 쿠키만 사용합니다.
+로컬 프론트엔드는 로컬 API와 DB에 연결하고, 운영 프론트엔드만 운영 API와 DB를 사용합니다.
+이렇게 하면 인증 세션은 각 환경의 HttpOnly `SameSite=Lax` 쿠키로만 유지되며 로컬 개발을 위해
+운영 세션이나 운영 DB를 공유하지 않습니다.
 
 개발을 마치면 DB 컨테이너만 중지할 수 있습니다. `postgres_data` 볼륨은 그대로 유지됩니다.
 

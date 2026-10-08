@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from typing import Any
 
@@ -12,6 +13,7 @@ from pakit.services.payment_service import (
 )
 
 KAKAOPAY_API_BASE_URL = "https://open-api.kakaopay.com/online/v1/payment"
+logger = logging.getLogger(__name__)
 
 
 class KakaoPayClient(PaymentGateway):
@@ -97,7 +99,18 @@ class KakaoPayClient(PaymentGateway):
                 response.raise_for_status()
                 payload: dict[str, Any] = response.json()
                 return payload
+        except httpx2.HTTPStatusError as error:
+            logger.warning(
+                "KakaoPay API rejected request path=%s status=%s error=%s",
+                path,
+                error.response.status_code,
+                _error_detail(error.response),
+            )
+            raise PaymentGatewayError("카카오페이 API 요청이 거절됐습니다.") from error
         except (httpx2.HTTPError, TypeError, ValueError) as error:
+            logger.warning(
+                "KakaoPay API request failed path=%s error=%s", path, type(error).__name__
+            )
             raise PaymentGatewayError("카카오페이 API 요청에 실패했습니다.") from error
 
 
@@ -106,3 +119,15 @@ def _required_string(payload: dict[str, Any], key: str) -> str:
     if not isinstance(value, str) or not value:
         raise ValueError
     return value
+
+
+def _error_detail(response: httpx2.Response) -> str:
+    try:
+        payload = response.json()
+    except (TypeError, ValueError):
+        return "unparseable_response"
+    if not isinstance(payload, dict):
+        return "unexpected_response"
+    code = payload.get("error_code", "unknown")
+    message = payload.get("error_message", "unknown")
+    return f"code={code} message={message}"
