@@ -1,5 +1,5 @@
 from secrets import token_urlsafe
-from typing import Annotated
+from typing import Annotated, Literal
 from urllib.parse import urlsplit, urlunsplit
 
 from fastapi import APIRouter, Cookie, Depends, Query, Request, Response, status
@@ -35,6 +35,16 @@ OAUTH_STATE_MAX_AGE_SECONDS = 600
 
 def _secure_cookie(settings: Settings) -> bool:
     return settings.environment in {"staging", "production"}
+
+
+def _session_cookie_samesite(settings: Settings, return_to: str | None) -> Literal["lax", "none"]:
+    if not _secure_cookie(settings):
+        return "lax"
+    safe_return_to = _safe_return_to(return_to)
+    if safe_return_to is None:
+        return "lax"
+    target = urlsplit(safe_return_to)
+    return "none" if target.hostname in {"localhost", "127.0.0.1"} else "lax"
 
 
 @router.get("/kakao/login", summary="카카오 로그인 시작")
@@ -105,7 +115,7 @@ async def complete_kakao_login(
         max_age=settings.session_max_age_seconds,
         httponly=True,
         secure=_secure_cookie(settings),
-        samesite="lax",
+        samesite=_session_cookie_samesite(settings, return_to),
     )
     return response
 

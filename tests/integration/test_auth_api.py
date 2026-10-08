@@ -287,6 +287,53 @@ def test_returns_to_allowed_local_frontend_after_login(
 
     assert completed.status_code == 307
     assert completed.headers["location"] == local_return_to
+    session_cookie = next(
+        value
+        for value in completed.headers.get_list("set-cookie")
+        if value.startswith("pakit_session=")
+    )
+    assert "SameSite=lax" in session_cookie
+    assert "Secure" not in session_cookie
+
+
+def test_uses_secure_cross_site_cookie_for_local_frontend_with_production_api(
+    auth_client: tuple[TestClient, FakeUserRepository, FakeResultRepository],
+) -> None:
+    del auth_client
+    production_settings = Settings(
+        _env_file=None,
+        environment="production",
+        kakao_rest_api_key="rest-key",
+        kakao_client_secret=SecretStr("client-secret"),
+        kakao_redirect_uri="https://api.pakit.kr/api/auth/kakao/callback",
+        frontend_auth_redirect_url="https://pakit.kr/auth/complete",
+        session_secret=SecretStr("test-session-secret"),
+        session_max_age_seconds=3600,
+    )
+    app.dependency_overrides[get_settings] = lambda: production_settings
+    local_return_to = "http://localhost:5173/compatibility/checkout?mine=MINE0001&friend=FRIEND01"
+    with TestClient(app, base_url="https://api.pakit.kr") as production_client:
+        started = production_client.get(
+            "/api/auth/kakao/login",
+            params={"return_to": local_return_to},
+            follow_redirects=False,
+        )
+        state = parse_qs(urlparse(started.headers["location"]).query)["state"][0]
+        completed = production_client.get(
+            "/api/auth/kakao/callback",
+            params={"code": "authorization-code", "state": state},
+            follow_redirects=False,
+        )
+
+    assert completed.status_code == 307
+    assert completed.headers["location"] == local_return_to
+    session_cookie = next(
+        value
+        for value in completed.headers.get_list("set-cookie")
+        if value.startswith("pakit_session=")
+    )
+    assert "SameSite=none" in session_cookie
+    assert "Secure" in session_cookie
 
 
 def test_ignores_external_login_return_url(
