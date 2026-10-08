@@ -52,6 +52,19 @@ class MemoryPaymentRepository:
     ) -> ResultAccess:
         return ResultAccess(True, self.owns_result and user_id == 42, True)
 
+    async def find_approved_romantic_report_order(
+        self, user_id: int, mine_result_code: str, partner_result_code: str
+    ) -> PaymentOrder | None:
+        if (
+            self.order is None
+            or self.order.user_id != user_id
+            or self.order.status != "APPROVED"
+            or self.order.purchase.mine_result_code != mine_result_code
+            or self.order.purchase.partner_result_code != partner_result_code
+        ):
+            return None
+        return self.order
+
     async def create_order(self, user_id: int, purchase: RomanticReportPurchase) -> PaymentOrder:
         self.order = PaymentOrder(
             order_id=ORDER_ID,

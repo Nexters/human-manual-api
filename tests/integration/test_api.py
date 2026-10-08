@@ -7,8 +7,10 @@ from typing import Any
 import pytest
 from fastapi.testclient import TestClient
 
+from pakit.api.auth_dependencies import get_optional_current_user
 from pakit.api.dependencies import (
     get_compatibility_event_reader,
+    get_payment_repository,
     get_result_repository,
     get_usage_event_repository,
 )
@@ -23,7 +25,9 @@ from pakit.api.schemas.compatibility import (
 from pakit.domain.assessment_contract import ASSESSMENT_VERSION, QUESTION_CONTRACTS, AnswerKind
 from pakit.domain.assessment_submission import AssessmentSubmission, SubmissionResultData
 from pakit.main import app
+from pakit.services.payment_service import PaymentOrder, RomanticReportPurchase
 from pakit.services.usage_event_repository import StoredCompatibilityEvent
+from pakit.services.user_repository import StoredUser
 
 
 class InMemoryResultRepository:
@@ -77,11 +81,32 @@ class InMemoryUsageEventRepository:
         return list(reversed(stored))
 
 
+class InMemoryPaymentRepository:
+    def __init__(self) -> None:
+        self.order: PaymentOrder | None = None
+
+    async def find_approved_romantic_report_order(
+        self, user_id: int, mine_result_code: str, partner_result_code: str
+    ) -> PaymentOrder | None:
+        order = self.order
+        if (
+            order is None
+            or order.user_id != user_id
+            or order.status != "APPROVED"
+            or order.purchase.mine_result_code != mine_result_code
+            or order.purchase.partner_result_code != partner_result_code
+        ):
+            return None
+        return order
+
+
 result_repository = InMemoryResultRepository()
 usage_event_repository = InMemoryUsageEventRepository()
+payment_repository = InMemoryPaymentRepository()
 app.dependency_overrides[get_result_repository] = lambda: result_repository
 app.dependency_overrides[get_usage_event_repository] = lambda: usage_event_repository
 app.dependency_overrides[get_compatibility_event_reader] = lambda: usage_event_repository
+app.dependency_overrides[get_payment_repository] = lambda: payment_repository
 client = TestClient(app)
 
 
@@ -333,6 +358,7 @@ def test_assessment_openapi_uses_korean_developer_descriptions() -> None:
         "details",
         "tips",
         "relationship_tip",
+        "relationship_report",
     }
 
 
@@ -419,6 +445,13 @@ def test_calculates_friend_compatibility_from_two_saved_results() -> None:
         "image_url": friend.json()["overview"]["image_url"],
     }
     assert 0 <= body["synergy"]["score"] <= 100
+    assert body["relationship_report"] == {
+        "status": "LOGIN_REQUIRED",
+        "order_id": None,
+        "report_code": None,
+    }
+    assert response.headers["cache-control"] == "private, no-store"
+    assert response.headers["vary"] == "Cookie"
     assert usage_event_repository.events[-1] == {
         "event_name": "compatibility_completed",
         "result_code": mine.json()["result_code"],
@@ -445,6 +478,57 @@ def test_calculates_friend_compatibility_from_two_saved_results() -> None:
     ):
         assert image_url.startswith("https://testserver/assets/characters/")
         assert client.get(image_url).status_code == 200
+
+
+def test_returns_paid_report_access_only_for_the_exact_logged_in_pair() -> None:
+    mine = client.post("/api/tests/submissions", json=ASSESSMENT_SUBMISSION_EXAMPLE).json()
+    friend = client.post("/api/tests/submissions", json=_valid_submission()).json()
+    other = client.post("/api/tests/submissions", json=_valid_submission()).json()
+    user = StoredUser(id=42, created_at=datetime.now(UTC), last_logged_in_at=datetime.now(UTC))
+    payment_repository.order = PaymentOrder(
+        order_id="paid-order",
+        user_id=user.id,
+        product_code="romantic-report-v1",
+        product_name="Pakit 연인 관계 설명서",
+        purchase=RomanticReportPurchase(
+            mine["result_code"],
+            friend["result_code"],
+            "여자",
+            "남자",
+        ),
+        amount=990,
+        status="APPROVED",
+        tid="tid",
+        aid="aid",
+        fulfillment_reference="report-ready",
+        created_at=datetime.now(UTC),
+        approved_at=datetime.now(UTC),
+    )
+    app.dependency_overrides[get_optional_current_user] = lambda: user
+    try:
+        paid = client.get(
+            "/api/compatibility",
+            params={"mine": mine["result_code"], "friend": friend["result_code"]},
+        )
+        different_pair = client.get(
+            "/api/compatibility",
+            params={"mine": mine["result_code"], "friend": other["result_code"]},
+        )
+        reversed_pair = client.get(
+            "/api/compatibility",
+            params={"mine": friend["result_code"], "friend": mine["result_code"]},
+        )
+    finally:
+        app.dependency_overrides.pop(get_optional_current_user, None)
+        payment_repository.order = None
+
+    assert paid.json()["relationship_report"] == {
+        "status": "READY",
+        "order_id": "paid-order",
+        "report_code": "report-ready",
+    }
+    assert different_pair.json()["relationship_report"]["status"] == "NOT_PURCHASED"
+    assert reversed_pair.json()["relationship_report"]["status"] == "NOT_PURCHASED"
 
 
 def test_returns_404_for_unknown_compatibility_codes() -> None:

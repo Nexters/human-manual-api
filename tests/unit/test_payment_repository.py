@@ -48,6 +48,12 @@ def test_persists_payment_order_and_enforces_result_ownership() -> None:
                     approved_at=datetime(2026, 10, 7, tzinfo=UTC),
                 ),
             )
+            exact_order = await repository.find_approved_romantic_report_order(
+                user.id, "MINE0001", "FRIEND01"
+            )
+            reverse_order = await repository.find_approved_romantic_report_order(
+                user.id, "FRIEND01", "MINE0001"
+            )
 
         await engine.dispose()
         assert access.mine_owned_by_user is True
@@ -56,6 +62,9 @@ def test_persists_payment_order_and_enforces_result_ownership() -> None:
         assert approved is not None
         assert approved.status == "APPROVED"
         assert approved.amount == 990
+        assert exact_order is not None
+        assert exact_order.order_id == order.order_id
+        assert reverse_order is None
 
     asyncio.run(run())
 

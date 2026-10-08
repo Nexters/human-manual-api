@@ -123,6 +123,9 @@ COMPATIBILITY_RESPONSE_EXAMPLE: dict[str, Any] = {
             "뜸해질 때 쓸 짧은 신호 하나를 정해두면 각자의 시간도 더 편하게 믿을 수 있어요."
         ),
     },
+    "relationship_report": {
+        "status": "NOT_PURCHASED",
+    },
 }
 
 
@@ -177,6 +180,19 @@ class RelationshipTipOutput(BaseModel):
     description: str = Field(description="공통 팁 설명")
 
 
+class RelationshipReportAccessOutput(BaseModel):
+    """현재 사용자와 이 궁합 조합의 유료 관계 설명서 접근 상태입니다."""
+
+    status: Literal[
+        "LOGIN_REQUIRED",
+        "NOT_PURCHASED",
+        "PAID_PENDING_REPORT",
+        "READY",
+    ] = Field(description="현재 사용자에게 적용되는 유료 관계 설명서 상태")
+    order_id: str | None = Field(default=None, description="승인된 결제 주문 ID")
+    report_code: str | None = Field(default=None, description="생성 완료된 관계 설명서 코드")
+
+
 class CompatibilityOutput(BaseModel):
     """저장된 두 테스트 결과로 계산한 친구 궁합입니다."""
 
@@ -198,6 +214,9 @@ class CompatibilityOutput(BaseModel):
         description="상대의 가장 극단적인 성향 축을 기준으로 각 사람에게 전달할 팁 2개",
     )
     relationship_tip: RelationshipTipOutput = Field(description="오래 지내기 위한 공통 팁")
+    relationship_report: RelationshipReportAccessOutput = Field(
+        description="현재 로그인 사용자와 이 순서의 결과 코드 조합에 대한 유료 설명서 상태"
+    )
 
     @classmethod
     def from_domain_payload(
@@ -205,6 +224,7 @@ class CompatibilityOutput(BaseModel):
         payload: dict[str, Any],
         *,
         public_base_url: str,
+        relationship_report: dict[str, Any],
     ) -> "CompatibilityOutput":
         payload["mine"]["image_url"] = absolute_image_url(
             payload["mine"]["image_url"], public_base_url=public_base_url
@@ -214,6 +234,7 @@ class CompatibilityOutput(BaseModel):
         )
         for tip in payload["tips"]:
             tip["image_url"] = absolute_image_url(tip["image_url"], public_base_url=public_base_url)
+        payload["relationship_report"] = relationship_report
         return cls.model_validate(payload)
 
 

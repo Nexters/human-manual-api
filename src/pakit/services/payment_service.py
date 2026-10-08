@@ -6,6 +6,12 @@ ROMANTIC_REPORT_PRICE_KRW = 990
 ROMANTIC_REPORT_PRODUCT_CODE = "romantic-report-v1"
 
 PaymentStatus = Literal["CREATED", "READY", "APPROVED", "CANCELED", "FAILED"]
+RelationshipReportAccessStatus = Literal[
+    "LOGIN_REQUIRED",
+    "NOT_PURCHASED",
+    "PAID_PENDING_REPORT",
+    "READY",
+]
 
 
 @dataclass(frozen=True)
@@ -37,6 +43,13 @@ class ResultAccess:
     mine_exists: bool
     mine_owned_by_user: bool
     partner_exists: bool
+
+
+@dataclass(frozen=True)
+class RelationshipReportAccess:
+    status: RelationshipReportAccessStatus
+    order_id: str | None = None
+    report_code: str | None = None
 
 
 @dataclass(frozen=True)
@@ -80,6 +93,10 @@ class PaymentRepository(Protocol):
     async def get_result_access(
         self, user_id: int, mine_result_code: str, partner_result_code: str
     ) -> ResultAccess: ...
+
+    async def find_approved_romantic_report_order(
+        self, user_id: int, mine_result_code: str, partner_result_code: str
+    ) -> PaymentOrder | None: ...
 
     async def create_order(
         self, user_id: int, purchase: RomanticReportPurchase
@@ -145,6 +162,35 @@ class PaymentOrderStateError(RuntimeError):
 
 def payment_partner_user_id(user_id: int) -> str:
     return f"pakit-{user_id}"
+
+
+async def get_relationship_report_access(
+    *,
+    user_id: int | None,
+    mine_result_code: str,
+    partner_result_code: str,
+    repository: PaymentRepository,
+) -> RelationshipReportAccess:
+    if user_id is None:
+        return RelationshipReportAccess(status="LOGIN_REQUIRED")
+
+    order = await repository.find_approved_romantic_report_order(
+        user_id,
+        mine_result_code,
+        partner_result_code,
+    )
+    if order is None:
+        return RelationshipReportAccess(status="NOT_PURCHASED")
+    if order.fulfillment_reference is None:
+        return RelationshipReportAccess(
+            status="PAID_PENDING_REPORT",
+            order_id=order.order_id,
+        )
+    return RelationshipReportAccess(
+        status="READY",
+        order_id=order.order_id,
+        report_code=order.fulfillment_reference,
+    )
 
 
 async def prepare_payment(

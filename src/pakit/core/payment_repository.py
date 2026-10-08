@@ -39,6 +39,36 @@ class SqlAlchemyPaymentRepository(PaymentRepository):
             partner_exists=partner_result_code in by_code,
         )
 
+    async def find_approved_romantic_report_order(
+        self, user_id: int, mine_result_code: str, partner_result_code: str
+    ) -> PaymentOrder | None:
+        records = (
+            await self._session.scalars(
+                select(PaymentOrderRecord)
+                .where(
+                    PaymentOrderRecord.user_id == user_id,
+                    PaymentOrderRecord.product_code == ROMANTIC_REPORT_PRODUCT_CODE,
+                    PaymentOrderRecord.status == "APPROVED",
+                )
+                .order_by(
+                    PaymentOrderRecord.approved_at.desc(),
+                    PaymentOrderRecord.created_at.desc(),
+                )
+            )
+        ).all()
+        matching = [
+            record
+            for record in records
+            if str(record.product_payload.get("mine_result_code")) == mine_result_code
+            and str(record.product_payload.get("partner_result_code")) == partner_result_code
+        ]
+        fulfilled = next(
+            (record for record in matching if record.fulfillment_reference is not None),
+            None,
+        )
+        selected = fulfilled or (matching[0] if matching else None)
+        return _stored(selected) if selected is not None else None
+
     async def create_order(self, user_id: int, purchase: RomanticReportPurchase) -> PaymentOrder:
         record = PaymentOrderRecord(
             order_id=token_urlsafe(18),

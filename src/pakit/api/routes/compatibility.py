@@ -1,11 +1,13 @@
 from dataclasses import asdict
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Path, Query, Request
+from fastapi import APIRouter, Depends, Path, Query, Request, Response
 from fastapi.responses import JSONResponse
 
+from pakit.api.auth_dependencies import get_optional_current_user
 from pakit.api.dependencies import (
     get_compatibility_event_reader,
+    get_payment_repository,
     get_result_repository,
     get_usage_event_repository,
 )
@@ -29,9 +31,11 @@ from pakit.services.compatibility_service import (
 from pakit.services.compatibility_service import (
     get_compatibility as build_compatibility_result,
 )
+from pakit.services.payment_service import PaymentRepository, get_relationship_report_access
 from pakit.services.result_repository import ResultRepository
 from pakit.services.usage_event_repository import CompatibilityEventReader, UsageEventRepository
 from pakit.services.usage_tracking_service import record_compatibility_completed
+from pakit.services.user_repository import StoredUser
 
 router = APIRouter(prefix="/compatibility", tags=["Compatibility"])
 ranking_router = APIRouter(prefix="/results", tags=["Compatibility"])
@@ -61,10 +65,13 @@ ranking_router = APIRouter(prefix="/results", tags=["Compatibility"])
 )
 async def get_compatibility(
     request: Request,
+    response: Response,
     mine: Annotated[str, Query(description="내 테스트 결과 코드")],
     friend: Annotated[str, Query(description="친구 테스트 결과 코드")],
     repository: Annotated[ResultRepository, Depends(get_result_repository)],
     usage_repository: Annotated[UsageEventRepository, Depends(get_usage_event_repository)],
+    payment_repository: Annotated[PaymentRepository, Depends(get_payment_repository)],
+    current_user: Annotated[StoredUser | None, Depends(get_optional_current_user)],
 ) -> CompatibilityOutput | JSONResponse:
     """저장된 두 테스트 결과로 친구 궁합을 계산합니다."""
     try:
@@ -96,9 +103,18 @@ async def get_compatibility(
         score=result.synergy.score,
         version=COMPATIBILITY_RULES_VERSION,
     )
+    access = await get_relationship_report_access(
+        user_id=current_user.id if current_user is not None else None,
+        mine_result_code=mine,
+        partner_result_code=friend,
+        repository=payment_repository,
+    )
+    response.headers["Cache-Control"] = "private, no-store"
+    response.headers["Vary"] = "Cookie"
     return CompatibilityOutput.from_domain_payload(
         asdict(result),
         public_base_url=str(request.base_url),
+        relationship_report=asdict(access),
     )
 
 
