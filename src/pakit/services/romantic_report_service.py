@@ -19,7 +19,7 @@ from pakit.services.romantic_report_repository import (
     StoredRomanticReport,
 )
 
-PROMPT_VERSION: Final = "romantic-prompt-2026-09-11.3"
+PROMPT_VERSION: Final = "romantic-prompt-2026-10-08.1"
 
 
 class RomanticReportResultNotFoundError(RuntimeError):
