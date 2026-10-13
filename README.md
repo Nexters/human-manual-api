@@ -255,6 +255,11 @@ AI 생성 요청은 최대 150초까지 기다리며, 운영 Nginx는
 상대 결과·성별을 `POST /api/payments/kakaopay/ready`로 보내고, 응답의 접속 환경별 URL로
 이동합니다. 승인 콜백이 완료된 주문만
 `POST /api/relationship-reports/romantic/orders/{order_id}`에서 관계 설명서를 생성할 수 있습니다.
+결제 준비 API는 카카오페이로 이동하기 전에 본인·상대 결과가 존재하고 양쪽 모두 현재 유료
+분석에 필요한 원본 응답을 보유했는지 검증합니다. 이전 결과라 재검사가 필요한 경우에는
+`PAYMENT_MINE_RESULT_RETEST_REQUIRED` 또는 `PAYMENT_PARTNER_RESULT_RETEST_REQUIRED`, 결과를
+찾을 수 없는 경우에는 `PAYMENT_MINE_RESULT_NOT_FOUND` 또는
+`PAYMENT_PARTNER_RESULT_NOT_FOUND`를 반환하며 결제 주문을 만들지 않습니다.
 결제 준비 요청의 `Origin`이 서버의 CORS 허용 목록에 있으면 승인·취소·실패 후에도 해당
 프론트엔드 origin의 결제 완료 페이지로 돌아갑니다. 허용되지 않은 origin은 아래 설정값으로
 대체됩니다.

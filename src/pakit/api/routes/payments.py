@@ -5,7 +5,11 @@ from fastapi import APIRouter, Depends, Path, Query, Request
 from fastapi.responses import JSONResponse, RedirectResponse
 
 from pakit.api.auth_dependencies import require_current_user
-from pakit.api.dependencies import get_payment_gateway, get_payment_repository
+from pakit.api.dependencies import (
+    get_payment_gateway,
+    get_payment_repository,
+    get_romantic_report_repository,
+)
 from pakit.api.schemas.assessment_submissions import ErrorResponse
 from pakit.api.schemas.payments import (
     KakaoPayReadyInput,
@@ -17,15 +21,19 @@ from pakit.core.config import ALLOWED_CORS_ORIGINS, Settings, get_settings
 from pakit.services.payment_service import (
     PaymentGateway,
     PaymentGatewayError,
+    PaymentMineResultNotFoundError,
+    PaymentMineResultRetestRequiredError,
     PaymentOrderNotFoundError,
     PaymentOrderStateError,
+    PaymentPartnerResultNotFoundError,
+    PaymentPartnerResultRetestRequiredError,
     PaymentRepository,
-    PaymentResultNotFoundError,
     PaymentResultNotOwnedError,
     RomanticReportPurchase,
     approve_payment,
     prepare_payment,
 )
+from pakit.services.romantic_report_repository import RomanticReportRepository
 from pakit.services.user_repository import StoredUser
 
 router = APIRouter(prefix="/payments/kakaopay", tags=["Payment"])
@@ -41,7 +49,8 @@ OrderId = Annotated[
     responses={
         401: {"model": ErrorResponse, "description": "로그인 필요"},
         403: {"model": ErrorResponse, "description": "본인 결과가 아님"},
-        404: {"model": ErrorResponse, "description": "결과 코드 없음"},
+        404: {"model": ErrorResponse, "description": "본인 또는 상대 결과 코드 없음"},
+        409: {"model": ErrorResponse, "description": "유료 분석에 사용할 수 없는 이전 결과"},
         502: {"model": ErrorResponse, "description": "카카오페이 요청 실패"},
         503: {"model": ErrorResponse, "description": "카카오페이 설정 없음"},
     },
@@ -51,6 +60,10 @@ async def ready_kakaopay_payment(
     request: Request,
     user: Annotated[StoredUser, Depends(require_current_user)],
     repository: Annotated[PaymentRepository, Depends(get_payment_repository)],
+    report_repository: Annotated[
+        RomanticReportRepository,
+        Depends(get_romantic_report_repository),
+    ],
     gateway: Annotated[PaymentGateway | None, Depends(get_payment_gateway)],
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> KakaoPayReadyOutput | JSONResponse:
@@ -72,12 +85,36 @@ async def ready_kakaopay_payment(
                 request, settings, "fail_kakaopay_payment", frontend_origin
             ),
             repository=repository,
+            report_repository=report_repository,
             gateway=gateway,
         )
-    except PaymentResultNotFoundError:
-        return _error(404, "PAYMENT_RESULT_NOT_FOUND", "테스트 결과를 찾을 수 없습니다.")
+    except PaymentMineResultNotFoundError:
+        return _error(
+            404,
+            "PAYMENT_MINE_RESULT_NOT_FOUND",
+            "내 테스트 결과를 찾을 수 없습니다. 새 테스트를 진행해주세요.",
+        )
     except PaymentResultNotOwnedError:
         return _error(403, "PAYMENT_RESULT_NOT_OWNED", "본인 계정의 결과만 구매할 수 있습니다.")
+    except PaymentPartnerResultNotFoundError:
+        return _error(
+            404,
+            "PAYMENT_PARTNER_RESULT_NOT_FOUND",
+            "친구의 테스트 결과를 찾을 수 없습니다. 친구에게 새 테스트를 요청해주세요.",
+        )
+    except PaymentMineResultRetestRequiredError:
+        return _error(
+            409,
+            "PAYMENT_MINE_RESULT_RETEST_REQUIRED",
+            "내 결과는 이전 버전이라 유료 분석에 사용할 수 없습니다. 새 테스트를 진행해주세요.",
+        )
+    except PaymentPartnerResultRetestRequiredError:
+        return _error(
+            409,
+            "PAYMENT_PARTNER_RESULT_RETEST_REQUIRED",
+            "친구 결과는 이전 버전이라 유료 분석에 사용할 수 없습니다. "
+            "친구에게 새 테스트를 요청해주세요.",
+        )
     except PaymentGatewayError:
         return _error(502, "KAKAOPAY_READY_FAILED", "카카오페이 결제 준비에 실패했습니다.")
     base = PaymentOrderOutput.from_order(ready.order).model_dump()

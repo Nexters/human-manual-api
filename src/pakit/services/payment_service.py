@@ -2,6 +2,15 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Literal, Protocol
 
+from pakit.services.romantic_profile_builder import (
+    RomanticProfileUnavailableError,
+    build_romantic_profile,
+)
+from pakit.services.romantic_report_repository import (
+    RelationshipProfileSourceUnavailableError,
+    RomanticReportRepository,
+)
+
 ROMANTIC_REPORT_PRICE_KRW = 990
 ROMANTIC_REPORT_PRODUCT_CODE = "romantic-report-v1"
 
@@ -144,11 +153,23 @@ class PaymentGatewayError(RuntimeError):
     pass
 
 
-class PaymentResultNotFoundError(RuntimeError):
+class PaymentMineResultNotFoundError(RuntimeError):
+    pass
+
+
+class PaymentPartnerResultNotFoundError(RuntimeError):
     pass
 
 
 class PaymentResultNotOwnedError(RuntimeError):
+    pass
+
+
+class PaymentMineResultRetestRequiredError(RuntimeError):
+    pass
+
+
+class PaymentPartnerResultRetestRequiredError(RuntimeError):
     pass
 
 
@@ -201,15 +222,33 @@ async def prepare_payment(
     cancel_url: str,
     fail_url: str,
     repository: PaymentRepository,
+    report_repository: RomanticReportRepository,
     gateway: PaymentGateway,
 ) -> ReadyPayment:
     access = await repository.get_result_access(
         user_id, purchase.mine_result_code, purchase.partner_result_code
     )
-    if not access.mine_exists or not access.partner_exists:
-        raise PaymentResultNotFoundError
+    if not access.mine_exists:
+        raise PaymentMineResultNotFoundError
     if not access.mine_owned_by_user:
         raise PaymentResultNotOwnedError
+    if not access.partner_exists:
+        raise PaymentPartnerResultNotFoundError
+
+    await _validate_profile_source(
+        purchase.mine_result_code,
+        purchase.mine_gender,
+        report_repository,
+        not_found_error=PaymentMineResultNotFoundError,
+        unavailable_error=PaymentMineResultRetestRequiredError,
+    )
+    await _validate_profile_source(
+        purchase.partner_result_code,
+        purchase.partner_gender,
+        report_repository,
+        not_found_error=PaymentPartnerResultNotFoundError,
+        unavailable_error=PaymentPartnerResultRetestRequiredError,
+    )
 
     order = await repository.create_order(user_id, purchase)
     try:
@@ -230,6 +269,26 @@ async def prepare_payment(
         raise
     ready_order = await repository.set_ready(order.order_id, redirect.tid)
     return ReadyPayment(order=ready_order, redirect=redirect)
+
+
+async def _validate_profile_source(
+    result_code: str,
+    gender: str,
+    repository: RomanticReportRepository,
+    *,
+    not_found_error: type[RuntimeError],
+    unavailable_error: type[RuntimeError],
+) -> None:
+    try:
+        source = await repository.get_profile_source(result_code)
+    except RelationshipProfileSourceUnavailableError as error:
+        raise unavailable_error from error
+    if source is None:
+        raise not_found_error
+    try:
+        build_romantic_profile(source, gender=gender)
+    except RomanticProfileUnavailableError as error:
+        raise unavailable_error from error
 
 
 async def approve_payment(

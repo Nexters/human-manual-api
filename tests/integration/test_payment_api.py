@@ -26,6 +26,8 @@ from pakit.services.payment_service import (
 from pakit.services.romantic_report_generator import GeneratedRelationshipReport
 from pakit.services.romantic_report_repository import (
     RelationshipProfileSource,
+    RelationshipProfileSourceUnavailableError,
+    RomanticReportRepository,
     RomanticReportToSave,
     StoredRomanticReport,
 )
@@ -43,14 +45,26 @@ ORDER_ID = "order_123456789012345"
 
 
 class MemoryPaymentRepository:
-    def __init__(self, *, owns_result: bool = True) -> None:
+    def __init__(
+        self,
+        *,
+        mine_exists: bool = True,
+        owns_result: bool = True,
+        partner_exists: bool = True,
+    ) -> None:
+        self.mine_exists = mine_exists
         self.owns_result = owns_result
+        self.partner_exists = partner_exists
         self.order: PaymentOrder | None = None
 
     async def get_result_access(
         self, user_id: int, mine_result_code: str, partner_result_code: str
     ) -> ResultAccess:
-        return ResultAccess(True, self.owns_result and user_id == 42, True)
+        return ResultAccess(
+            self.mine_exists,
+            self.mine_exists and self.owns_result and user_id == 42,
+            self.partner_exists,
+        )
 
     async def find_approved_romantic_report_order(
         self, user_id: int, mine_result_code: str, partner_result_code: str
@@ -172,11 +186,16 @@ def _client(
     gateway: FakePaymentGateway,
     *,
     settings: Settings | None = None,
+    report_repository: RomanticReportRepository | None = None,
 ) -> tuple[TestClient, FastAPI]:
     application = create_app()
     application.dependency_overrides[require_current_user] = lambda: USER
     application.dependency_overrides[get_payment_repository] = lambda: repository
     application.dependency_overrides[get_payment_gateway] = lambda: gateway
+    selected_report_repository = report_repository or MemoryReportRepository()
+    application.dependency_overrides[get_romantic_report_repository] = lambda: (
+        selected_report_repository
+    )
     configured_settings = settings or Settings(_env_file=None)
     application.dependency_overrides[get_settings] = lambda: configured_settings
     return TestClient(application), application
@@ -299,6 +318,32 @@ def test_rejects_payment_when_mine_result_is_not_owned() -> None:
     assert gateway.ready_request is None
 
 
+def test_rejects_payment_when_mine_result_is_missing() -> None:
+    repository = MemoryPaymentRepository(mine_exists=False)
+    gateway = FakePaymentGateway()
+    client, _ = _client(repository, gateway)
+
+    response = client.post("/api/payments/kakaopay/ready", json=PURCHASE)
+
+    assert response.status_code == 404
+    assert response.json()["error"]["code"] == "PAYMENT_MINE_RESULT_NOT_FOUND"
+    assert repository.order is None
+    assert gateway.ready_request is None
+
+
+def test_rejects_payment_when_partner_result_is_missing() -> None:
+    repository = MemoryPaymentRepository(partner_exists=False)
+    gateway = FakePaymentGateway()
+    client, _ = _client(repository, gateway)
+
+    response = client.post("/api/payments/kakaopay/ready", json=PURCHASE)
+
+    assert response.status_code == 404
+    assert response.json()["error"]["code"] == "PAYMENT_PARTNER_RESULT_NOT_FOUND"
+    assert repository.order is None
+    assert gateway.ready_request is None
+
+
 def test_requires_kakaopay_configuration() -> None:
     repository = MemoryPaymentRepository()
     gateway = FakePaymentGateway()
@@ -312,9 +357,16 @@ def test_requires_kakaopay_configuration() -> None:
 
 
 class MemoryReportRepository:
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        unavailable_codes: set[str] | None = None,
+        unsupported_codes: set[str] | None = None,
+    ) -> None:
         self.stored: StoredRomanticReport | None = None
         self.reuse_current_version = True
+        self.unavailable_codes = unavailable_codes or set()
+        self.unsupported_codes = unsupported_codes or set()
 
     async def get_by_report_code(self, report_code: str) -> StoredRomanticReport | None:
         if self.stored is None or self.stored.report_code != report_code:
@@ -322,13 +374,17 @@ class MemoryReportRepository:
         return self.stored
 
     async def get_profile_source(self, result_code: str) -> RelationshipProfileSource | None:
+        if result_code in self.unavailable_codes:
+            raise RelationshipProfileSourceUnavailableError
         if result_code not in {"MINE0001", "FRIEND01"}:
             return None
         return RelationshipProfileSource(
             result_code=result_code,
             nickname="본인" if result_code == "MINE0001" else "상대",
             mbti="ENTP" if result_code == "MINE0001" else "INFP",
-            assessment_version="2026-08-20.1",
+            assessment_version=(
+                "unsupported" if result_code in self.unsupported_codes else "2026-08-20.1"
+            ),
             axis_scores={"attachment": 50, "expression": 50, "routine": 50, "egen": 50},
             answers={
                 "step1.q06": "interrupt",
@@ -381,11 +437,55 @@ class FakeReportGenerator:
         return GeneratedRelationshipReport(content=content)
 
 
+def test_rejects_payment_when_mine_result_requires_retest() -> None:
+    repository = MemoryPaymentRepository()
+    gateway = FakePaymentGateway()
+    report_repository = MemoryReportRepository(unavailable_codes={"MINE0001"})
+    client, _ = _client(repository, gateway, report_repository=report_repository)
+
+    response = client.post("/api/payments/kakaopay/ready", json=PURCHASE)
+
+    assert response.status_code == 409
+    assert response.json()["error"]["code"] == "PAYMENT_MINE_RESULT_RETEST_REQUIRED"
+    assert repository.order is None
+    assert gateway.ready_request is None
+
+
+def test_rejects_payment_when_partner_result_requires_retest() -> None:
+    repository = MemoryPaymentRepository()
+    gateway = FakePaymentGateway()
+    report_repository = MemoryReportRepository(unavailable_codes={"FRIEND01"})
+    client, _ = _client(repository, gateway, report_repository=report_repository)
+
+    response = client.post("/api/payments/kakaopay/ready", json=PURCHASE)
+
+    assert response.status_code == 409
+    assert response.json()["error"]["code"] == "PAYMENT_PARTNER_RESULT_RETEST_REQUIRED"
+    assert repository.order is None
+    assert gateway.ready_request is None
+
+
+def test_rejects_payment_when_result_cannot_build_current_profile() -> None:
+    repository = MemoryPaymentRepository()
+    gateway = FakePaymentGateway()
+    report_repository = MemoryReportRepository(unsupported_codes={"MINE0001"})
+    client, _ = _client(repository, gateway, report_repository=report_repository)
+
+    response = client.post("/api/payments/kakaopay/ready", json=PURCHASE)
+
+    assert response.status_code == 409
+    assert response.json()["error"]["code"] == "PAYMENT_MINE_RESULT_RETEST_REQUIRED"
+    assert repository.order is None
+    assert gateway.ready_request is None
+
+
 def test_generates_report_only_after_payment_is_approved() -> None:
     repository = MemoryPaymentRepository()
     gateway = FakePaymentGateway()
     client, application = _client(repository, gateway)
-    application.dependency_overrides[get_romantic_report_repository] = MemoryReportRepository
+    application.dependency_overrides[get_romantic_report_repository] = lambda: (
+        MemoryReportRepository()
+    )
     application.dependency_overrides[get_romantic_report_generator] = FakeReportGenerator
 
     ready = client.post("/api/payments/kakaopay/ready", json=PURCHASE)
