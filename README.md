@@ -203,6 +203,7 @@ src/pakit/
 | `GET`  | `/api/compatibility?mine={code}&friend={code}`     | 두 결과의 친구 궁합 조회       |
 | `POST` | `/api/relationship-reports/romantic`               | AI 연인 관계 설명서 생성        |
 | `POST` | `/api/payments/kakaopay/ready`                    | 카카오페이 단건결제 준비        |
+| `GET`  | `/api/payments/kakaopay`                          | 내 결제 완료 목록 조회          |
 | `GET`  | `/api/payments/kakaopay/{order_id}/approve`       | 카카오페이 결제 승인 콜백       |
 | `GET`  | `/api/payments/kakaopay/{order_id}`               | 내 결제 주문 상태 조회          |
 | `POST` | `/api/relationship-reports/romantic/orders/{order_id}` | 결제한 관계 설명서 생성     |
@@ -260,6 +261,10 @@ AI 생성 요청은 최대 150초까지 기다리며, 운영 Nginx는
 `PAYMENT_MINE_RESULT_RETEST_REQUIRED` 또는 `PAYMENT_PARTNER_RESULT_RETEST_REQUIRED`, 결과를
 찾을 수 없는 경우에는 `PAYMENT_MINE_RESULT_NOT_FOUND` 또는
 `PAYMENT_PARTNER_RESULT_NOT_FOUND`를 반환하며 결제 주문을 만들지 않습니다.
+로그인 사용자는 `GET /api/payments/kakaopay`에서 결제가 승인된 주문을 최신순으로 조회할 수
+있습니다. 각 항목의 결과 코드로 구매 대상을 표시하고, `fulfillment_reference`가 있으면 이미
+생성되어 다시 열 수 있는 유료 관계 설명서입니다. 결제 준비만 했거나 취소·실패한 주문은
+결제 내역에 포함하지 않습니다.
 결제 준비 요청의 `Origin`이 서버의 CORS 허용 목록에 있으면 승인·취소·실패 후에도 해당
 프론트엔드 origin의 결제 완료 페이지로 돌아갑니다. 허용되지 않은 origin은 아래 설정값으로
 대체됩니다.

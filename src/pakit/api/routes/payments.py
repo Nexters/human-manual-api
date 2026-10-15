@@ -15,6 +15,8 @@ from pakit.api.schemas.payments import (
     KakaoPayReadyInput,
     KakaoPayReadyOutput,
     KakaoPayRedirectOutput,
+    MyPaymentOrderOutput,
+    MyPaymentOrdersOutput,
     PaymentOrderOutput,
 )
 from pakit.core.config import ALLOWED_CORS_ORIGINS, Settings, get_settings
@@ -41,6 +43,16 @@ OrderId = Annotated[
     str,
     Path(min_length=16, max_length=32, pattern=r"^[A-Za-z0-9_-]+$"),
 ]
+
+
+@router.get("", response_model=MyPaymentOrdersOutput, summary="내 결제 완료 목록")
+async def list_my_kakaopay_payments(
+    user: Annotated[StoredUser, Depends(require_current_user)],
+    repository: Annotated[PaymentRepository, Depends(get_payment_repository)],
+) -> MyPaymentOrdersOutput:
+    orders = await repository.list_approved_for_user(user.id)
+    items = [MyPaymentOrderOutput.from_order(order) for order in orders]
+    return MyPaymentOrdersOutput(total=len(items), items=items)
 
 
 @router.post(

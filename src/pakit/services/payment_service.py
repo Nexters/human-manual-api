@@ -99,6 +99,8 @@ class ReadyPayment:
 
 
 class PaymentRepository(Protocol):
+    async def list_approved_for_user(self, user_id: int) -> list[PaymentOrder]: ...
+
     async def get_result_access(
         self, user_id: int, mine_result_code: str, partner_result_code: str
     ) -> ResultAccess: ...

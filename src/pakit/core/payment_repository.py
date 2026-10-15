@@ -21,6 +21,22 @@ class SqlAlchemyPaymentRepository(PaymentRepository):
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
+    async def list_approved_for_user(self, user_id: int) -> list[PaymentOrder]:
+        records = (
+            await self._session.scalars(
+                select(PaymentOrderRecord)
+                .where(
+                    PaymentOrderRecord.user_id == user_id,
+                    PaymentOrderRecord.status == "APPROVED",
+                )
+                .order_by(
+                    PaymentOrderRecord.approved_at.desc(),
+                    PaymentOrderRecord.id.desc(),
+                )
+            )
+        ).all()
+        return [_stored(record) for record in records]
+
     async def get_result_access(
         self, user_id: int, mine_result_code: str, partner_result_code: str
     ) -> ResultAccess:

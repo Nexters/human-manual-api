@@ -50,5 +50,23 @@ class PaymentOrderOutput(BaseModel):
         )
 
 
+class MyPaymentOrderOutput(PaymentOrderOutput):
+    mine_result_code: str = Field(description="구매자 본인의 테스트 결과 코드")
+    partner_result_code: str = Field(description="상대방의 테스트 결과 코드")
+
+    @classmethod
+    def from_order(cls, order: PaymentOrder) -> "MyPaymentOrderOutput":
+        return cls(
+            **PaymentOrderOutput.from_order(order).model_dump(),
+            mine_result_code=order.purchase.mine_result_code,
+            partner_result_code=order.purchase.partner_result_code,
+        )
+
+
+class MyPaymentOrdersOutput(BaseModel):
+    total: int = Field(ge=0)
+    items: list[MyPaymentOrderOutput]
+
+
 class KakaoPayReadyOutput(PaymentOrderOutput):
     redirect_url: KakaoPayRedirectOutput = Field(description="접속 환경별 카카오페이 결제 화면 URL")

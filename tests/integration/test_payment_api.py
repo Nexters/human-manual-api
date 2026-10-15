@@ -57,6 +57,11 @@ class MemoryPaymentRepository:
         self.partner_exists = partner_exists
         self.order: PaymentOrder | None = None
 
+    async def list_approved_for_user(self, user_id: int) -> list[PaymentOrder]:
+        if self.order is None or self.order.user_id != user_id or self.order.status != "APPROVED":
+            return []
+        return [self.order]
+
     async def get_result_access(
         self, user_id: int, mine_result_code: str, partner_result_code: str
     ) -> ResultAccess:
@@ -233,6 +238,42 @@ def test_prepares_and_approves_fixed_price_payment_idempotently() -> None:
     )
     assert second.status_code == 307
     assert gateway.approval_calls == 1
+
+
+def test_lists_only_current_users_approved_payments() -> None:
+    repository = MemoryPaymentRepository()
+    gateway = FakePaymentGateway()
+    client, _ = _client(repository, gateway)
+
+    assert client.get("/api/payments/kakaopay").json() == {"total": 0, "items": []}
+
+    client.post("/api/payments/kakaopay/ready", json=PURCHASE)
+    client.get(
+        f"/api/payments/kakaopay/{ORDER_ID}/approve",
+        params={"pg_token": "pg-token"},
+        follow_redirects=False,
+    )
+    response = client.get("/api/payments/kakaopay")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "total": 1,
+        "items": [
+            {
+                "order_id": ORDER_ID,
+                "product_code": "romantic-report-v1",
+                "product_name": "Pakit 연인 관계 설명서",
+                "status": "APPROVED",
+                "amount": 990,
+                "currency": "KRW",
+                "fulfillment_reference": None,
+                "created_at": "2026-10-07T00:00:00Z",
+                "approved_at": "2026-10-07T00:00:00Z",
+                "mine_result_code": "MINE0001",
+                "partner_result_code": "FRIEND01",
+            }
+        ],
+    }
 
 
 def test_returns_to_local_frontend_that_started_payment() -> None:
