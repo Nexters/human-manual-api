@@ -53,6 +53,8 @@ class PaymentOrderOutput(BaseModel):
 class MyPaymentOrderOutput(PaymentOrderOutput):
     mine_result_code: str = Field(description="구매자 본인의 테스트 결과 코드")
     partner_result_code: str = Field(description="상대방의 테스트 결과 코드")
+    mine_gender: str = Field(description="구매 당시 본인의 성별")
+    partner_gender: str = Field(description="구매 당시 상대방의 성별")
 
     @classmethod
     def from_order(cls, order: PaymentOrder) -> "MyPaymentOrderOutput":
@@ -60,6 +62,8 @@ class MyPaymentOrderOutput(PaymentOrderOutput):
             **PaymentOrderOutput.from_order(order).model_dump(),
             mine_result_code=order.purchase.mine_result_code,
             partner_result_code=order.purchase.partner_result_code,
+            mine_gender=order.purchase.mine_gender,
+            partner_gender=order.purchase.partner_gender,
         )
 
 

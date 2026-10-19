@@ -271,6 +271,8 @@ def test_lists_only_current_users_approved_payments() -> None:
                 "approved_at": "2026-10-07T00:00:00Z",
                 "mine_result_code": "MINE0001",
                 "partner_result_code": "FRIEND01",
+                "mine_gender": PURCHASE["mine_gender"],
+                "partner_gender": PURCHASE["partner_gender"],
             }
         ],
     }
