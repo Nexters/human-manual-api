@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from pakit.core.models import AssessmentResultRecord, BackendUsageEventRecord, UserRecord
 from pakit.services.user_repository import (
+    PrimaryResultDeletionError,
     ResultSyncSummary,
     StoredUser,
     UserCompatibilitySummary,
@@ -109,9 +110,11 @@ class SqlAlchemyUserRepository:
         if action == "primary":
             user.primary_result_code = result_code
         else:
+            if record.deleted_at is None:
+                visible_results = await self.list_results(user_id)
+                if visible_results and visible_results[0].result_code == result_code:
+                    raise PrimaryResultDeletionError
             record.deleted_at = record.deleted_at or datetime.now(UTC)
-            if user.primary_result_code == result_code:
-                user.primary_result_code = None
         await self._session.commit()
         return True
 

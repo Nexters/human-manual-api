@@ -26,7 +26,7 @@ from pakit.core.config import ALLOWED_CORS_ORIGINS, Settings, get_settings
 from pakit.core.kakao import KakaoOAuthError
 from pakit.core.session import SessionSigner
 from pakit.services.auth_service import KakaoClient, log_in_with_kakao
-from pakit.services.user_repository import StoredUser, UserRepository
+from pakit.services.user_repository import PrimaryResultDeletionError, StoredUser, UserRepository
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 OAUTH_STATE_COOKIE_NAME = "pakit_oauth_state"
@@ -217,5 +217,12 @@ async def delete_my_result(
     user: Annotated[StoredUser, Depends(require_current_user)],
     repository: Annotated[UserRepository, Depends(get_user_repository)],
 ) -> None:
-    if not await repository.manage_result(user.id, result_code, "delete"):
+    try:
+        found = await repository.manage_result(user.id, result_code, "delete")
+    except PrimaryResultDeletionError as error:
+        raise HTTPException(
+            status_code=409,
+            detail="대표 결과는 삭제할 수 없습니다. 먼저 다른 결과를 대표로 설정해주세요.",
+        ) from error
+    if not found:
         raise HTTPException(status_code=404, detail="보관된 결과를 찾을 수 없습니다.")

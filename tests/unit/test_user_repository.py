@@ -1,6 +1,7 @@
 import asyncio
 from datetime import UTC, datetime, timedelta
 
+import pytest
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from pakit.core.models import (
@@ -10,6 +11,7 @@ from pakit.core.models import (
     UserRecord,
 )
 from pakit.core.user_repository import SqlAlchemyUserRepository
+from pakit.services.user_repository import PrimaryResultDeletionError
 
 
 def _snapshot(nickname: str, result_name: str, noun: str) -> dict[str, object]:
@@ -167,6 +169,8 @@ def test_primary_selection_and_soft_delete_preserve_snapshots_and_ownership() ->
                 "NEWER001",
                 "OLDER001",
             ]
+            with pytest.raises(PrimaryResultDeletionError):
+                await repository.manage_result(user.id, "NEWER001", "delete")
             assert await repository.manage_result(user.id, "OLDER001", "primary")
             await repository.sync_results(user.id, ("FUTURE01",))
             assert [r.result_code for r in await repository.list_results(user.id)] == [
@@ -174,14 +178,17 @@ def test_primary_selection_and_soft_delete_preserve_snapshots_and_ownership() ->
                 "FUTURE01",
                 "NEWER001",
             ]
+            with pytest.raises(PrimaryResultDeletionError):
+                await repository.manage_result(user.id, "OLDER001", "delete")
+            assert await repository.manage_result(user.id, "NEWER001", "primary")
             assert await repository.manage_result(user.id, "OLDER001", "delete")
             assert await repository.manage_result(user.id, "OLDER001", "delete")
             assert not await repository.manage_result(user.id, "OLDER001", "primary")
             sync = await repository.sync_results(user.id, ("OLDER001",))
             assert sync.already_synced == ("OLDER001",)
             assert [r.result_code for r in await repository.list_results(user.id)] == [
-                "FUTURE01",
                 "NEWER001",
+                "FUTURE01",
             ]
             # The surviving owned result can still show its side of the relationship.
             history = await repository.list_compatibilities(user.id)
@@ -189,11 +196,12 @@ def test_primary_selection_and_soft_delete_preserve_snapshots_and_ownership() ->
             assert history[0].mine.result_code == "FUTURE01"
             await repository.manage_result(user.id, "FUTURE01", "delete")
             assert await repository.list_compatibilities(user.id) == []
-            await repository.manage_result(user.id, "NEWER001", "delete")
-            assert await repository.list_results(user.id) == []
+            with pytest.raises(PrimaryResultDeletionError):
+                await repository.manage_result(user.id, "NEWER001", "delete")
+            assert [r.result_code for r in await repository.list_results(user.id)] == ["NEWER001"]
         async with sessions() as session:
             repository = SqlAlchemyUserRepository(session)
-            assert await repository.list_results(user.id) == []
+            assert [r.result_code for r in await repository.list_results(user.id)] == ["NEWER001"]
             from sqlalchemy import select
 
             record = await session.scalar(

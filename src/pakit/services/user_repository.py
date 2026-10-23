@@ -36,6 +36,10 @@ class ResultSyncSummary:
     rejected: tuple[str, ...]
 
 
+class PrimaryResultDeletionError(ValueError):
+    """The account representative must be changed before it can be hidden."""
+
+
 class UserRepository(Protocol):
     async def upsert_kakao_user(self, kakao_user_id: str) -> StoredUser: ...
 

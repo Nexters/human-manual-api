@@ -15,6 +15,7 @@ from pakit.core.kakao import KakaoOAuthError
 from pakit.domain.assessment_submission import AssessmentSubmission, SubmissionResultData
 from pakit.main import app
 from pakit.services.user_repository import (
+    PrimaryResultDeletionError,
     ResultSyncSummary,
     StoredUser,
     UserCompatibilitySummary,
@@ -86,6 +87,8 @@ class FakeUserRepository:
         self, user_id: int, result_code: str, action: Literal["primary", "delete"]
     ) -> bool:
         assert user_id == 42
+        if result_code == "PROTECT1" and action == "delete":
+            raise PrimaryResultDeletionError
         return result_code == "MINE0001"
 
     async def list_results(self, user_id: int) -> list[UserResultSummary]:
@@ -341,3 +344,13 @@ def test_result_management_requires_login_and_owned_result(
     assert client.request(method, path).status_code == 204
     assert client.request(method, path.replace("MINE0001", "FRIEND01")).status_code == 404
     assert client.request(method, path.replace("MINE0001", "bad")).status_code == 422
+
+
+def test_refuses_deleting_primary_result(
+    auth_client: tuple[TestClient, FakeUserRepository, FakeResultRepository],
+) -> None:
+    client, _, _ = auth_client
+    _log_in(client)
+    response = client.delete("/api/auth/me/results/PROTECT1")
+    assert response.status_code == 409
+    assert "대표 결과" in response.json()["detail"]
