@@ -125,3 +125,85 @@ def test_returns_empty_history_for_user_without_results() -> None:
         await engine.dispose()
 
     asyncio.run(run())
+
+
+def test_primary_selection_and_soft_delete_preserve_snapshots_and_ownership() -> None:
+    async def run() -> None:
+        engine = create_async_engine("sqlite+aiosqlite://")
+        async with engine.begin() as connection:
+            await connection.run_sync(Base.metadata.create_all)
+        sessions = async_sessionmaker(engine, expire_on_commit=False)
+        async with sessions() as session:
+            repository = SqlAlchemyUserRepository(session)
+            user = await repository.upsert_kakao_user("owner")
+            other = await repository.upsert_kakao_user("other")
+            now = datetime.now(UTC)
+            for index, code in enumerate(("OLDER001", "NEWER001", "FUTURE01")):
+                session.add(
+                    AssessmentResultRecord(
+                        result_code=code,
+                        assessment_version="v1",
+                        content_version="v1",
+                        result_snapshot=_snapshot(code, "팽이", "팽이"),
+                        user_id=user.id if index < 2 else None,
+                        created_at=now + timedelta(minutes=index),
+                    )
+                )
+            session.add(
+                BackendUsageEventRecord(
+                    event_name="compatibility_completed",
+                    result_code="OLDER001",
+                    related_result_code="FUTURE01",
+                    compatibility_score=80,
+                    compatibility_version="v1",
+                    occurred_at=now,
+                )
+            )
+            await session.commit()
+            assert not await repository.manage_result(other.id, "OLDER001", "primary")
+            assert not await repository.manage_result(other.id, "OLDER001", "delete")
+            assert not await repository.manage_result(user.id, "UNKNOWN1", "delete")
+            assert [r.result_code for r in await repository.list_results(user.id)] == [
+                "NEWER001",
+                "OLDER001",
+            ]
+            assert await repository.manage_result(user.id, "OLDER001", "primary")
+            await repository.sync_results(user.id, ("FUTURE01",))
+            assert [r.result_code for r in await repository.list_results(user.id)] == [
+                "OLDER001",
+                "FUTURE01",
+                "NEWER001",
+            ]
+            assert await repository.manage_result(user.id, "OLDER001", "delete")
+            assert await repository.manage_result(user.id, "OLDER001", "delete")
+            assert not await repository.manage_result(user.id, "OLDER001", "primary")
+            sync = await repository.sync_results(user.id, ("OLDER001",))
+            assert sync.already_synced == ("OLDER001",)
+            assert [r.result_code for r in await repository.list_results(user.id)] == [
+                "FUTURE01",
+                "NEWER001",
+            ]
+            # The surviving owned result can still show its side of the relationship.
+            history = await repository.list_compatibilities(user.id)
+            assert len(history) == 1
+            assert history[0].mine.result_code == "FUTURE01"
+            await repository.manage_result(user.id, "FUTURE01", "delete")
+            assert await repository.list_compatibilities(user.id) == []
+            await repository.manage_result(user.id, "NEWER001", "delete")
+            assert await repository.list_results(user.id) == []
+        async with sessions() as session:
+            repository = SqlAlchemyUserRepository(session)
+            assert await repository.list_results(user.id) == []
+            from sqlalchemy import select
+
+            record = await session.scalar(
+                select(AssessmentResultRecord).where(
+                    AssessmentResultRecord.result_code == "OLDER001"
+                )
+            )
+            assert record is not None and record.deleted_at is not None
+            assert record.user_id == user.id
+            assert record.result_snapshot == _snapshot("OLDER001", "팽이", "팽이")
+        await engine.dispose()
+
+    asyncio.run(run())

@@ -2,7 +2,7 @@ from secrets import token_urlsafe
 from typing import Annotated
 from urllib.parse import urlsplit, urlunsplit
 
-from fastapi import APIRouter, Cookie, Depends, Query, Request, Response, status
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Query, Request, Response, status
 from fastapi.responses import JSONResponse, RedirectResponse
 
 from pakit.api.auth_dependencies import (
@@ -18,6 +18,7 @@ from pakit.api.schemas.auth import (
     MyCompatibilityItemOutput,
     MyResultItemOutput,
     MyResultsOutput,
+    ResultCode,
     ResultSyncInput,
     ResultSyncOutput,
 )
@@ -198,3 +199,23 @@ async def list_my_compatibilities(
         for summary in summaries
     ]
     return MyCompatibilitiesOutput(total=len(items), items=items)
+
+
+@router.put("/me/results/{result_code}/primary", status_code=204, summary="대표 결과 선택")
+async def select_primary_result(
+    result_code: ResultCode,
+    user: Annotated[StoredUser, Depends(require_current_user)],
+    repository: Annotated[UserRepository, Depends(get_user_repository)],
+) -> None:
+    if not await repository.manage_result(user.id, result_code, "primary"):
+        raise HTTPException(status_code=404, detail="보관된 결과를 찾을 수 없습니다.")
+
+
+@router.delete("/me/results/{result_code}", status_code=204, summary="보관함 결과 숨기기")
+async def delete_my_result(
+    result_code: ResultCode,
+    user: Annotated[StoredUser, Depends(require_current_user)],
+    repository: Annotated[UserRepository, Depends(get_user_repository)],
+) -> None:
+    if not await repository.manage_result(user.id, result_code, "delete"):
+        raise HTTPException(status_code=404, detail="보관된 결과를 찾을 수 없습니다.")

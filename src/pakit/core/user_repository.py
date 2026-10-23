@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, Literal
 
-from sqlalchemy import or_, select
+from sqlalchemy import case, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from pakit.core.models import AssessmentResultRecord, BackendUsageEventRecord, UserRecord
@@ -91,12 +91,49 @@ class SqlAlchemyUserRepository:
             rejected=tuple(rejected),
         )
 
+    async def manage_result(
+        self, user_id: int, result_code: str, action: Literal["primary", "delete"]
+    ) -> bool:
+        # Serialize account mutations, including simultaneous selection and deletion.
+        user = await self._session.scalar(
+            select(UserRecord).where(UserRecord.id == user_id).with_for_update()
+        )
+        record = await self._session.scalar(
+            select(AssessmentResultRecord).where(
+                AssessmentResultRecord.user_id == user_id,
+                AssessmentResultRecord.result_code == result_code,
+            )
+        )
+        if user is None or record is None or (action == "primary" and record.deleted_at):
+            return False
+        if action == "primary":
+            user.primary_result_code = result_code
+        else:
+            record.deleted_at = record.deleted_at or datetime.now(UTC)
+            if user.primary_result_code == result_code:
+                user.primary_result_code = None
+        await self._session.commit()
+        return True
+
     async def list_results(self, user_id: int) -> list[UserResultSummary]:
         records = (
             await self._session.scalars(
                 select(AssessmentResultRecord)
-                .where(AssessmentResultRecord.user_id == user_id)
+                .where(
+                    AssessmentResultRecord.user_id == user_id,
+                    AssessmentResultRecord.deleted_at.is_(None),
+                )
                 .order_by(
+                    case(
+                        (
+                            AssessmentResultRecord.result_code
+                            == select(UserRecord.primary_result_code)
+                            .where(UserRecord.id == user_id)
+                            .scalar_subquery(),
+                            0,
+                        ),
+                        else_=1,
+                    ),
                     AssessmentResultRecord.created_at.desc(),
                     AssessmentResultRecord.id.desc(),
                 )
@@ -107,7 +144,10 @@ class SqlAlchemyUserRepository:
     async def list_compatibilities(self, user_id: int) -> list[UserCompatibilitySummary]:
         owned_records = (
             await self._session.scalars(
-                select(AssessmentResultRecord).where(AssessmentResultRecord.user_id == user_id)
+                select(AssessmentResultRecord).where(
+                    AssessmentResultRecord.user_id == user_id,
+                    AssessmentResultRecord.deleted_at.is_(None),
+                )
             )
         ).all()
         owned_by_code = {record.result_code: record for record in owned_records}

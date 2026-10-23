@@ -28,6 +28,7 @@ class UserRecord(Base):
         BigInteger().with_variant(Integer, "sqlite"),
         primary_key=True,
     )
+    primary_result_code: Mapped[str | None] = mapped_column(String(8), nullable=True)
     kakao_user_id: Mapped[str] = mapped_column(String(64), unique=True, index=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -52,6 +53,7 @@ class AssessmentResultRecord(Base):
     result_snapshot: Mapped[dict[str, Any]] = mapped_column(
         JSON().with_variant(JSONB(), "postgresql")
     )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     response_snapshot: Mapped[dict[str, Any] | None] = mapped_column(
         JSON(none_as_null=True).with_variant(JSONB(none_as_null=True), "postgresql"),
         nullable=True,

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Protocol
+from typing import Literal, Protocol
 
 
 @dataclass(frozen=True)
@@ -46,6 +46,10 @@ class UserRepository(Protocol):
         user_id: int,
         result_codes: tuple[str, ...],
     ) -> ResultSyncSummary: ...
+
+    async def manage_result(
+        self, user_id: int, result_code: str, action: Literal["primary", "delete"]
+    ) -> bool: ...
 
     async def list_results(self, user_id: int) -> list[UserResultSummary]: ...
 

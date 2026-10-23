@@ -284,3 +284,15 @@ PAKIT_FRONTEND_PAYMENT_REDIRECT_URL=https://pakit.kr/payments/kakaopay/complete
 가격은 클라이언트 입력을 받지 않고 서버에서 990원으로 고정합니다.
 결제 주문은 향후 다른 상품도 사용할 수 있도록 상품 코드·표시명·가격과 상품별 payload의
 불변 스냅샷을 저장하며, 현재 관계 설명서만 `romantic-report-v1` payload를 해석합니다.
+
+
+### 2026-10-23 대표 결과와 보관함 삭제
+
+- 사용자가 대표 결과를 선택한다. `PUT /api/auth/me/results/{result_code}/primary`.
+  `GET /api/auth/me/results`는 대표 결과를 첫 항목으로 반환하고 나머지는 최신순이다.
+  선택 이력이 없거나 대표 결과를 삭제하면 남은 결과 중 최신 결과를 사용한다.
+  대표를 직접 선택한 뒤 새 테스트를 만들어도 대표 선택은 유지된다.
+- `DELETE /api/auth/me/results/{result_code}`는 소유 계정의 보관함에서 숨기는 soft delete다.
+  결과 스냅샷, 공유 조회, 기존 케미 및 결제 기록은 유지한다. 계정 케미 목록에서는
+  삭제한 내 결과를 기준으로 한 이력을 제외한다. 로그인 동기화로 삭제를 취소하지 않는다.
+- 두 변경은 로그인 및 결과 소유권을 검사한다. 원본 답변의 영구 파기 정책과는 별개다.

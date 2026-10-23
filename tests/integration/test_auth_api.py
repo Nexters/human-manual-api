@@ -1,5 +1,6 @@
 from collections.abc import Iterator
 from datetime import UTC, datetime
+from typing import Literal
 from urllib.parse import parse_qs, urlparse
 
 import pytest
@@ -80,6 +81,12 @@ class FakeUserRepository:
             already_synced=("FRIEND01",),
             rejected=("UNKNOWN1",),
         )
+
+    async def manage_result(
+        self, user_id: int, result_code: str, action: Literal["primary", "delete"]
+    ) -> bool:
+        assert user_id == 42
+        return result_code == "MINE0001"
 
     async def list_results(self, user_id: int) -> list[UserResultSummary]:
         assert user_id == 42
@@ -314,3 +321,23 @@ def test_ignores_external_login_return_url(
     )
 
     assert completed.headers["location"] == "https://pakit.kr/auth/complete"
+
+
+@pytest.mark.parametrize(
+    "method,path",
+    [
+        ("PUT", "/api/auth/me/results/MINE0001/primary"),
+        ("DELETE", "/api/auth/me/results/MINE0001"),
+    ],
+)
+def test_result_management_requires_login_and_owned_result(
+    auth_client: tuple[TestClient, FakeUserRepository, FakeResultRepository],
+    method: str,
+    path: str,
+) -> None:
+    client, _, _ = auth_client
+    assert client.request(method, path).status_code == 401
+    _log_in(client)
+    assert client.request(method, path).status_code == 204
+    assert client.request(method, path.replace("MINE0001", "FRIEND01")).status_code == 404
+    assert client.request(method, path.replace("MINE0001", "bad")).status_code == 422
