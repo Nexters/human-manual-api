@@ -45,6 +45,7 @@ class FakeUserRepository:
         self.synced_codes: tuple[str, ...] = ()
         self.result = UserResultSummary(
             result_code="MINE0001",
+            is_legacy=True,
             nickname="해서니",
             result_name="테스트용 팽이",
             noun="팽이",
@@ -206,6 +207,8 @@ def test_logs_in_syncs_local_results_and_lists_account_history(
     assert results.json()["items"][0]["image_url"] == (
         "https://testserver/assets/characters/spinning_top.png"
     )
+    assert results.json()["items"][0]["is_legacy"] is True
+    assert compatibilities.json()["items"][0]["friend"]["is_legacy"] is False
     assert compatibilities.json()["items"][0]["score"] == 91
 
     assert client.post("/api/auth/logout").status_code == 204

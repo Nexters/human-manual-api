@@ -34,6 +34,7 @@ def _result_summary(record: AssessmentResultRecord) -> UserResultSummary:
         character_id=overview["character_id"],
         image_url=overview["image_url"],
         created_at=record.created_at,
+        is_legacy=record.response_snapshot is None,
     )
 
 

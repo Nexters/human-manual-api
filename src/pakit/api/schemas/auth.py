@@ -40,6 +40,7 @@ class MyResultItemOutput(BaseModel):
     character_id: str
     image_url: str
     created_at: datetime
+    is_legacy: bool = Field(description="원본 응답 기록이 없어 일부 기능이 제한되는 옛날 결과")
 
     @classmethod
     def from_summary(
@@ -59,6 +60,7 @@ class MyResultItemOutput(BaseModel):
                 public_base_url=public_base_url,
             ),
             created_at=summary.created_at,
+            is_legacy=summary.is_legacy,
         )
 
 

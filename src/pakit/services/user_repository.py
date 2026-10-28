@@ -19,6 +19,7 @@ class UserResultSummary:
     character_id: str
     image_url: str
     created_at: datetime
+    is_legacy: bool = False
 
 
 @dataclass(frozen=True)

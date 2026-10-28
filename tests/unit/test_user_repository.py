@@ -215,3 +215,20 @@ def test_primary_selection_and_soft_delete_preserve_snapshots_and_ownership() ->
         await engine.dispose()
 
     asyncio.run(run())
+
+
+@pytest.mark.parametrize("response_snapshot, expected", [(None, True), ({"answers": []}, False)])
+def test_legacy_flag_uses_response_presence_not_creation_date(
+    response_snapshot: dict[str, object] | None, expected: bool
+) -> None:
+    from pakit.core.user_repository import _result_summary
+
+    record = AssessmentResultRecord(
+        result_code="LEGACY01",
+        assessment_version="v1",
+        content_version="v1",
+        result_snapshot=_snapshot("이름", "팽이", "팽이"),
+        response_snapshot=response_snapshot,
+        created_at=datetime(2026, 8, 1, tzinfo=UTC),
+    )
+    assert _result_summary(record).is_legacy is expected

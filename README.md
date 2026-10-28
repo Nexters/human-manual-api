@@ -297,3 +297,7 @@ PAKIT_FRONTEND_PAYMENT_REDIRECT_URL=https://pakit.kr/payments/kakaopay/complete
   결과 스냅샷, 공유 조회, 기존 케미 및 결제 기록은 유지한다. 계정 케미 목록에서는
   삭제한 내 결과를 기준으로 한 이력을 제외한다. 로그인 동기화로 삭제를 취소하지 않는다.
 - 두 변경은 로그인 및 결과 소유권을 검사한다. 원본 답변의 영구 파기 정책과는 별개다.
+
+
+`GET /api/auth/me/results` 및 계정 케미의 결과 요약은 `is_legacy`를 포함합니다.
+원본 응답 스냅샷이 없는 기존 결과는 `true`이며, 기본 결과 열람은 유지됩니다.
