@@ -118,3 +118,4 @@ class SubmissionResultData:
     charging: ChargingData
     compatible_friends: tuple[CompatibleFriendData, ...]
     compatibility_profile: CompatibilityProfileData | None
+    is_legacy: bool = False

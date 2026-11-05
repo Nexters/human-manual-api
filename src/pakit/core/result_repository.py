@@ -38,7 +38,9 @@ def _unboxing_item(snapshot: dict[str, Any], asset_directory: str) -> UnboxingIt
     )
 
 
-def _result_from_snapshot(snapshot: dict[str, Any]) -> SubmissionResultData:
+def _result_from_snapshot(
+    snapshot: dict[str, Any], *, is_legacy: bool = False
+) -> SubmissionResultData:
     overview = snapshot["overview"]
     unboxing = snapshot["unboxing_kit"]
     scores = unboxing["axis_scores"]
@@ -120,6 +122,7 @@ def _result_from_snapshot(snapshot: dict[str, Any]) -> SubmissionResultData:
             if compatibility_profile is not None
             else None
         ),
+        is_legacy=is_legacy,
     )
 
 
@@ -135,12 +138,14 @@ class SqlAlchemyResultRepository:
         content_version: str,
         user_id: int | None = None,
     ) -> None:
+        result_snapshot = asdict(result)
+        result_snapshot.pop("is_legacy", None)
         self._session.add(
             AssessmentResultRecord(
                 result_code=result.result_code,
                 assessment_version=submission.assessment_version,
                 content_version=content_version,
-                result_snapshot=asdict(result),
+                result_snapshot=result_snapshot,
                 response_snapshot={
                     "assessment_version": submission.assessment_version,
                     "mbti": submission.mbti.value,
@@ -161,7 +166,10 @@ class SqlAlchemyResultRepository:
         )
         if record is None:
             return None
-        return _result_from_snapshot(record.result_snapshot)
+        return _result_from_snapshot(
+            record.result_snapshot,
+            is_legacy=record.response_snapshot is None,
+        )
 
     async def count(self) -> int:
         count = await self._session.scalar(select(func.count()).select_from(AssessmentResultRecord))

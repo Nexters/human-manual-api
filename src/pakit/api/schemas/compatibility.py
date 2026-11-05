@@ -40,12 +40,14 @@ COMPATIBILITY_RESPONSE_EXAMPLE: dict[str, Any] = {
         "noun": "팽이",
         "character_id": "spinning_top",
         "image_url": "https://api.pakit.kr/assets/characters/spinning_top.png",
+        "is_legacy": False,
     },
     "friend": {
         "nickname": "선우",
         "noun": "곰인형",
         "character_id": "teddy_bear",
         "image_url": "https://api.pakit.kr/assets/characters/teddy_bear.png",
+        "is_legacy": False,
     },
     "headline": "다른 맛이 잘 섞이는 장난감",
     "description": "닮은 부분은 편안하고 다른 부분은 서로의 빈틈을 채워줘요.",
@@ -136,6 +138,7 @@ class CompatibilityPersonOutput(BaseModel):
     noun: str = Field(description="테스트 결과 장난감 명사")
     character_id: str = Field(description="캐릭터 이미지 매핑용 고정 ID")
     image_url: str = Field(description="서버가 제공하는 캐릭터 이미지 절대 URL")
+    is_legacy: bool = Field(description="원본 응답 기록이 없어 일부 기능이 제한되는 옛날 결과")
 
 
 class SynergyOutput(BaseModel):

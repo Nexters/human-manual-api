@@ -192,6 +192,7 @@ class CompatibilityPersonData:
     noun: str
     character_id: str
     image_url: str
+    is_legacy: bool
 
 
 @dataclass(frozen=True)
@@ -948,6 +949,7 @@ def _person(result: SubmissionResultData) -> CompatibilityPersonData:
         noun=result.overview.noun,
         character_id=result.overview.character_id,
         image_url=result.overview.image_url,
+        is_legacy=result.is_legacy,
     )
 
 

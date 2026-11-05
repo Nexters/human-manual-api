@@ -126,10 +126,43 @@ def test_persists_and_restores_an_immutable_result_snapshot() -> None:
         }
         assert "answers" not in record.result_snapshot
         assert "response_snapshot" not in record.result_snapshot
+        assert "is_legacy" not in record.result_snapshot
         assert record.content_version == "content-v1"
         assert record.user_id == 42
         assert record.result_snapshot["participant"] == {"nickname": "송송"}
         assert record.result_snapshot["compatibility_profile"]["mbti"] == "ENTP"
+
+    asyncio.run(run())
+
+
+def test_marks_a_result_without_original_responses_as_legacy() -> None:
+    async def run() -> None:
+        engine = create_async_engine("sqlite+aiosqlite://")
+        async with engine.begin() as connection:
+            await connection.run_sync(Base.metadata.create_all)
+
+        sessions = async_sessionmaker(engine, expire_on_commit=False)
+        expected = _result()
+        async with sessions() as session:
+            repository = SqlAlchemyResultRepository(session)
+            await repository.save(
+                expected,
+                submission=AssessmentSubmissionInput.model_validate(
+                    ASSESSMENT_SUBMISSION_EXAMPLE
+                ).to_domain(),
+                content_version="content-v1",
+            )
+            record = await session.scalar(select(AssessmentResultRecord))
+            assert record is not None
+            record.response_snapshot = None
+            await session.commit()
+
+        async with sessions() as session:
+            restored = await SqlAlchemyResultRepository(session).get(expected.result_code)
+
+        await engine.dispose()
+        assert restored is not None
+        assert restored.is_legacy is True
 
     asyncio.run(run())
 

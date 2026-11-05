@@ -437,12 +437,14 @@ def test_calculates_friend_compatibility_from_two_saved_results() -> None:
         "noun": mine.json()["overview"]["noun"],
         "character_id": mine.json()["overview"]["character_id"],
         "image_url": mine.json()["overview"]["image_url"],
+        "is_legacy": False,
     }
     assert body["friend"] == {
         "nickname": "선우",
         "noun": friend.json()["overview"]["noun"],
         "character_id": friend.json()["overview"]["character_id"],
         "image_url": friend.json()["overview"]["image_url"],
+        "is_legacy": False,
     }
     assert 0 <= body["synergy"]["score"] <= 100
     assert body["relationship_report"] == {
@@ -529,6 +531,26 @@ def test_returns_paid_report_access_only_for_the_exact_logged_in_pair() -> None:
     }
     assert different_pair.json()["relationship_report"]["status"] == "NOT_PURCHASED"
     assert reversed_pair.json()["relationship_report"]["status"] == "NOT_PURCHASED"
+
+
+def test_identifies_which_compatibility_result_is_legacy() -> None:
+    mine = client.post("/api/tests/submissions", json=ASSESSMENT_SUBMISSION_EXAMPLE).json()
+    friend = client.post("/api/tests/submissions", json=_valid_submission()).json()
+    friend_code = friend["result_code"]
+    stored_friend = result_repository.results[friend_code]
+    result_repository.results[friend_code] = replace(stored_friend, is_legacy=True)
+
+    try:
+        response = client.get(
+            "/api/compatibility",
+            params={"mine": mine["result_code"], "friend": friend_code},
+        )
+    finally:
+        result_repository.results[friend_code] = stored_friend
+
+    assert response.status_code == 200
+    assert response.json()["mine"]["is_legacy"] is False
+    assert response.json()["friend"]["is_legacy"] is True
 
 
 def test_returns_404_for_unknown_compatibility_codes() -> None:
